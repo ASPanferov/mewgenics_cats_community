@@ -635,7 +635,7 @@ def api_admin_test_prompt_writer():
             contents=user_prompt,
             config=genai.types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                max_output_tokens=800,
+                max_output_tokens=8000,
                 temperature=0.85,
                 top_p=0.92,
             ),

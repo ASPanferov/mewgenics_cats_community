@@ -365,7 +365,7 @@ def generate_visual_prompt(cat_summary: dict) -> str:
             contents=user_prompt,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                max_output_tokens=800,
+                max_output_tokens=8000,
                 temperature=0.85,
                 top_p=0.92,
             ),
