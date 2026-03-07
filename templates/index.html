@@ -258,29 +258,29 @@
         .error-msg { color: #b03020; font-size: 12px; padding: 4px 12px; font-weight: bold; }
 
         /* === FEED === */
-        .feed-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px 16px; }
+        .feed-grid { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 24px 16px; }
 
         .feed-card {
             background: #e8dbb8;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23e0d4b0'/%3E%3Crect x='0' y='0' width='2' height='2' fill='%23e8dbb8'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23e8dbb8'/%3E%3C/svg%3E");
             border: 3px solid #5c4428;
-            border-radius: 6px;
+            border-radius: 8px;
             box-shadow: 4px 4px 0 #8a7a5a;
-            width: 100%; max-width: 520px;
+            width: 100%; max-width: 800px;
             overflow: hidden;
         }
         .feed-card img.feed-img { width: 100%; object-fit: cover; cursor: pointer; display: block; border-bottom: 3px solid #5c4428; }
-        .feed-card-info { padding: 10px 14px; }
-        .feed-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .feed-cat-name { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: #2a1a0e; }
-        .feed-owner { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8a7050; margin-bottom: 6px; }
-        .feed-owner img { width: 20px; height: 20px; border-radius: 50%; }
-        .feed-tags { display: flex; flex-wrap: wrap; gap: 3px; }
-        .feed-card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px 10px; }
-        .like-btn { background: none; border: none; cursor: pointer; font-size: 22px; padding: 2px 6px; border-radius: 6px; transition: transform 0.15s; display: flex; align-items: center; gap: 6px; font-family: inherit; color: #8a7050; }
+        .feed-card-info { padding: 14px 20px; }
+        .feed-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .feed-cat-name { font-family: 'Caveat', cursive; font-size: 34px; font-weight: 700; color: #2a1a0e; }
+        .feed-owner { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8a7050; margin-bottom: 8px; }
+        .feed-owner img { width: 24px; height: 24px; border-radius: 50%; }
+        .feed-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .feed-card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px 14px; }
+        .like-btn { background: none; border: none; cursor: pointer; font-size: 28px; padding: 4px 8px; border-radius: 6px; transition: transform 0.15s; display: flex; align-items: center; gap: 8px; font-family: inherit; color: #8a7050; }
         .like-btn:hover { transform: scale(1.15); }
         .like-btn.liked { color: #c03030; }
-        .like-btn .like-count { font-size: 15px; font-weight: bold; }
+        .like-btn .like-count { font-size: 18px; font-weight: bold; }
 
         /* === UTILITY === */
         .loading-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 4px; }
@@ -339,9 +339,28 @@
         @media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 700px) {
             .cat-grid { grid-template-columns: 1fr; }
-            .controls { padding: 10px 12px; }
-            .controls input[type="text"] { width: 140px; }
+            .controls { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+            .controls input[type="text"] { width: 100%; }
+            .ctrl-group { width: 48%; }
+            .ctrl-group select { width: 100%; }
             .save-info { margin-left: 0; width: 100%; }
+            .topbar { padding: 8px 10px; flex-wrap: wrap; gap: 6px; }
+            .topbar .tabs { gap: 4px; }
+            .topbar .tabs button { font-size: 13px; padding: 4px 10px; }
+            .feed-card { border-radius: 0; box-shadow: none; border-left: none; border-right: none; }
+            .feed-grid { padding: 12px 0; gap: 16px; }
+            .feed-card-info { padding: 10px 14px; }
+            .feed-card-bottom { padding: 6px 14px 10px; }
+            .feed-cat-name { font-size: 28px; }
+            .like-btn { font-size: 24px; }
+            .like-btn .like-count { font-size: 16px; }
+            .auth-area { font-size: 12px; }
+            .auth-area img { width: 26px; height: 26px; }
+        }
+        @media (max-width: 400px) {
+            .ctrl-group { width: 100%; }
+            .feed-cat-name { font-size: 24px; }
+            .feed-owner { font-size: 12px; }
         }
     </style>
 </head>
