@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 
-from flask import Flask, render_template, jsonify, request, redirect, make_response
+from flask import Flask, render_template, jsonify, request, redirect, make_response, Response
 
 from cat_parser import load_all_cats, get_save_info, CatData, CatStats
 from prompt_builder import build_prompt, build_cat_summary_ru
@@ -165,6 +165,25 @@ def index():
 @app.route("/cabinet")
 def cabinet():
     return render_template("index.html", page="cabinet")
+
+
+@app.route("/img/<int:cat_id>")
+def img_proxy(cat_id):
+    """Proxy cat image through our domain to bypass blob storage blocks."""
+    import requests as http_requests
+    row = db.get_cat(cat_id)
+    if not row or not row.get("image_url"):
+        return "Not found", 404
+    try:
+        resp = http_requests.get(row["image_url"], timeout=15)
+        if resp.status_code != 200:
+            return "Upstream error", 502
+        r = Response(resp.content, content_type=resp.headers.get("Content-Type", "image/png"))
+        r.headers["Cache-Control"] = "public, max-age=86400, s-maxage=604800"
+        r.headers["CDN-Cache-Control"] = "public, max-age=604800"
+        return r
+    except Exception:
+        return "Error", 502
 
 
 @app.route("/cat/<int:cat_id>")
