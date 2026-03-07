@@ -114,20 +114,14 @@ Each mutation is on a specific body part. Show it as a grotesque visible deforma
 - Multiple mutations stack — the cat becomes increasingly monstrous
 
 ═══════════════════════════════════════════════
-STATUS EFFECTS
-═══════════════════════════════════════════════
-INJURED: bandages, fresh wounds, limping, wincing, bruises through fur, one eye swollen shut
-DEAD: ghost translucent form, X-shaped eyes, floating above tiny grave, angel halo or devil horns
-RETIRED: battle-worn veteran look, old scars, relaxed but haunted expression, medals/trophies
-
-═══════════════════════════════════════════════
 GENDER & AGE
 ═══════════════════════════════════════════════
 Male (кот): stocky lumpy build, broader jaw
 Female (кошка): scraggly angular build, slightly more elegant but still grotesque
 Spider-cat (кот-паук): HORRIFYING spider-cat hybrid, eight mismatched legs, multiple eyes, web
-Young (< 10 days): tiny kitten proportions, even bigger eyes relative to body
-Old (> 50 days): grizzled, sagging skin, wise/tired eyes, gray whiskers
+Young (< 5 days): tiny kitten proportions, even bigger eyes relative to body
+Adult (5-19 days): standard proportions
+Old (20+ days): grizzled, sagging skin, wise/tired eyes, gray whiskers
 
 ═══════════════════════════════════════════════
 PROMPT STRUCTURE
@@ -140,8 +134,7 @@ Build the prompt in this order:
 5. Passive visual traits (auras, modifications)
 6. Items as accessories
 7. Mutations as deformations
-8. Status effects (injured/dead/retired)
-9. Overall mood and composition
+8. Overall mood and composition
 10. "NO TEXT, NO WORDS, NO LETTERS" reminder at the end
 
 IMPORTANT: Do NOT just list features. WEAVE them into a cohesive scene. The cat should feel like ONE character, not a checklist. Think about how all these elements interact visually."""
@@ -161,28 +154,20 @@ def _build_cat_data_text(cat_data: dict) -> str:
         lines.append("GENDER: Female (кошка)")
     elif gender == 'кот-паук':
         lines.append("GENDER: Spider-cat (кот-паук) — hybrid spider-cat horror")
-    if voice:
-        lines.append(f"VOICE TYPE: {voice}")
-
     # Class
     class_en = cat_data.get('class_en', 'Colorless')
-    class_ru = cat_data.get('class', cat_data.get('class_ru', ''))
-    lines.append(f"CLASS: {class_en}" + (f" ({class_ru})" if class_ru else ""))
-
-    # Status
-    status = cat_data.get('status', 'OK')
-    lines.append(f"STATUS: {status}")
-    if cat_data.get('is_dead'):
-        lines.append("THIS CAT IS DEAD — draw as a ghost/spirit with translucent body")
-    if cat_data.get('is_retired'):
-        lines.append("RETIRED — battle-worn veteran, old scars, haunted but relaxed")
-    if status == 'Injured':
-        lines.append("INJURED — show bandages, wounds, limping, pain")
+    lines.append(f"CLASS: {class_en}")
 
     # Age
     age = cat_data.get('age_days')
     if age:
-        lines.append(f"AGE: {age} days" + (" (very young kitten)" if age < 10 else " (old grizzled)" if age > 50 else ""))
+        if age < 5:
+            age_desc = " (young kitten)"
+        elif age >= 20 and cat_data.get('is_retired'):
+            age_desc = " (old grizzled cat)"
+        else:
+            age_desc = " (adult cat)"
+        lines.append(f"AGE: {age} days{age_desc}")
 
     # Breed
     breed = cat_data.get('breed', '')
@@ -206,15 +191,7 @@ def _build_cat_data_text(cat_data: dict) -> str:
             s = stats.get(key, {})
             if s:
                 eff = s.get('effective', 0)
-                base = s.get('base', 0)
-                bonus = s.get('bonus', 0)
-                extra = s.get('extra', 0)
-                mod = ""
-                if bonus:
-                    mod += f" +{bonus}bonus"
-                if extra:
-                    mod += f" {'+' if extra > 0 else ''}{extra}injury"
-                stat_parts.append(f"{key}={eff} (base {base}{mod})")
+                stat_parts.append(f"{key}={eff}")
         lines.append(f"STATS: {', '.join(stat_parts)}")
 
         # Highlight extreme stats
