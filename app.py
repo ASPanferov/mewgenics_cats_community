@@ -8,6 +8,7 @@ from flask import Flask, render_template, jsonify, request, redirect, make_respo
 
 from cat_parser import load_all_cats, get_save_info, CatData, CatStats
 from prompt_builder import build_prompt, build_cat_summary_ru
+from prompt_writer import generate_visual_prompt
 from auth import get_google_auth_url, exchange_code, create_jwt, get_current_user
 import db
 import storage
@@ -303,7 +304,16 @@ def api_cat_prompt(db_cat_id):
         return jsonify({"error": "Кот не найден"}), 404
 
     cat = _cat_data_from_row(row)
-    return jsonify({"prompt": build_prompt(cat), "cat": build_cat_summary_ru(cat)})
+    summary = build_cat_summary_ru(cat)
+    # Generate AI prompt for preview
+    ai_prompt = generate_visual_prompt(summary)
+    fallback = build_prompt(cat)
+    return jsonify({
+        "prompt": ai_prompt or fallback,
+        "fallback_prompt": fallback,
+        "cat": summary,
+        "ai_generated": ai_prompt is not None,
+    })
 
 
 @app.route("/api/cat/<int:db_cat_id>/generate", methods=["POST"])
@@ -325,18 +335,23 @@ def api_generate(db_cat_id):
         return jsonify({"error": "Кот не найден"}), 404
 
     cat = _cat_data_from_row(row)
-    prompt = build_prompt(cat)
+    summary = build_cat_summary_ru(cat)
 
     data = request.get_json(silent=True) or {}
     if data.get("custom_prompt"):
         prompt = data["custom_prompt"]
+    else:
+        # Step 1: AI prompt writer generates a detailed visual prompt
+        ai_prompt = generate_visual_prompt(summary)
+        # Fallback to hardcoded prompt builder if AI fails
+        prompt = ai_prompt or build_prompt(cat)
 
     try:
         from google import genai
 
         client = genai.Client(api_key=GEMINI_API_KEY)
         response = client.models.generate_content(
-            model="gemini-3.1-flash-image-preview",
+            model="gemini-2.0-flash-exp",
             contents=prompt,
             config=genai.types.GenerateContentConfig(
                 response_modalities=["IMAGE", "TEXT"],
