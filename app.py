@@ -384,7 +384,7 @@ def api_generate(db_cat_id):
 
         client = genai.Client(api_key=GEMINI_API_KEY)
         response = client.models.generate_content(
-            model="gemini-2.0-flash-exp",
+            model="gemini-3.1-flash-image-preview",
             contents=prompt,
             config=genai.types.GenerateContentConfig(
                 response_modalities=["IMAGE", "TEXT"],
