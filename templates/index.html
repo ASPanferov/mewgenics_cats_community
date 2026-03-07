@@ -903,7 +903,15 @@
                 if (d.success) {
                     feedCats[feedIdx].liked = d.liked;
                     feedCats[feedIdx].like_count = d.like_count;
-                    renderFeed();
+                    // Update button in-place without re-rendering entire feed
+                    const cards = document.querySelectorAll('.feed-card');
+                    if (cards[feedIdx]) {
+                        const btn = cards[feedIdx].querySelector('.like-btn');
+                        if (btn) {
+                            btn.className = 'like-btn' + (d.liked ? ' liked' : '');
+                            btn.innerHTML = `${d.liked ? '&#10084;' : '&#9825;'} <span class="like-count">${d.like_count}</span>`;
+                        }
+                    }
                 } else showToast(d.error || 'Ошибка');
             } catch(e) { showToast('Ошибка сети'); }
         }
