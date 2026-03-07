@@ -99,14 +99,15 @@ def init_db():
     execute("CREATE INDEX IF NOT EXISTS idx_saves_user_id ON saves(user_id)")
     execute("CREATE INDEX IF NOT EXISTS idx_cats_published ON cats(published) WHERE published = TRUE")
     # Migration: add published columns if they don't exist
-    try:
-        execute("ALTER TABLE cats ADD COLUMN IF NOT EXISTS published BOOLEAN DEFAULT FALSE")
-    except Exception:
-        pass
-    try:
-        execute("ALTER TABLE cats ADD COLUMN IF NOT EXISTS published_at TIMESTAMP")
-    except Exception:
-        pass
+    existing = query("""
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'cats' AND column_name IN ('published', 'published_at')
+    """)
+    existing_cols = {r["column_name"] for r in existing}
+    if "published" not in existing_cols:
+        execute("ALTER TABLE cats ADD COLUMN published BOOLEAN DEFAULT FALSE")
+    if "published_at" not in existing_cols:
+        execute("ALTER TABLE cats ADD COLUMN published_at TIMESTAMP")
 
 
 # === User operations ===
