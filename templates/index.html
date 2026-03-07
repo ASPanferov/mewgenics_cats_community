@@ -410,6 +410,16 @@
         }
 
         function renderNav() {
+            let adminLink = '';
+            if (currentUser) {
+                fetch('/api/admin/check').then(r=>r.json()).then(d=>{
+                    if(d.is_admin) {
+                        const nav = document.getElementById('nav-bar');
+                        if(nav && !nav.querySelector('.admin-link'))
+                            nav.insertAdjacentHTML('beforeend', `<a href="/admin" class="admin-link" style="margin-left:auto;color:#f0d878;background:rgba(0,0,0,0.2);border-radius:4px">Admin</a>`);
+                    }
+                }).catch(()=>{});
+            }
             document.getElementById('nav-bar').innerHTML = `
                 <a href="/" class="${PAGE==='feed'?'active':''}">Лента</a>
                 <a href="/cabinet" class="${PAGE==='cabinet'?'active':''}">Мои коты</a>`;

@@ -127,6 +127,8 @@ def init_db():
     """)
     if not user_cols:
         execute("ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE")
+    # Settings table
+    init_settings()
 
 
 # === User operations ===
@@ -285,3 +287,92 @@ def get_user_likes(user_id):
     """Get set of cat_ids liked by user."""
     rows = query("SELECT cat_id FROM likes WHERE user_id = %s", (user_id,))
     return {r["cat_id"] for r in rows}
+
+
+# === Admin ===
+
+ADMIN_EMAILS = ["pafa0712@gmail.com", "insaneramzes@gmail.com"]
+
+
+def is_admin(user_id):
+    """Check if user is admin by email."""
+    user = get_user(user_id)
+    if not user:
+        return False
+    return user.get("email", "") in ADMIN_EMAILS
+
+
+# === Settings (key-value store for prompts etc.) ===
+
+def init_settings():
+    """Create settings table."""
+    execute("""
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at TIMESTAMP DEFAULT NOW()
+        )
+    """)
+
+
+def get_setting(key, default=None):
+    row = query_one("SELECT value FROM settings WHERE key = %s", (key,))
+    return row["value"] if row else default
+
+
+def set_setting(key, value):
+    execute("""
+        INSERT INTO settings (key, value, updated_at)
+        VALUES (%s, %s, NOW())
+        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+    """, (key, value))
+
+
+# === Analytics ===
+
+def get_analytics():
+    """Get basic analytics data."""
+    stats = {}
+    row = query_one("SELECT COUNT(*) as cnt FROM users")
+    stats["total_users"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COUNT(*) as cnt FROM users WHERE generations_count > 0")
+    stats["users_with_generations"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COALESCE(SUM(generations_count), 0) as cnt FROM users")
+    stats["total_generations"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COUNT(*) as cnt FROM cats")
+    stats["total_cats"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COUNT(*) as cnt FROM cats WHERE image_url IS NOT NULL")
+    stats["cats_with_images"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COUNT(*) as cnt FROM cats WHERE published = TRUE")
+    stats["published_cats"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COUNT(*) as cnt FROM saves")
+    stats["total_saves"] = row["cnt"] if row else 0
+
+    row = query_one("SELECT COUNT(*) as cnt FROM likes")
+    stats["total_likes"] = row["cnt"] if row else 0
+
+    # Top users by generations
+    stats["top_users"] = query("""
+        SELECT id, name, email, generations_count, is_premium,
+               (SELECT COUNT(*) FROM saves WHERE user_id = users.id) as saves_count,
+               (SELECT COUNT(*) FROM cats c JOIN saves s ON c.save_id = s.id WHERE s.user_id = users.id) as cats_count
+        FROM users ORDER BY generations_count DESC LIMIT 20
+    """)
+
+    # Recent generations (cats with images)
+    stats["recent_images"] = query("""
+        SELECT c.id, c.name, c.image_url, u.name as owner_name, u.email as owner_email
+        FROM cats c
+        JOIN saves s ON c.save_id = s.id
+        JOIN users u ON s.user_id = u.id
+        WHERE c.image_url IS NOT NULL
+        ORDER BY c.id DESC LIMIT 20
+    """)
+
+    return stats

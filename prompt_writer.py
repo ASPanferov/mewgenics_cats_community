@@ -7,7 +7,13 @@ from google.genai import types
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 PROMPT_MODEL = "gemini-2.5-flash"
 
-SYSTEM_INSTRUCTION = """\
+# Settings keys in DB
+SETTING_SYSTEM_INSTRUCTION = "prompt_system_instruction"
+SETTING_USER_PROMPT_TEMPLATE = "prompt_user_template"
+SETTING_PROMPT_MODEL = "prompt_model"
+SETTING_IMAGE_MODEL = "image_model"
+
+DEFAULT_SYSTEM_INSTRUCTION = """\
 You are a master visual prompt writer for AI image generation. You will receive structured game data about a cat character from the game Mewgenics by Edmund McMillen. Your job: transform ALL that data into a single, vivid, highly detailed image generation prompt in English.
 
 ═══════════════════════════════════════════════
@@ -299,6 +305,61 @@ def _build_cat_data_text(cat_data: dict) -> str:
     return "\n".join(lines)
 
 
+DEFAULT_USER_PROMPT_TEMPLATE = """Here is the game data for a Mewgenics cat character. Transform it into a vivid image generation prompt following all the rules in your instructions.
+
+{cat_data}
+
+Write the image generation prompt:"""
+
+
+def get_system_instruction():
+    """Get system instruction from DB or use default."""
+    try:
+        import db
+        val = db.get_setting(SETTING_SYSTEM_INSTRUCTION)
+        if val:
+            return val
+    except Exception:
+        pass
+    return DEFAULT_SYSTEM_INSTRUCTION
+
+
+def get_user_prompt_template():
+    """Get user prompt template from DB or use default."""
+    try:
+        import db
+        val = db.get_setting(SETTING_USER_PROMPT_TEMPLATE)
+        if val:
+            return val
+    except Exception:
+        pass
+    return DEFAULT_USER_PROMPT_TEMPLATE
+
+
+def get_prompt_model():
+    """Get prompt writer model from DB or use default."""
+    try:
+        import db
+        val = db.get_setting(SETTING_PROMPT_MODEL)
+        if val:
+            return val
+    except Exception:
+        pass
+    return PROMPT_MODEL
+
+
+def get_image_model():
+    """Get image generation model from DB or use default."""
+    try:
+        import db
+        val = db.get_setting(SETTING_IMAGE_MODEL)
+        if val:
+            return val
+    except Exception:
+        pass
+    return "gemini-3.1-flash-image-preview"
+
+
 def generate_visual_prompt(cat_summary: dict) -> str:
     """Use Gemini Flash to generate a detailed visual prompt from cat data.
 
@@ -312,22 +373,21 @@ def generate_visual_prompt(cat_summary: dict) -> str:
         return None
 
     cat_data = dict(cat_summary)
-
     data_text = _build_cat_data_text(cat_data)
 
-    user_prompt = f"""Here is the game data for a Mewgenics cat character. Transform it into a vivid image generation prompt following all the rules in your instructions.
+    system_instruction = get_system_instruction()
+    user_template = get_user_prompt_template()
+    model = get_prompt_model()
 
-{data_text}
-
-Write the image generation prompt:"""
+    user_prompt = user_template.replace("{cat_data}", data_text)
 
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
         response = client.models.generate_content(
-            model=PROMPT_MODEL,
+            model=model,
             contents=user_prompt,
             config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_INSTRUCTION,
+                system_instruction=system_instruction,
                 max_output_tokens=800,
                 temperature=0.85,
                 top_p=0.92,

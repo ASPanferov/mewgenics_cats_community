@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Mewgenics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #2a1a0e; color: #e0d4b0;
+            font-family: 'Patrick Hand', 'Comic Sans MS', cursive;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(180deg, #4a1a1a 0%, #2a0e0e 100%);
+            padding: 10px 24px; border-bottom: 4px solid #8a2020;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header h1 { font-family: 'Caveat', cursive; font-size: 28px; color: #f0d878; }
+        .header a { color: #c9b48a; text-decoration: none; font-size: 14px; }
+        .header a:hover { color: #f0d878; }
+
+        .tabs {
+            display: flex; background: #3a2010; border-bottom: 2px solid #5c3020;
+        }
+        .tabs button {
+            padding: 10px 24px; background: none; border: none; color: #a09070;
+            font-family: inherit; font-size: 16px; cursor: pointer; border-bottom: 3px solid transparent;
+        }
+        .tabs button:hover { color: #e0d4b0; }
+        .tabs button.active { color: #f0d878; border-bottom-color: #f0d878; }
+
+        .tab-content { display: none; padding: 20px 24px; }
+        .tab-content.active { display: block; }
+
+        /* Analytics */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #3a2818; border: 2px solid #5c4428; border-radius: 8px;
+            padding: 16px; text-align: center;
+        }
+        .stat-card .num {
+            font-family: 'Caveat', cursive; font-size: 36px; color: #f0d878;
+            display: block; line-height: 1;
+        }
+        .stat-card .label { font-size: 13px; color: #a09070; margin-top: 4px; }
+
+        table {
+            width: 100%; border-collapse: collapse; margin-top: 12px;
+            font-size: 14px;
+        }
+        th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #5c4428; color: #f0d878; font-size: 12px; text-transform: uppercase; }
+        td { padding: 6px 12px; border-bottom: 1px solid #3a2818; }
+        tr:hover td { background: rgba(240,216,120,0.05); }
+        .premium-tag { color: #f0d878; font-weight: bold; }
+
+        /* Prompts */
+        .prompt-section {
+            margin-bottom: 24px; background: #3a2818; border: 2px solid #5c4428;
+            border-radius: 8px; overflow: hidden;
+        }
+        .prompt-header {
+            padding: 12px 16px; background: #4a3020; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #5c4428;
+        }
+        .prompt-header h3 { font-family: 'Caveat', cursive; font-size: 22px; color: #f0d878; }
+        .prompt-header .hint { font-size: 11px; color: #8a7050; }
+        .prompt-body { padding: 12px 16px; }
+        textarea.prompt-edit {
+            width: 100%; min-height: 200px; background: #2a1a0e; border: 2px solid #5c4428;
+            color: #e0d4b0; padding: 12px; border-radius: 6px; font-family: monospace;
+            font-size: 12px; resize: vertical; line-height: 1.5;
+        }
+        textarea.prompt-edit.tall { min-height: 500px; }
+        input.model-input {
+            background: #2a1a0e; border: 2px solid #5c4428; color: #e0d4b0;
+            padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 14px;
+            width: 100%; max-width: 500px;
+        }
+
+        .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+        .btn {
+            padding: 8px 20px; border: 2px solid #5c4428; border-radius: 6px;
+            cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold;
+        }
+        .btn-save { background: #4a8848; color: #fff; border-color: #2a6828; }
+        .btn-save:hover { background: #5a9a58; }
+        .btn-reset { background: #8a3020; color: #fff; border-color: #5c2018; }
+        .btn-reset:hover { background: #a04030; }
+        .btn-default { background: #5c4428; color: #e0d4b0; }
+        .btn-default:hover { background: #6a5438; }
+
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: #4a8848; color: #fff;
+            padding: 10px 20px; border-radius: 8px; font-family: inherit; font-size: 14px;
+            z-index: 3000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .toast.show { display: block; }
+        .toast.error { background: #8a3020; }
+
+        /* Cat preview */
+        .preview-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .preview-row select, .preview-row button {
+            font-family: inherit; font-size: 14px;
+        }
+        .preview-row select {
+            background: #2a1a0e; border: 2px solid #5c4428; color: #e0d4b0;
+            padding: 6px 12px; border-radius: 6px; min-width: 250px;
+        }
+        .preview-block {
+            background: #1a0e06; border: 2px solid #5c4428; border-radius: 6px;
+            padding: 16px; margin-top: 12px; font-family: monospace; font-size: 12px;
+            white-space: pre-wrap; line-height: 1.5; max-height: 600px; overflow-y: auto;
+        }
+        .preview-label {
+            font-family: 'Caveat', cursive; font-size: 18px; color: #f0d878;
+            margin: 16px 0 8px; display: block;
+        }
+        .preview-meta { font-size: 12px; color: #8a7050; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MEWGENICS ADMIN</h1>
+        <a href="/cabinet">&larr; Назад к котам</a>
+    </div>
+    <div class="tabs">
+        <button class="active" onclick="switchTab('analytics')">Аналитика</button>
+        <button onclick="switchTab('prompts')">Промпты</button>
+        <button onclick="switchTab('preview')">Превью данных кота</button>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div class="tab-content active" id="tab-analytics">
+        <div class="stats-grid" id="stats-grid"></div>
+        <h3 style="color:#f0d878;font-family:'Caveat',cursive;font-size:22px;margin-bottom:8px">Пользователи</h3>
+        <table id="users-table"><thead><tr>
+            <th>ID</th><th>Имя</th><th>Email</th><th>Генерации</th><th>Сейвы</th><th>Коты</th><th>Premium</th>
+        </tr></thead><tbody></tbody></table>
+
+        <h3 style="color:#f0d878;font-family:'Caveat',cursive;font-size:22px;margin:24px 0 8px">Последние генерации</h3>
+        <table id="images-table"><thead><tr>
+            <th>ID</th><th>Кот</th><th>Владелец</th><th>Арт</th>
+        </tr></thead><tbody></tbody></table>
+    </div>
+
+    <!-- Prompts Tab -->
+    <div class="tab-content" id="tab-prompts">
+        <div class="prompt-section">
+            <div class="prompt-header">
+                <h3>Модель писателя промптов</h3>
+                <span class="hint">Gemini модель для генерации текстовых промптов</span>
+            </div>
+            <div class="prompt-body">
+                <input class="model-input" id="prompt-model" placeholder="gemini-2.5-flash">
+            </div>
+        </div>
+
+        <div class="prompt-section">
+            <div class="prompt-header">
+                <h3>Модель генерации картинок</h3>
+                <span class="hint">Gemini модель для генерации изображений</span>
+            </div>
+            <div class="prompt-body">
+                <input class="model-input" id="image-model" placeholder="gemini-3.1-flash-image-preview">
+            </div>
+        </div>
+
+        <div class="prompt-section">
+            <div class="prompt-header">
+                <h3>System Instruction (писатель промптов)</h3>
+                <span class="hint">Системная инструкция для Gemini — описание стиля, правила, база знаний</span>
+            </div>
+            <div class="prompt-body">
+                <textarea class="prompt-edit tall" id="system-instruction"></textarea>
+            </div>
+        </div>
+
+        <div class="prompt-section">
+            <div class="prompt-header">
+                <h3>User Prompt Template</h3>
+                <span class="hint">Шаблон промпта пользователя. {cat_data} заменяется на данные кота</span>
+            </div>
+            <div class="prompt-body">
+                <textarea class="prompt-edit" id="user-prompt-template"></textarea>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-save" onclick="savePrompts()">Сохранить все</button>
+            <button class="btn btn-default" onclick="resetToDefaults()">Сбросить к дефолтным</button>
+        </div>
+    </div>
+
+    <!-- Preview Tab -->
+    <div class="tab-content" id="tab-preview">
+        <p style="color:#a09070;margin-bottom:12px">Выберите кота чтобы увидеть какие данные отправляются писателю промптов:</p>
+        <div class="preview-row">
+            <select id="cat-select"><option value="">Загрузка...</option></select>
+            <button class="btn btn-save" onclick="previewCat()">Собрать данные</button>
+        </div>
+        <div id="preview-result"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Tab switching
+        function switchTab(name) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showToast(msg, isError) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ====== ANALYTICS ======
+        async function loadAnalytics() {
+            try {
+                const r = await fetch('/api/admin/analytics');
+                const d = await r.json();
+                if (d.error) { showToast(d.error, true); return; }
+
+                document.getElementById('stats-grid').innerHTML = [
+                    ['total_users', 'Пользователей'],
+                    ['users_with_generations', 'Генерировали'],
+                    ['total_generations', 'Генераций всего'],
+                    ['total_cats', 'Котов всего'],
+                    ['cats_with_images', 'С артами'],
+                    ['published_cats', 'Опубликовано'],
+                    ['total_saves', 'Сейвов'],
+                    ['total_likes', 'Лайков'],
+                ].map(([k, label]) => `
+                    <div class="stat-card">
+                        <span class="num">${d[k] || 0}</span>
+                        <span class="label">${label}</span>
+                    </div>
+                `).join('');
+
+                // Users table
+                const tbody = document.querySelector('#users-table tbody');
+                tbody.innerHTML = (d.top_users || []).map(u => `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td>${esc(u.name || '')}</td>
+                        <td>${esc(u.email || '')}</td>
+                        <td>${u.generations_count || 0}</td>
+                        <td>${u.saves_count || 0}</td>
+                        <td>${u.cats_count || 0}</td>
+                        <td>${u.is_premium ? '<span class="premium-tag">PRO</span>' : ''}</td>
+                    </tr>
+                `).join('');
+
+                // Images table
+                const itbody = document.querySelector('#images-table tbody');
+                itbody.innerHTML = (d.recent_images || []).map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${esc(c.name || '')}</td>
+                        <td>${esc(c.owner_name || '')} (${esc(c.owner_email || '')})</td>
+                        <td>${c.image_url ? `<img src="${c.image_url}" style="height:40px;border-radius:4px">` : '-'}</td>
+                    </tr>
+                `).join('');
+            } catch(e) { showToast('Ошибка загрузки аналитики', true); }
+        }
+
+        // ====== PROMPTS ======
+        let defaultPrompts = {};
+
+        async function loadPrompts() {
+            try {
+                const r = await fetch('/api/admin/prompts');
+                const d = await r.json();
+                if (d.error) { showToast(d.error, true); return; }
+
+                document.getElementById('system-instruction').value = d.system_instruction || '';
+                document.getElementById('user-prompt-template').value = d.user_prompt_template || '';
+                document.getElementById('prompt-model').value = d.prompt_model || '';
+                document.getElementById('image-model').value = d.image_model || '';
+                defaultPrompts = d.defaults || {};
+            } catch(e) { showToast('Ошибка загрузки промптов', true); }
+        }
+
+        async function savePrompts() {
+            const data = {
+                system_instruction: document.getElementById('system-instruction').value,
+                user_prompt_template: document.getElementById('user-prompt-template').value,
+                prompt_model: document.getElementById('prompt-model').value,
+                image_model: document.getElementById('image-model').value,
+            };
+            try {
+                const r = await fetch('/api/admin/prompts', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data),
+                });
+                const d = await r.json();
+                if (d.success) showToast('Сохранено!');
+                else showToast(d.error || 'Ошибка', true);
+            } catch(e) { showToast('Ошибка сети', true); }
+        }
+
+        function resetToDefaults() {
+            if (!confirm('Сбросить все промпты к значениям по умолчанию?')) return;
+            document.getElementById('system-instruction').value = defaultPrompts.system_instruction || '';
+            document.getElementById('user-prompt-template').value = defaultPrompts.user_prompt_template || '';
+            document.getElementById('prompt-model').value = defaultPrompts.prompt_model || '';
+            document.getElementById('image-model').value = defaultPrompts.image_model || '';
+            showToast('Сброшено к дефолтным (нажмите Сохранить!)');
+        }
+
+        // ====== CAT PREVIEW ======
+        async function loadCatsList() {
+            try {
+                const r = await fetch('/api/admin/cats-list');
+                const cats = await r.json();
+                const sel = document.getElementById('cat-select');
+                sel.innerHTML = '<option value="">-- Выберите кота --</option>' +
+                    cats.map(c => `<option value="${c.id}">${esc(c.name || 'Без имени')} | ${c.cat_class || '?'} | ${esc(c.owner_name || '?')}${c.image_url ? ' [ART]' : ''}</option>`).join('');
+            } catch(e) { showToast('Ошибка загрузки котов', true); }
+        }
+
+        async function previewCat() {
+            const catId = document.getElementById('cat-select').value;
+            if (!catId) { showToast('Выберите кота', true); return; }
+
+            try {
+                const r = await fetch(`/api/admin/preview-cat-data/${catId}`);
+                const d = await r.json();
+                if (d.error) { showToast(d.error, true); return; }
+
+                document.getElementById('preview-result').innerHTML = `
+                    <div class="preview-meta">
+                        Кот: <b>${esc(d.cat_name)}</b> | Класс: <b>${esc(d.cat_class)}</b> |
+                        Модель промптов: <b>${esc(d.prompt_model)}</b> |
+                        Модель картинок: <b>${esc(d.image_model)}</b>
+                    </div>
+
+                    <span class="preview-label">1. Данные кота (data_text) — что видит писатель промптов:</span>
+                    <div class="preview-block">${esc(d.data_text)}</div>
+
+                    <span class="preview-label">2. Полный User Prompt — что отправляется в Gemini:</span>
+                    <div class="preview-block">${esc(d.full_user_prompt)}</div>
+
+                    <span class="preview-label">3. System Instruction (первые 500 символов):</span>
+                    <div class="preview-block">${esc(d.system_instruction_preview)}</div>
+                `;
+            } catch(e) { showToast('Ошибка', true); }
+        }
+
+        function esc(s) {
+            if (!s) return '';
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // Init
+        loadAnalytics();
+        loadPrompts();
+        loadCatsList();
+    </script>
+</body>
+</html>

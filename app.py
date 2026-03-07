@@ -8,7 +8,12 @@ from flask import Flask, render_template, jsonify, request, redirect, make_respo
 
 from cat_parser import load_all_cats, get_save_info, CatData, CatStats
 from prompt_builder import build_prompt, build_cat_summary_ru
-from prompt_writer import generate_visual_prompt
+from prompt_writer import (generate_visual_prompt, get_image_model, get_system_instruction,
+                           get_user_prompt_template, get_prompt_model,
+                           DEFAULT_SYSTEM_INSTRUCTION, DEFAULT_USER_PROMPT_TEMPLATE,
+                           SETTING_SYSTEM_INSTRUCTION, SETTING_USER_PROMPT_TEMPLATE,
+                           SETTING_PROMPT_MODEL, SETTING_IMAGE_MODEL,
+                           PROMPT_MODEL, _build_cat_data_text)
 from auth import get_google_auth_url, exchange_code, create_jwt, get_current_user
 import db
 import storage
@@ -383,8 +388,9 @@ def api_generate(db_cat_id):
         from google import genai
 
         client = genai.Client(api_key=GEMINI_API_KEY)
+        image_model = get_image_model()
         response = client.models.generate_content(
-            model="gemini-3.1-flash-image-preview",
+            model=image_model,
             contents=prompt,
             config=genai.types.GenerateContentConfig(
                 response_modalities=["IMAGE", "TEXT"],
@@ -480,6 +486,146 @@ def api_unpublish(db_cat_id):
     except Exception as e:
         return jsonify({"error": f"DB error: {e}"}), 500
     return jsonify({"success": True, "published": False})
+
+
+# === Admin ===
+
+@app.route("/admin")
+def admin_page():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return redirect("/")
+    return render_template("admin.html")
+
+
+@app.route("/api/admin/check")
+def api_admin_check():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"is_admin": False}), 403
+    return jsonify({"is_admin": True})
+
+
+@app.route("/api/admin/analytics")
+def api_admin_analytics():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    stats = db.get_analytics()
+    # Serialize top_users and recent_images
+    stats["top_users"] = [dict(r) for r in stats["top_users"]]
+    stats["recent_images"] = [dict(r) for r in stats["recent_images"]]
+    return jsonify(stats)
+
+
+@app.route("/api/admin/prompts")
+def api_admin_get_prompts():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    return jsonify({
+        "system_instruction": get_system_instruction(),
+        "user_prompt_template": get_user_prompt_template(),
+        "prompt_model": get_prompt_model(),
+        "image_model": get_image_model(),
+        "defaults": {
+            "system_instruction": DEFAULT_SYSTEM_INSTRUCTION,
+            "user_prompt_template": DEFAULT_USER_PROMPT_TEMPLATE,
+            "prompt_model": PROMPT_MODEL,
+            "image_model": "gemini-3.1-flash-image-preview",
+        }
+    })
+
+
+@app.route("/api/admin/prompts", methods=["POST"])
+def api_admin_save_prompts():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data"}), 400
+
+    saved = []
+    if "system_instruction" in data:
+        val = data["system_instruction"].strip()
+        if val and val != DEFAULT_SYSTEM_INSTRUCTION:
+            db.set_setting(SETTING_SYSTEM_INSTRUCTION, val)
+        elif not val or val == DEFAULT_SYSTEM_INSTRUCTION:
+            db.execute("DELETE FROM settings WHERE key = %s", (SETTING_SYSTEM_INSTRUCTION,))
+        saved.append("system_instruction")
+
+    if "user_prompt_template" in data:
+        val = data["user_prompt_template"].strip()
+        if val and val != DEFAULT_USER_PROMPT_TEMPLATE:
+            db.set_setting(SETTING_USER_PROMPT_TEMPLATE, val)
+        elif not val or val == DEFAULT_USER_PROMPT_TEMPLATE:
+            db.execute("DELETE FROM settings WHERE key = %s", (SETTING_USER_PROMPT_TEMPLATE,))
+        saved.append("user_prompt_template")
+
+    if "prompt_model" in data:
+        val = data["prompt_model"].strip()
+        if val and val != PROMPT_MODEL:
+            db.set_setting(SETTING_PROMPT_MODEL, val)
+        elif not val or val == PROMPT_MODEL:
+            db.execute("DELETE FROM settings WHERE key = %s", (SETTING_PROMPT_MODEL,))
+        saved.append("prompt_model")
+
+    if "image_model" in data:
+        val = data["image_model"].strip()
+        if val:
+            db.set_setting(SETTING_IMAGE_MODEL, val)
+        saved.append("image_model")
+
+    return jsonify({"success": True, "saved": saved})
+
+
+@app.route("/api/admin/preview-cat-data/<int:db_cat_id>")
+def api_admin_preview_cat_data(db_cat_id):
+    """Preview the data that gets sent to the prompt writer for a specific cat."""
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+
+    row = db.get_cat(db_cat_id)
+    if not row:
+        return jsonify({"error": "Cat not found"}), 404
+
+    cat = _cat_data_from_row(row)
+    summary = build_cat_summary_ru(cat)
+    data_text = _build_cat_data_text(summary)
+
+    user_template = get_user_prompt_template()
+    full_user_prompt = user_template.replace("{cat_data}", data_text)
+
+    return jsonify({
+        "cat_name": cat.name,
+        "cat_class": cat.cat_class,
+        "data_text": data_text,
+        "full_user_prompt": full_user_prompt,
+        "system_instruction_preview": get_system_instruction()[:500] + "...",
+        "prompt_model": get_prompt_model(),
+        "image_model": get_image_model(),
+    })
+
+
+@app.route("/api/admin/cats-list")
+def api_admin_cats_list():
+    """Get all cats across all users for admin cat selector."""
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+
+    rows = db.query("""
+        SELECT c.id, c.name, c.image_url,
+               (c.data->>'cat_class') as cat_class,
+               u.name as owner_name
+        FROM cats c
+        JOIN saves s ON c.save_id = s.id
+        JOIN users u ON s.user_id = u.id
+        ORDER BY c.id DESC LIMIT 500
+    """)
+    return jsonify([dict(r) for r in rows])
 
 
 # === DB init ===
