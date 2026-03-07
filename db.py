@@ -127,6 +127,13 @@ def init_db():
     """)
     if not user_cols:
         execute("ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE")
+    # Migration: add is_admin column to users
+    admin_cols = query("""
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'is_admin'
+    """)
+    if not admin_cols:
+        execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE")
     # Feedback table
     execute("""
         CREATE TABLE IF NOT EXISTS feedback (
@@ -308,11 +315,15 @@ ADMIN_EMAILS = ["pafa0712@gmail.com", "insaneramzes@gmail.com"]
 
 
 def is_admin(user_id):
-    """Check if user is admin by email."""
+    """Check if user is admin by email or is_admin flag."""
     user = get_user(user_id)
     if not user:
         return False
-    return user.get("email", "") in ADMIN_EMAILS
+    return user.get("email", "") in ADMIN_EMAILS or bool(user.get("is_admin"))
+
+
+def set_admin(user_id, is_admin_flag=True):
+    execute("UPDATE users SET is_admin = %s WHERE id = %s", (is_admin_flag, user_id))
 
 
 # === Settings (key-value store for prompts etc.) ===
@@ -397,7 +408,7 @@ def get_analytics():
 
     # Top users by generations
     stats["top_users"] = query("""
-        SELECT id, name, email, generations_count, is_premium,
+        SELECT id, name, email, generations_count, is_premium, is_admin,
                (SELECT COUNT(*) FROM saves WHERE user_id = users.id) as saves_count,
                (SELECT COUNT(*) FROM cats c JOIN saves s ON c.save_id = s.id WHERE s.user_id = users.id) as cats_count
         FROM users ORDER BY generations_count DESC LIMIT 20

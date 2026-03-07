@@ -513,6 +513,46 @@ def api_admin_feedback_read(fid):
     return jsonify({"success": True})
 
 
+# === Admin user management ===
+
+@app.route("/api/admin/user/<int:uid>/toggle-premium", methods=["POST"])
+def api_admin_toggle_premium(uid):
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    target = db.get_user(uid)
+    if not target:
+        return jsonify({"error": "User not found"}), 404
+    new_val = not bool(target.get("is_premium"))
+    db.set_premium(uid, new_val)
+    return jsonify({"success": True, "is_premium": new_val})
+
+
+@app.route("/api/admin/user/<int:uid>/toggle-admin", methods=["POST"])
+def api_admin_toggle_admin(uid):
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    target = db.get_user(uid)
+    if not target:
+        return jsonify({"error": "User not found"}), 404
+    # Hardcoded admins can't be demoted
+    if target.get("email", "") in db.ADMIN_EMAILS:
+        return jsonify({"error": "Cannot change hardcoded admin"}), 400
+    new_val = not bool(target.get("is_admin"))
+    db.set_admin(uid, new_val)
+    return jsonify({"success": True, "is_admin": new_val})
+
+
+@app.route("/api/admin/user/<int:uid>/reset-generations", methods=["POST"])
+def api_admin_reset_generations(uid):
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    db.execute("UPDATE users SET generations_count = 0 WHERE id = %s", (uid,))
+    return jsonify({"success": True})
+
+
 # === Likes ===
 
 @app.route("/api/cat/<int:db_cat_id>/like", methods=["POST"])
