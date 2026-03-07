@@ -389,8 +389,23 @@ def api_unpublish(db_cat_id):
 
 try:
     db.init_db()
-except Exception:
-    pass
+except Exception as e:
+    print(f"init_db error: {e}")
+
+
+@app.route("/api/migrate")
+def api_migrate():
+    """One-time migration endpoint."""
+    try:
+        db.init_db()
+        cols = db.query("""
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name = 'cats'
+        """)
+        col_names = [r["column_name"] for r in cols]
+        return jsonify({"ok": True, "cats_columns": col_names})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
