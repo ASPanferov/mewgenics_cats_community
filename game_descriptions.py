@@ -1,4 +1,8 @@
-"""Load game descriptions from CSV files for abilities, passives, and items."""
+"""Load game descriptions from CSV files for abilities, passives, and items.
+
+CSV format: KEY,en,ru
+Supports language selection via `lang` parameter (default: 'ru').
+"""
 
 import csv
 import os
@@ -8,83 +12,92 @@ _GAME_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "game_
 
 
 def _clean_desc(text: str) -> str:
-    """Clean game description markup for prompt use."""
-    # Remove [img:xxx] tags -> replace with stat name
+    """Clean game description markup."""
     text = re.sub(r'\[img:(\w+)\]', lambda m: m.group(1).upper(), text)
-    # Remove [s:.7]...[/s] (fine print)
     text = re.sub(r'\[s:[.\d]+\](.*?)\[/s\]', r'\1', text)
-    # Remove &nbsp;
     text = text.replace('&nbsp;', ' ')
-    # Collapse whitespace
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
 
-def _load_csv_descriptions(csv_path: str) -> dict[str, tuple[str, str]]:
+def _load_csv_descriptions(csv_path: str) -> dict[str, dict[str, tuple[str, str]]]:
     """Load all NAME/DESC pairs from a CSV, keyed by lowercase internal name.
 
-    Handles various prefixes: ABILITY_, ABLITY_, PASSIVE_, DISORDER_,
-    ITEM_, ARMOR_, WEAPON_, CONSUMABLE_, etc.
+    Returns: {lowercase_key: {'en': (name, desc), 'ru': (name, desc)}}
     """
-    entries = {}  # lowercase_key -> {NAME: ..., DESC: ...}
+    entries = {}  # lowercase_key -> {lang: {NAME: ..., DESC: ...}}
 
     if not os.path.exists(csv_path):
         return {}
 
     with open(csv_path, 'r', encoding='utf-8-sig') as f:
-        for row in csv.reader(f):
-            if len(row) < 2 or row[0].startswith('//') or 'KEY' in row[0]:
-                continue
-            key, ru = row[0], row[1]
-            if not ru:
+        reader = csv.DictReader(f)
+        for row in reader:
+            key = row.get('KEY', '')
+            if not key or key.startswith('//'):
                 continue
 
-            # Match any PREFIX_INTERNALNAME[digits]_NAME/DESC
             m = re.match(r'[A-Z]+_(.+?)(\d*)_(NAME|DESC)$', key)
-            if m:
-                raw_name = m.group(1).lower().replace('_', '')
-                level = m.group(2) or ''
-                field_type = m.group(3)
-                # Only keep base level (no suffix) or level 2
-                full_key = raw_name + level
-                if full_key not in entries:
-                    entries[full_key] = {}
-                entries[full_key][field_type] = ru
+            if not m:
+                continue
+
+            raw_name = m.group(1).lower().replace('_', '')
+            level = m.group(2) or ''
+            field_type = m.group(3)
+            full_key = raw_name + level
+
+            if full_key not in entries:
+                entries[full_key] = {}
+
+            for lang in ('en', 'ru'):
+                val = row.get(lang, '')
+                if val:
+                    if lang not in entries[full_key]:
+                        entries[full_key][lang] = {}
+                    entries[full_key][lang][field_type] = val
 
     result = {}
-    for lc_key, fields in entries.items():
-        name = fields.get('NAME', '')
-        desc = _clean_desc(fields.get('DESC', ''))
-        if name or desc:
-            result[lc_key] = (name, desc)
+    for lc_key, lang_data in entries.items():
+        result[lc_key] = {}
+        for lang, fields in lang_data.items():
+            name = fields.get('NAME', '')
+            desc = _clean_desc(fields.get('DESC', ''))
+            if name or desc:
+                result[lc_key][lang] = (name, desc)
     return result
 
 
-def _load_mutation_descriptions(csv_path: str) -> dict[str, str]:
-    """Load mutation descriptions keyed by 'PART_FRAME' e.g. 'body_301'."""
+def _load_mutation_descriptions(csv_path: str) -> dict[str, dict[str, str]]:
+    """Load mutation descriptions keyed by 'PART_FRAME'.
+
+    Returns: {part_frame: {'en': desc, 'ru': desc}}
+    """
     result = {}
     if not os.path.exists(csv_path):
         return result
 
     with open(csv_path, 'r', encoding='utf-8-sig') as f:
-        for row in csv.reader(f):
-            if len(row) < 2 or row[0].startswith('//') or 'KEY' in row[0]:
+        reader = csv.DictReader(f)
+        for row in reader:
+            key = row.get('KEY', '')
+            if not key or key.startswith('//'):
                 continue
-            key, ru = row[0], row[1]
-            if not ru:
-                continue
-            # MUTATION_BODY_301_DESC -> body_301
             m = re.match(r'MUTATION_(\w+?)_(\d+)_DESC$', key)
             if m:
                 part = m.group(1).lower()
                 frame = m.group(2)
-                result[f"{part}_{frame}"] = _clean_desc(ru)
+                pk = f"{part}_{frame}"
+                result[pk] = {}
+                for lang in ('en', 'ru'):
+                    val = row.get(lang, '')
+                    if val:
+                        result[pk][lang] = _clean_desc(val)
 
     return result
 
 
 class GameDescriptions:
-    """Lazy-loaded game description database."""
+    """Lazy-loaded game description database with multi-language support."""
 
     def __init__(self):
         self._abilities = None
@@ -104,58 +117,29 @@ class GameDescriptions:
         self._mutations = _load_mutation_descriptions(
             os.path.join(_GAME_DATA_DIR, "mutations.csv"))
 
-    def _lookup(self, db: dict, internal_name: str) -> tuple[str, str] | None:
-        """Lookup by internal CamelCase name -> (ru_name, ru_desc)."""
+    def _lookup(self, db: dict, internal_name: str, lang: str = 'ru') -> tuple[str, str] | None:
+        """Lookup by internal CamelCase name -> (name, desc) in given language."""
         lc = internal_name.lower()
-        return db.get(lc)
+        entry = db.get(lc)
+        if not entry:
+            return None
+        # Try requested lang, fallback to en, then ru
+        return entry.get(lang) or entry.get('en') or entry.get('ru')
 
-    def get_ability(self, name: str) -> tuple[str, str] | None:
+    def get_ability(self, name: str, lang: str = 'ru') -> tuple[str, str] | None:
         self._ensure_loaded()
-        # Try abilities first, then passives (some overlap)
-        return self._lookup(self._abilities, name) or self._lookup(self._passives, name)
+        return self._lookup(self._abilities, name, lang) or self._lookup(self._passives, name, lang)
 
-    def get_passive(self, name: str) -> tuple[str, str] | None:
+    def get_passive(self, name: str, lang: str = 'ru') -> tuple[str, str] | None:
         self._ensure_loaded()
-        return self._lookup(self._passives, name) or self._lookup(self._abilities, name)
+        return self._lookup(self._passives, name, lang) or self._lookup(self._abilities, name, lang)
 
-    def get_item(self, name: str) -> tuple[str, str] | None:
+    def get_item(self, name: str, lang: str = 'ru') -> tuple[str, str] | None:
         self._ensure_loaded()
-        return self._lookup(self._items, name) or self._lookup(self._passives, name)
+        return self._lookup(self._items, name, lang) or self._lookup(self._passives, name, lang)
 
-    def describe_ability_for_prompt(self, name: str) -> str:
-        """Get a concise English-style visual description for an ability."""
-        info = self.get_ability(name)
-        if info:
-            ru_name, ru_desc = info
-            return f"{name} ({ru_name}): {ru_desc}"
-        return name
-
-    def describe_passive_for_prompt(self, name: str) -> str:
-        info = self.get_passive(name)
-        if info:
-            ru_name, ru_desc = info
-            return f"{name} ({ru_name}): {ru_desc}"
-        return name
-
-    def describe_item_for_prompt(self, name: str) -> str:
-        info = self.get_item(name)
-        if info:
-            ru_name, ru_desc = info
-            return f"{name} ({ru_name}): {ru_desc}"
-        return name
-
-    def get_mutation(self, part: str, frame: int) -> str | None:
-        """Get mutation description by part name and frame number.
-
-        Part names in CSV use singular mapped forms:
-        - leftear/rightear -> ears
-        - lefteye/righteye -> eyes
-        - lefteyebrow/righteyebrow -> eyebrows
-        - leg1/leg2 -> legs
-        - arm1/arm2 -> arms
-        """
+    def get_mutation(self, part: str, frame: int, lang: str = 'ru') -> str | None:
         self._ensure_loaded()
-        # Map parser part names to CSV part names
         part_map = {
             'leftear': 'ears', 'rightear': 'ears',
             'lefteye': 'eyes', 'righteye': 'eyes',
@@ -164,7 +148,10 @@ class GameDescriptions:
             'arm1': 'arms', 'arm2': 'arms',
         }
         csv_part = part_map.get(part, part)
-        return self._mutations.get(f"{csv_part}_{frame}")
+        entry = self._mutations.get(f"{csv_part}_{frame}")
+        if not entry:
+            return None
+        return entry.get(lang) or entry.get('en') or entry.get('ru')
 
 
 # Singleton

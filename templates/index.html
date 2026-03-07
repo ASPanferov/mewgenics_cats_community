@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +33,16 @@
         .header-brand { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
         .header-logo { font-size: 32px; filter: drop-shadow(2px 2px 0 #2a1a0e); }
         .header h1 { font-family: 'Caveat', cursive; font-size: 32px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e, -1px -1px 0 #2a1a0e, 1px -1px 0 #2a1a0e; letter-spacing: 3px; position: relative; z-index: 1; }
-        .header-right { display: flex; align-items: center; gap: 12px; }
+        .header-right { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+        .lang-switch {
+            display: flex; gap: 2px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 2px;
+        }
+        .lang-switch button {
+            background: none; border: none; color: #a08a60; cursor: pointer;
+            font-family: inherit; font-size: 12px; padding: 3px 8px; border-radius: 4px; font-weight: bold;
+        }
+        .lang-switch button.active { background: #f0d878; color: #2a1a0e; }
+        .lang-switch button:hover:not(.active) { color: #f0d878; }
         .user-info { display: flex; align-items: center; gap: 8px; color: #c9b48a; font-size: 14px; }
         .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #f0d878; }
         .gen-counter { font-size: 12px; color: #c9b48a; background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 8px; }
@@ -454,60 +463,42 @@
             <span class="header-logo">&#128049;</span>
             <h1>MEWGENICS</h1>
         </div>
-        <div class="header-right"><div id="auth-area"></div></div>
+        <div class="header-right">
+            <div class="lang-switch" id="lang-switch"></div>
+            <div id="auth-area"></div>
+        </div>
     </div>
     <div class="nav" id="nav-bar"></div>
     <div id="main-content"></div>
 
     <!-- Footer -->
-    <footer class="site-footer" id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-col">
-                <h3>Mewgenics Cat Community</h3>
-                <p>Fan-made проект для просмотра и генерации артов котов из игры <b>Mewgenics</b> от Edmund McMillen.</p>
-                <p>Не является официальным продуктом Team Meat.</p>
-            </div>
-            <div class="footer-col">
-                <h3>Автор</h3>
-                <p>Создано <a href="https://t.me/arpanferov" target="_blank">@arpanferov</a></p>
-                <p style="margin-top:8px"><button class="btn-feedback" onclick="openFeedback()">&#128172; Обратная связь</button></p>
-            </div>
-            <div class="footer-col">
-                <h3>Лицензия</h3>
-                <p>Все игровые ассеты и персонажи принадлежат Edmund McMillen / Team Meat.</p>
-                <p>Данный проект носит исключительно фанатский характер и не преследует коммерческих целей.</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            Mewgenics Cat Community &copy; 2025-2026 &mdash; Fan project. Not affiliated with Team Meat.
-        </div>
-    </footer>
+    <footer class="site-footer" id="site-footer"></footer>
 
     <!-- Floating feedback button -->
-    <button class="fab-feedback" onclick="openFeedback()" title="Сообщить о баге">&#128027;</button>
+    <button class="fab-feedback" id="fab-feedback" onclick="openFeedback()">&#128027;</button>
 
     <div class="modal-overlay" id="prompt-modal">
         <div class="modal">
-            <h2 id="modal-cat-name">Промпт</h2>
+            <h2 id="modal-cat-name"></h2>
             <textarea id="prompt-text"></textarea>
             <div class="btn-row">
-                <button class="btn-close" onclick="closeModal()">Отмена</button>
-                <button class="btn btn-generate" onclick="generateFromModal()">Сгенерировать</button>
+                <button class="btn-close" onclick="closeModal()" id="prompt-cancel-btn"></button>
+                <button class="btn btn-generate" onclick="generateFromModal()" id="prompt-gen-btn"></button>
             </div>
         </div>
     </div>
     <!-- Feedback modal -->
     <div class="modal-overlay" id="feedback-modal">
         <div class="modal">
-            <h2>&#128027; Обратная связь / Баг-репорт</h2>
+            <h2 id="fb-title"></h2>
             <div class="feedback-form">
-                <input type="text" id="fb-name" placeholder="Ваше имя (необязательно)">
-                <input type="email" id="fb-email" placeholder="Email для ответа">
-                <textarea id="fb-message" placeholder="Опишите баг или оставьте пожелание..."></textarea>
+                <input type="text" id="fb-name">
+                <input type="email" id="fb-email">
+                <textarea id="fb-message"></textarea>
             </div>
             <div class="btn-row" style="margin-top:12px">
-                <button class="btn-close" onclick="closeFeedback()">Отмена</button>
-                <button class="btn btn-generate" id="fb-submit" onclick="submitFeedback()">Отправить</button>
+                <button class="btn-close" id="fb-cancel-btn" onclick="closeFeedback()"></button>
+                <button class="btn btn-generate" id="fb-submit" onclick="submitFeedback()"></button>
             </div>
         </div>
     </div>
@@ -528,7 +519,166 @@
         const STAT_ICONS = ['STR','DEX','CON','INT','SPD','CHA','LCK'];
         function catImg(c) { return '/img/' + c.db_id + (c._bust ? '?t='+c._bust : ''); }
 
+        // === i18n ===
+        let LANG = document.cookie.match(/lang=(\w+)/)?.[1] || 'ru';
+        const T = {
+            feed: {en: 'Feed', ru: 'Лента'},
+            my_cats: {en: 'My Cats', ru: 'Мои коты'},
+            login: {en: 'Log in', ru: 'Войти'},
+            logout: {en: 'Log out', ru: 'Выйти'},
+            login_prompt: {en: 'Log in to manage cats', ru: 'Войдите чтобы управлять котами'},
+            login_subtitle: {en: 'Upload saves and generate unique art', ru: 'Загружайте сохранения и генерируйте уникальные арты'},
+            login_google: {en: 'Log in with Google', ru: 'Войти через Google'},
+            generations: {en: 'generations', ru: 'генераций'},
+            upload_title: {en: 'Upload Save File', ru: 'Загрузите сохранение'},
+            upload_hint: {en: 'Drag a <strong>.sav</strong> file here or click to select', ru: 'Перетащите файл <strong>.sav</strong> сюда или нажмите для выбора'},
+            where_save: {en: 'Where to find save file?', ru: 'Где найти файл сохранения?'},
+            search: {en: 'Search...', ru: 'Поиск...'},
+            sort: {en: 'Sort:', ru: 'Сортировка:'},
+            sort_img: {en: 'Art + newest', ru: 'Арт + новые'},
+            sort_new: {en: 'Newest', ru: 'Новорождённые'},
+            sort_old: {en: 'Oldest', ru: 'Старейшие'},
+            sort_name_az: {en: 'Name A-Z', ru: 'Имя А-Я'},
+            sort_name_za: {en: 'Name Z-A', ru: 'Имя Я-А'},
+            sort_class: {en: 'By class', ru: 'По классу'},
+            filter_class: {en: 'Class:', ru: 'Класс:'},
+            filter_all: {en: 'All', ru: 'Все'},
+            filter_status: {en: 'Status:', ru: 'Статус:'},
+            filter_alive: {en: 'Alive', ru: 'Живые'},
+            filter_injured: {en: 'Injured', ru: 'Раненые'},
+            filter_dead: {en: 'Dead', ru: 'Мёртвые'},
+            filter_retired: {en: 'Retired', ru: 'Ретирован'},
+            filter_donated: {en: 'Donated', ru: 'Отдан'},
+            filter_gender: {en: 'Gender:', ru: 'Пол:'},
+            filter_male: {en: 'Male', ru: 'Кот'},
+            filter_female: {en: 'Female', ru: 'Кошка'},
+            filter_image: {en: 'Image:', ru: 'Арт:'},
+            filter_with_art: {en: 'With art', ru: 'С артом'},
+            filter_no_art: {en: 'No art', ru: 'Без арта'},
+            new_save: {en: 'New save', ru: 'Новый сейв'},
+            day: {en: 'Day', ru: 'День'},
+            gold: {en: 'Gold', ru: 'Золото'},
+            generate: {en: 'Generate', ru: 'Генерация'},
+            regenerate: {en: 'Regenerate', ru: 'Перегенерить'},
+            publish: {en: 'To feed', ru: 'В ленту'},
+            unpublish: {en: 'Remove', ru: 'Убрать'},
+            published_toast: {en: 'Published!', ru: 'Опубликовано!'},
+            unpublished_toast: {en: 'Removed from feed', ru: 'Убрано из ленты'},
+            share: {en: 'Share', ru: 'Поделиться'},
+            link_copied: {en: 'Link copied!', ru: 'Ссылка скопирована!'},
+            login_to_like: {en: 'Log in to like', ru: 'Войдите чтобы лайкать'},
+            empty_feed: {en: 'No cats published yet', ru: 'Пока никто не опубликовал котов'},
+            empty_feed_hint: {en: 'Log in, upload a save and publish!', ru: 'Войдите, загрузите сохранение и опубликуйте!'},
+            feedback_title: {en: 'Feedback / Bug Report', ru: 'Обратная связь / Баг-репорт'},
+            fb_name: {en: 'Your name (optional)', ru: 'Ваше имя (необязательно)'},
+            fb_email: {en: 'Email for reply', ru: 'Email для ответа'},
+            fb_message: {en: 'Describe the bug or leave feedback...', ru: 'Опишите баг или оставьте пожелание...'},
+            fb_send: {en: 'Send', ru: 'Отправить'},
+            fb_cancel: {en: 'Cancel', ru: 'Отмена'},
+            fb_thanks: {en: 'Thank you for your feedback!', ru: 'Спасибо за обратную связь!'},
+            fb_empty: {en: 'Please write a message', ru: 'Напишите сообщение'},
+            days: {en: 'd.', ru: 'дн.'},
+            dead: {en: 'Dead', ru: 'Мёртв'},
+            injured: {en: 'Injured', ru: 'Ранен'},
+            retired_badge: {en: 'Ret.', ru: 'Рет.'},
+            in_feed: {en: 'In feed', ru: 'В ленте'},
+            net_error: {en: 'Network error', ru: 'Ошибка сети'},
+            loading: {en: 'Loading...', ru: 'Загрузка...'},
+            error: {en: 'Error', ru: 'Ошибка'},
+            sending: {en: 'Sending...', ru: 'Отправка...'},
+            male: {en: 'Male', ru: 'Кот'},
+            female: {en: 'Female', ru: 'Кошка'},
+            spider_cat: {en: 'Spider cat', ru: 'Кот-паук'},
+            breed: {en: 'Breed:', ru: 'Порода:'},
+            age: {en: 'Age:', ru: 'Возраст:'},
+            born: {en: 'Born:', ru: 'Рождён:'},
+            born_day: {en: 'day', ru: 'день'},
+            inbreeding: {en: 'Inbreeding:', ru: 'Инбридинг:'},
+            parents: {en: 'Parents:', ru: 'Родители:'},
+            voice: {en: 'Voice:', ru: 'Голос:'},
+            focus: {en: 'Focus', ru: 'Фокус'},
+            attacks: {en: 'Attacks', ru: 'Атаки'},
+            passives_label: {en: 'Passives', ru: 'Пассивки'},
+            items_label: {en: 'Items', ru: 'Предметы'},
+            mutations_label: {en: 'Mutations', ru: 'Мутации'},
+            defects_label: {en: 'Defects', ru: 'Дефекты'},
+            birth_defect: {en: 'Birth defect', ru: 'Врождённый дефект'},
+            defect_suffix: {en: ' (defect)', ru: ' (дефект)'},
+            none: {en: 'none', ru: 'нет'},
+            prompt_title: {en: 'Prompt', ru: 'Промпт'},
+            cancel: {en: 'Cancel', ru: 'Отмена'},
+            copy_link: {en: 'Copy the link:', ru: 'Скопируйте ссылку:'},
+            of: {en: 'of', ru: 'из'},
+            food: {en: 'Food', ru: 'Еда'},
+            coins: {en: 'Coins', ru: 'Монеты'},
+            collars: {en: 'Collars', ru: 'Ошейники'},
+            cats_loaded: {en: 'cats!', ru: 'котов!'},
+            footer_about: {en: 'Fan-made project for viewing and generating cat art from <b>Mewgenics</b> by Edmund McMillen.', ru: 'Fan-made проект для просмотра и генерации артов котов из игры <b>Mewgenics</b> от Edmund McMillen.'},
+            footer_disclaimer: {en: 'Not an official Team Meat product.', ru: 'Не является официальным продуктом Team Meat.'},
+            footer_author: {en: 'Author', ru: 'Автор'},
+            footer_created_by: {en: 'Created by', ru: 'Создано'},
+            footer_feedback: {en: 'Feedback', ru: 'Обратная связь'},
+            footer_license: {en: 'License', ru: 'Лицензия'},
+            footer_license_text: {en: 'All game assets and characters belong to Edmund McMillen / Team Meat.', ru: 'Все игровые ассеты и персонажи принадлежат Edmund McMillen / Team Meat.'},
+            footer_license_text2: {en: 'This project is purely fan-made and non-commercial.', ru: 'Данный проект носит исключительно фанатский характер и не преследует коммерческих целей.'},
+            report_bug: {en: 'Report a bug', ru: 'Сообщить о баге'},
+            win_path_hint: {en: 'Open File Explorer and paste into the address bar:', ru: 'Откройте проводник и вставьте в адресную строку:'},
+            win_full_path: {en: 'Full path:', ru: 'Полный путь:'},
+            win_save_hint: {en: 'Inside, find the folder with your <b>Steam ID</b>, then <code>saves</code>. Files are named <b>steamcampaign01.sav</b>, <b>steamcampaign02.sav</b>, etc. — one per campaign (max 3).', ru: 'Внутри найдите папку с вашим <b>Steam ID</b>, затем <code>saves</code>. Файлы называются <b>steamcampaign01.sav</b>, <b>steamcampaign02.sav</b> и т.д. — по одному на каждый кампейн (максимум 3).'},
+            hidden_folder_hint: {en: 'AppData is a hidden folder. If you don\'t see it, enable hidden files in Explorer, or just paste the %AppData% path into the address bar.', ru: 'AppData — скрытая папка. Если не видите её, включите показ скрытых файлов в проводнике, либо просто вставьте путь с %AppData% в адресную строку.'},
+        };
+        function t(key) { return (T[key] && T[key][LANG]) || (T[key] && T[key]['en']) || key; }
+
+        async function setLang(lang) {
+            LANG = lang;
+            document.cookie = `lang=${lang};path=/;max-age=${365*24*3600};samesite=lax`;
+            await fetch('/api/set-lang', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({lang})});
+            location.reload();
+        }
+
+        function applyTranslations() {
+            // Footer
+            document.getElementById('site-footer').innerHTML = `
+            <div class="footer-inner">
+                <div class="footer-col">
+                    <h3>Mewgenics Cat Community</h3>
+                    <p>${t('footer_about')}</p>
+                    <p>${t('footer_disclaimer')}</p>
+                </div>
+                <div class="footer-col">
+                    <h3>${t('footer_author')}</h3>
+                    <p>${t('footer_created_by')} <a href="https://t.me/arpanferov" target="_blank">@arpanferov</a></p>
+                    <p style="margin-top:8px"><button class="btn-feedback" onclick="openFeedback()">&#128172; ${t('footer_feedback')}</button></p>
+                </div>
+                <div class="footer-col">
+                    <h3>${t('footer_license')}</h3>
+                    <p>${t('footer_license_text')}</p>
+                    <p>${t('footer_license_text2')}</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                Mewgenics Cat Community &copy; 2025-2026 &mdash; Fan project. Not affiliated with Team Meat.
+            </div>`;
+            // Floating button
+            document.getElementById('fab-feedback').title = t('report_bug');
+            // Feedback modal
+            document.getElementById('fb-title').innerHTML = `&#128027; ${t('feedback_title')}`;
+            document.getElementById('fb-name').placeholder = t('fb_name');
+            document.getElementById('fb-email').placeholder = t('fb_email');
+            document.getElementById('fb-message').placeholder = t('fb_message');
+            document.getElementById('fb-cancel-btn').textContent = t('fb_cancel');
+            document.getElementById('fb-submit').textContent = t('fb_send');
+            // Prompt modal
+            document.getElementById('prompt-cancel-btn').textContent = t('cancel');
+            document.getElementById('prompt-gen-btn').textContent = t('generate');
+        }
+
         async function init() {
+            // Render language switch
+            document.getElementById('lang-switch').innerHTML =
+                `<button class="${LANG==='ru'?'active':''}" onclick="setLang('ru')">RU</button>` +
+                `<button class="${LANG==='en'?'active':''}" onclick="setLang('en')">EN</button>`;
+            applyTranslations();
             try {
                 const r = await fetch('/auth/me');
                 const d = await r.json();
@@ -551,11 +701,11 @@
                     ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}">` : ''}
                     <span>${esc(currentUser.name)}</span>
                     ${currentUser.is_premium ? '<span class="premium-badge">PRO</span>' : ''}
-                    <span class="gen-counter">${currentUser.generations_count}/${currentUser.max_generations} генераций</span>
-                    <a href="/auth/logout" class="btn-logout">Выйти</a>
+                    <span class="gen-counter">${currentUser.generations_count}/${currentUser.max_generations} ${t('generations')}</span>
+                    <a href="/auth/logout" class="btn-logout">${t('logout')}</a>
                 </div>`;
             } else {
-                a.innerHTML = `<a href="/auth/google" class="btn-auth">Войти</a>`;
+                a.innerHTML = `<a href="/auth/google" class="btn-auth">${t('login')}</a>`;
             }
         }
 
@@ -571,8 +721,8 @@
                 }).catch(()=>{});
             }
             document.getElementById('nav-bar').innerHTML = `
-                <a href="/" class="${PAGE==='feed'?'active':''}">Лента</a>
-                <a href="/cabinet" class="${PAGE==='cabinet'?'active':''}">Мои коты</a>`;
+                <a href="/" class="${PAGE==='feed'?'active':''}">${t('feed')}</a>
+                <a href="/cabinet" class="${PAGE==='cabinet'?'active':''}">${t('my_cats')}</a>`;
         }
 
         // ====== FEED (infinite scroll) ======
@@ -602,7 +752,7 @@
                 loader = document.createElement('div');
                 loader.id = 'feed-loader';
                 loader.className = 'feed-loader';
-                loader.innerHTML = '<span class="loading-spinner"></span> Загрузка...';
+                loader.innerHTML = `<span class="loading-spinner"></span> ${t('loading')}`;
                 fg.parentNode.insertBefore(loader, document.getElementById('feed-bottom'));
             }
             try {
@@ -621,7 +771,7 @@
                     loader.className = 'feed-end';
                     loader.textContent = feedCats.length ? '' : '';
                     if (!feedCats.length) {
-                        fg.innerHTML = `<div class="empty-feed"><p style="font-size:48px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:13px;color:#a08060">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
+                        fg.innerHTML = `<div class="empty-feed"><p style="font-size:48px">&#128049;</p><p>${t('empty_feed')}</p><p style="font-size:13px;color:#a08060">${t('empty_feed_hint')}</p></div>`;
                     }
                     loader.remove();
                 } else {
@@ -660,7 +810,7 @@
                     <button class="like-btn ${c.liked?'liked':''}" onclick="toggleLike(${c.db_id},${i})">
                         ${c.liked?'&#10084;':'&#9825;'} <span class="like-count">${c.like_count||0}</span>
                     </button>
-                    <button class="share-btn" onclick="shareCat(${c.db_id},'${esc(c.name)}')">&#128279; Поделиться</button>
+                    <button class="share-btn" onclick="shareCat(${c.db_id},'${esc(c.name)}')">&#128279; ${t('share')}</button>
                 </div>
             </div>`;
         }
@@ -677,27 +827,27 @@
 
         function renderLoginPage() {
             document.getElementById('main-content').innerHTML = `<div class="page-center">
-                <h2>Войдите чтобы управлять котами</h2>
-                <p>Загружайте сохранения и генерируйте уникальные арты</p>
-                <a href="/auth/google" class="btn-google">${GOOGLE_SVG} Войти через Google</a></div>`;
+                <h2>${t('login_prompt')}</h2>
+                <p>${t('login_subtitle')}</p>
+                <a href="/auth/google" class="btn-google">${GOOGLE_SVG} ${t('login_google')}</a></div>`;
         }
 
         function renderUploadPage() {
             document.getElementById('main-content').innerHTML = `<div class="page-center">
                 <div class="upload-box" id="upload-box" onclick="document.getElementById('file-input').click()">
-                    <h2>&#128190; Загрузите сохранение</h2>
-                    <p>Перетащите файл <strong>.sav</strong> сюда или нажмите для выбора</p>
+                    <h2>&#128190; ${t('upload_title')}</h2>
+                    <p>${t('upload_hint')}</p>
                     <input type="file" id="file-input" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])">
                 </div>
                 <div style="max-width:520px;margin:20px auto 0;text-align:left;background:#e8dcc0;border:2px solid #8a6e48;border-radius:8px;padding:16px 20px;font-size:13px;color:#5c3d2e;line-height:1.6">
-                    <h3 style="font-family:'Caveat',cursive;font-size:20px;color:#3a2e1e;margin-bottom:8px">&#128269; Где найти файл сохранения?</h3>
-                    <p><b>Windows:</b> Откройте проводник и вставьте в адресную строку:</p>
+                    <h3 style="font-family:'Caveat',cursive;font-size:20px;color:#3a2e1e;margin-bottom:8px">&#128269; ${t('where_save')}</h3>
+                    <p><b>Windows:</b> ${t('win_path_hint')}</p>
                     <code style="display:block;background:#d8cca8;padding:8px 12px;border-radius:4px;margin:6px 0;word-break:break-all;font-size:12px">%AppData%\\Glaiel Games\\Mewgenics</code>
-                    <p>Полный путь: <code style="font-size:11px">C:\\Users\\ВашеИмя\\AppData\\Roaming\\Glaiel Games\\Mewgenics\\</code></p>
-                    <p style="margin-top:6px">Внутри найдите папку с вашим <b>Steam ID</b>, затем <code>saves</code>. Файлы называются <b>steamcampaign01.sav</b>, <b>steamcampaign02.sav</b> и т.д. — по одному на каждый кампейн (максимум 3).</p>
+                    <p>${t('win_full_path')} <code style="font-size:11px">C:\\Users\\&lt;YourName&gt;\\AppData\\Roaming\\Glaiel Games\\Mewgenics\\</code></p>
+                    <p style="margin-top:6px">${t('win_save_hint')}</p>
                     <p style="margin-top:6px"><b>Steam Deck / Linux:</b></p>
                     <code style="display:block;background:#d8cca8;padding:8px 12px;border-radius:4px;margin:6px 0;word-break:break-all;font-size:12px">~/.local/share/Glaiel Games/Mewgenics/</code>
-                    <p style="margin-top:8px;font-size:11px;color:#8a7050">&#9888; AppData — скрытая папка. Если не видите её, включите показ скрытых файлов в проводнике, либо просто вставьте путь с %AppData% в адресную строку.</p>
+                    <p style="margin-top:8px;font-size:11px;color:#8a7050">&#9888; ${t('hidden_folder_hint')}</p>
                 </div>
             </div>`;
             const b = document.getElementById('upload-box');
@@ -708,80 +858,80 @@
 
         async function uploadFile(file) {
             if (!file) return;
-            showToast('Загрузка...');
+            showToast(t('loading'));
             const f = new FormData(); f.append('save_file', file);
             try {
                 const r = await fetch('/api/upload', {method:'POST', body:f});
                 const d = await r.json();
-                if (d.success) { showToast(`${d.cat_count} котов!`); await initCabinet(); }
-                else showToast(d.error||'Ошибка');
-            } catch(e) { showToast('Ошибка сети'); }
+                if (d.success) { showToast(`${d.cat_count} ${t('cats_loaded')}`); await initCabinet(); }
+                else showToast(d.error||t('error'));
+            } catch(e) { showToast(t('net_error')); }
         }
 
         function renderCabinetUI(info) {
             document.getElementById('main-content').innerHTML = `
                 <div class="controls">
                     <div class="controls-row">
-                        <input type="text" id="search" placeholder="Поиск по имени...">
+                        <input type="text" id="search" placeholder="${t('search')}">
                         <div class="ctrl-group">
-                            <label>Класс:</label>
+                            <label>${t('filter_class')}</label>
                             <select id="class-filter">
-                                <option value="">Все</option>
-                                <option value="Fighter">Боец</option><option value="Tank">Танк</option>
-                                <option value="Hunter">Охотник</option><option value="Mage">Маг</option>
-                                <option value="Medic">Медик</option><option value="Necromancer">Некромант</option>
-                                <option value="Druid">Друид</option><option value="Thief">Вор</option>
-                                <option value="Tinkerer">Механик</option><option value="Monk">Монах</option>
-                                <option value="Jester">Шут</option><option value="Psychic">Психик</option>
-                                <option value="Butcher">Мясник</option><option value="Colorless">Бесцветный</option>
+                                <option value="">${t('filter_all')}</option>
+                                <option value="Fighter">Fighter</option><option value="Tank">Tank</option>
+                                <option value="Hunter">Hunter</option><option value="Mage">Mage</option>
+                                <option value="Medic">Medic</option><option value="Necromancer">Necromancer</option>
+                                <option value="Druid">Druid</option><option value="Thief">Thief</option>
+                                <option value="Tinkerer">Tinkerer</option><option value="Monk">Monk</option>
+                                <option value="Jester">Jester</option><option value="Psychic">Psychic</option>
+                                <option value="Butcher">Butcher</option><option value="Colorless">Colorless</option>
                             </select>
                         </div>
                         <div class="ctrl-group">
-                            <label>Статус:</label>
+                            <label>${t('filter_status')}</label>
                             <select id="status-filter">
-                                <option value="">Все</option>
-                                <option value="alive">Живые</option>
-                                <option value="OK">Здоровые</option>
-                                <option value="Injured">Раненые</option>
-                                <option value="Dead">Мёртвые</option>
-                                <option value="retired">Ретированные</option>
-                                <option value="donated">Отданы NPC</option>
+                                <option value="">${t('filter_all')}</option>
+                                <option value="alive">${t('filter_alive')}</option>
+                                <option value="OK">OK</option>
+                                <option value="Injured">${t('filter_injured')}</option>
+                                <option value="Dead">${t('filter_dead')}</option>
+                                <option value="retired">${t('filter_retired')}</option>
+                                <option value="donated">${t('filter_donated')}</option>
                             </select>
                         </div>
                         <div class="ctrl-group">
-                            <label>Пол:</label>
+                            <label>${t('filter_gender')}</label>
                             <select id="gender-filter">
-                                <option value="">Все</option>
-                                <option value="1">Коты</option>
-                                <option value="2">Кошки</option>
+                                <option value="">${t('filter_all')}</option>
+                                <option value="1">${t('filter_male')}</option>
+                                <option value="2">${t('filter_female')}</option>
                             </select>
                         </div>
                         <div class="ctrl-group">
-                            <label>Арт:</label>
+                            <label>${t('filter_image')}</label>
                             <select id="image-filter">
-                                <option value="">Все</option>
-                                <option value="yes">С артом</option>
-                                <option value="no">Без арта</option>
+                                <option value="">${t('filter_all')}</option>
+                                <option value="yes">${t('filter_with_art')}</option>
+                                <option value="no">${t('filter_no_art')}</option>
                             </select>
                         </div>
                         <div class="ctrl-group">
-                            <label>Сортировка:</label>
+                            <label>${t('sort')}</label>
                             <select id="sort-select">
-                                <option value="image_first">Арт + новые</option>
-                                <option value="birth_desc">Новорождённые</option>
-                                <option value="birth_asc">Старейшие</option>
-                                <option value="name_asc">Имя А-Я</option>
-                                <option value="name_desc">Имя Я-А</option>
-                                <option value="class">По классу</option>
+                                <option value="image_first">${t('sort_img')}</option>
+                                <option value="birth_desc">${t('sort_new')}</option>
+                                <option value="birth_asc">${t('sort_old')}</option>
+                                <option value="name_asc">${t('sort_name_az')}</option>
+                                <option value="name_desc">${t('sort_name_za')}</option>
+                                <option value="class">${t('sort_class')}</option>
                             </select>
                         </div>
-                        <label class="ctrl-btn" style="cursor:pointer">Новый сейв<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
+                        <label class="ctrl-btn" style="cursor:pointer">${t('new_save')}<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
                         <div class="save-info">
-                            <span>День <b>${info.current_day||'?'}</b></span>
-                            <span>Золото <b>${info.house_gold||'?'}</b></span>
-                            ${info.house_food?`<span>Еда <b>${info.house_food}</b></span>`:''}
-                            ${info.adventure_coins?`<span>Монеты <b>${info.adventure_coins}</b></span>`:''}
-                            ${info.blank_collars?`<span>Ошейники <b>${info.blank_collars}</b></span>`:''}
+                            <span>${t('day')} <b>${info.current_day||'?'}</b></span>
+                            <span>${t('gold')} <b>${info.house_gold||'?'}</b></span>
+                            ${info.house_food?`<span>${t('food')} <b>${info.house_food}</b></span>`:''}
+                            ${info.adventure_coins?`<span>${t('coins')} <b>${info.adventure_coins}</b></span>`:''}
+                            ${info.blank_collars?`<span>${t('collars')} <b>${info.blank_collars}</b></span>`:''}
                             <span class="cat-count-badge" id="cat-count-badge"></span>
                         </div>
                     </div>
@@ -875,11 +1025,11 @@
                             ${gi?`<span class="card-gender">${gi}</span>`:''}
                         </div>
                         <div class="card-badges">
-                            ${cat.is_dead?'<span class="badge badge-dead">Мёртв</span>':''}
-                            ${cat.status==='Injured'&&!cat.is_dead?'<span class="badge badge-status">Ранен</span>':''}
-                            ${cat.is_retired?'<span class="badge badge-retired">Рет.</span>':''}
+                            ${cat.is_dead?`<span class="badge badge-dead">${t('dead')}</span>`:''}
+                            ${cat.status==='Injured'&&!cat.is_dead?`<span class="badge badge-status">${t('injured')}</span>`:''}
+                            ${cat.is_retired?`<span class="badge badge-retired">${t('retired_badge')}</span>`:''}
                             ${cat.is_donated?'<span class="badge badge-donated">NPC</span>':''}
-                            ${cat.published?'<span class="badge badge-published">В ленте</span>':''}
+                            ${cat.published?`<span class="badge badge-published">${t('in_feed')}</span>`:''}
                             <span class="badge badge-class bc-${cat.class_en}">${esc(cat['class'])}</span>
                         </div>
                     </div>
@@ -890,10 +1040,10 @@
                             ? `<img class="cat-portrait" src="${catImg(cat)}" onclick="showFullscreen('${catImg(cat)}')">`
                             : `<div class="no-portrait">&#128049;</div>`}
                         <div class="card-actions">
-                            <button class="btn btn-generate" id="gen-btn-${id}" onclick="generateImage(${id})" ${!canGen?'disabled':''}>${cat.has_image?'Перегенерить':'Генерация'}</button>
+                            <button class="btn btn-generate" id="gen-btn-${id}" onclick="generateImage(${id})" ${!canGen?'disabled':''}>${cat.has_image?t('regenerate'):t('generate')}</button>
                             ${cat.has_image?(cat.published
-                                ?`<button class="btn btn-unpublish" onclick="togglePublish(${id},false)">Убрать</button>`
-                                :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">В ленту</button>`):''}
+                                ?`<button class="btn btn-unpublish" onclick="togglePublish(${id},false)">${t('unpublish')}</button>`
+                                :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">${t('publish')}</button>`):''}
                         </div>
                     </div>
 
@@ -905,10 +1055,10 @@
 
                     <!-- BODY: abilities, passives, items, mutations -->
                     <div class="card-body">
-                        ${cat.stat_focus && cat.stat_focus !== 'нет' ? `<div class="card-section"><span class="card-section-label">Фокус</span><span class="focus-value">${esc(cat.stat_focus)}</span></div>` : ''}
-                        ${renderTagSection(cat.abilities_rich || cat.abilities, 'ability', 'Атаки')}
-                        ${renderTagSection(cat.passives_rich || cat.passives, 'passive', 'Пассивки')}
-                        ${renderTagSection(cat.items_rich || cat.items, 'item', 'Предметы')}
+                        ${cat.stat_focus && cat.stat_focus !== t('none') && cat.stat_focus !== 'нет' && cat.stat_focus !== 'none' ? `<div class="card-section"><span class="card-section-label">${t('focus')}</span><span class="focus-value">${esc(cat.stat_focus)}</span></div>` : ''}
+                        ${renderTagSection(cat.abilities_rich || cat.abilities, 'ability', t('attacks'))}
+                        ${renderTagSection(cat.passives_rich || cat.passives, 'passive', t('passives_label'))}
+                        ${renderTagSection(cat.items_rich || cat.items, 'item', t('items_label'))}
                         ${renderMutations(cat.mutations)}
                         ${renderBirthDefects(cat)}
                     </div>
@@ -919,14 +1069,14 @@
 
         function renderInfoStrip(cat) {
             const chips = [];
-            const genderText = cat.gender_code === 1 ? 'Кот' : cat.gender_code === 2 ? 'Кошка' : cat.gender === 'кот-паук' ? 'Кот-паук' : '';
+            const genderText = cat.gender_code === 1 ? t('male') : cat.gender_code === 2 ? t('female') : cat.gender === 'кот-паук' ? t('spider_cat') : '';
             if (genderText) chips.push(`<span class="info-chip"><span class="ic-val">${genderText}</span></span>`);
-            if (cat.breed && cat.breed !== 'None' && cat.breed !== '') chips.push(`<span class="info-chip"><span class="ic-label">Порода:</span><span class="ic-val">${esc(cat.breed)}</span></span>`);
-            if (cat.age_days != null) chips.push(`<span class="info-chip"><span class="ic-label">Возраст:</span><span class="ic-val">${cat.age_days} дн.</span></span>`);
-            if (cat.birth_day != null) chips.push(`<span class="info-chip"><span class="ic-label">Рождён:</span><span class="ic-val">день ${cat.birth_day}</span></span>`);
-            if (cat.inbreeding_level > 0) chips.push(`<span class="info-chip"><span class="ic-label">Инбридинг:</span><span class="ic-val">${cat.inbreeding_level}</span></span>`);
-            if (cat.parent_keys && cat.parent_keys.length > 0) chips.push(`<span class="info-chip"><span class="ic-label">Родители:</span><span class="ic-val">${cat.parent_keys.length}</span></span>`);
-            if (cat.voice && cat.voice !== 'неизвестно') chips.push(`<span class="info-chip"><span class="ic-label">Голос:</span><span class="ic-val">${esc(cat.voice)}</span></span>`);
+            if (cat.breed && cat.breed !== 'None' && cat.breed !== '') chips.push(`<span class="info-chip"><span class="ic-label">${t('breed')}</span><span class="ic-val">${esc(cat.breed)}</span></span>`);
+            if (cat.age_days != null) chips.push(`<span class="info-chip"><span class="ic-label">${t('age')}</span><span class="ic-val">${cat.age_days} ${t('days')}</span></span>`);
+            if (cat.birth_day != null) chips.push(`<span class="info-chip"><span class="ic-label">${t('born')}</span><span class="ic-val">${t('born_day')} ${cat.birth_day}</span></span>`);
+            if (cat.inbreeding_level > 0) chips.push(`<span class="info-chip"><span class="ic-label">${t('inbreeding')}</span><span class="ic-val">${cat.inbreeding_level}</span></span>`);
+            if (cat.parent_keys && cat.parent_keys.length > 0) chips.push(`<span class="info-chip"><span class="ic-label">${t('parents')}</span><span class="ic-val">${cat.parent_keys.length}</span></span>`);
+            if (cat.voice && cat.voice !== 'неизвестно' && cat.voice !== 'unknown') chips.push(`<span class="info-chip"><span class="ic-label">${t('voice')}</span><span class="ic-val">${esc(cat.voice)}</span></span>`);
             if (!chips.length) return '';
             return `<div class="card-info-strip">${chips.join('')}</div>`;
         }
@@ -941,7 +1091,7 @@
                 if(s.bonus) mods.push((s.bonus>0?'+':'')+s.bonus);
                 if(s.extra) mods.push((s.extra>0?'+':'')+s.extra);
                 h += `<div class="stat-cell">
-                    <span class="stat-icon">${s.label_ru}</span>
+                    <span class="stat-icon">${LANG==='ru' ? s.label_ru : s.label_en}</span>
                     <span class="stat-val ${c}">${s.effective}</span>
                     ${mods.length?`<span class="stat-mod">${s.base}${mods.join('')}</span>`:''}
                 </div>`;
@@ -976,27 +1126,28 @@
             if (!mutations || !mutations.length) return '';
             const tags = mutations.map(m => {
                 const cls = m.is_defect ? 'defect' : 'mutation';
+                const partName = LANG==='ru' ? (m.part_ru || m.part || '') : (m.part_en || m.part || '');
                 const hasDesc = m.desc && m.desc.trim();
                 if (hasDesc) {
                     return `<span class="tooltip-wrap">
-                        <span class="tag ${cls}">${esc(m.part_ru)}</span>
+                        <span class="tag ${cls}">${esc(partName)}</span>
                         <span class="tip">
-                            <span class="tip-title">${esc(m.part_ru)}</span>
-                            ${m.is_defect?'<span class="tip-key">Врождённый дефект</span>':''}
+                            <span class="tip-title">${esc(partName)}</span>
+                            ${m.is_defect?`<span class="tip-key">${t('birth_defect')}</span>`:''}
                             <span class="tip-desc">${esc(m.desc)}</span>
                         </span>
                     </span>`;
                 }
-                return `<span class="tag ${cls}">${esc(m.part_ru)}${m.is_defect?' (дефект)':''}</span>`;
+                return `<span class="tag ${cls}">${esc(partName)}${m.is_defect?t('defect_suffix'):''}</span>`;
             }).join('');
-            return `<div class="card-section"><span class="card-section-label">Мутации</span><div class="card-section-content">${tags}</div></div>`;
+            return `<div class="card-section"><span class="card-section-label">${t('mutations_label')}</span><div class="card-section-content">${tags}</div></div>`;
         }
 
         function renderBirthDefects(cat) {
             const defects = cat.birth_defect_passives || [];
             if (!defects.length) return '';
             const tags = defects.map(d => `<span class="tag birth-defect">${esc(d)}</span>`).join('');
-            return `<div class="card-section"><span class="card-section-label">Дефекты</span><div class="card-section-content">${tags}</div></div>`;
+            return `<div class="card-section"><span class="card-section-label">${t('defects_label')}</span><div class="card-section-content">${tags}</div></div>`;
         }
 
         function renderPagination(totalItems, totalPages) {
@@ -1018,7 +1169,7 @@
 
             html += `<button ${currentPage>=totalPages-1?'disabled':''} onclick="goToPage(${currentPage+1})">&rsaquo;</button>`;
             html += `<button ${currentPage>=totalPages-1?'disabled':''} onclick="goToPage(${totalPages-1})">&raquo;</button>`;
-            html += `<span class="page-info">${currentPage*CATS_PER_PAGE+1}-${Math.min((currentPage+1)*CATS_PER_PAGE, totalItems)} из ${totalItems}</span>`;
+            html += `<span class="page-info">${currentPage*CATS_PER_PAGE+1}-${Math.min((currentPage+1)*CATS_PER_PAGE, totalItems)} ${t('of')} ${totalItems}</span>`;
             pg.innerHTML = html;
         }
 
@@ -1030,12 +1181,12 @@
 
         function renderFeedDetails(cat) {
             const parts = [];
-            const genderText = cat.gender_code === 1 ? 'Кот' : cat.gender_code === 2 ? 'Кошка' : '';
+            const genderText = cat.gender_code === 1 ? t('male') : cat.gender_code === 2 ? t('female') : '';
             if (genderText) parts.push(genderText);
-            if (cat.age_days) parts.push(`${cat.age_days} дн.`);
-            if (cat.is_dead) parts.push('Мёртв');
-            else if (cat.status === 'Injured') parts.push('Ранен');
-            if (cat.is_retired) parts.push('Ретирован');
+            if (cat.age_days) parts.push(`${cat.age_days} ${t('days')}`);
+            if (cat.is_dead) parts.push(t('dead'));
+            else if (cat.status === 'Injured') parts.push(t('injured'));
+            if (cat.is_retired) parts.push(t('filter_retired'));
             if (!parts.length) return '';
             return `<div style="font-size:12px;color:#6a5830;margin-bottom:4px">${parts.join(' · ')}</div>`;
         }
@@ -1051,12 +1202,12 @@
                 if(d.success){ currentUser.generations_count++; renderAuthArea();
                     const c=allCats.find(x=>x.db_id===catId); if(c){c.has_image=true;c.image_url=d.image_url;c._bust=Date.now();}
                     renderCats();
-                } else { err.textContent=d.error;err.style.display='block';btn.disabled=false;btn.textContent='Генерация'; }
-            } catch(e){ err.textContent='Ошибка сети';err.style.display='block';btn.disabled=false;btn.textContent='Генерация'; }
+                } else { err.textContent=d.error;err.style.display='block';btn.disabled=false;btn.textContent=t('generate'); }
+            } catch(e){ err.textContent=t('net_error');err.style.display='block';btn.disabled=false;btn.textContent=t('generate'); }
         }
 
         async function toggleLike(catId, feedIdx) {
-            if (!currentUser) { showToast('Войдите чтобы лайкать'); return; }
+            if (!currentUser) { showToast(t('login_to_like')); return; }
             try {
                 const r = await fetch(`/api/cat/${catId}/like`, {method:'POST'});
                 const d = await r.json();
@@ -1072,23 +1223,23 @@
                             btn.innerHTML = `${d.liked ? '&#10084;' : '&#9825;'} <span class="like-count">${d.like_count}</span>`;
                         }
                     }
-                } else showToast(d.error || 'Ошибка');
-            } catch(e) { showToast('Ошибка сети'); }
+                } else showToast(d.error || t('error'));
+            } catch(e) { showToast(t('net_error')); }
         }
 
         async function togglePublish(catId, pub) {
             try {
                 const r = await fetch(`/api/cat/${catId}/${pub?'publish':'unpublish'}`,{method:'POST'});
                 const d = await r.json();
-                if(d.success){ const c=allCats.find(x=>x.db_id===catId);if(c)c.published=d.published; renderCats(); showToast(pub?'Опубликовано!':'Убрано из ленты'); }
+                if(d.success){ const c=allCats.find(x=>x.db_id===catId);if(c)c.published=d.published; renderCats(); showToast(pub?t('published_toast'):t('unpublished_toast')); }
                 else showToast(d.error);
-            } catch(e){ showToast('Ошибка'); }
+            } catch(e){ showToast(t('error')); }
         }
 
         async function showPrompt(catId) {
             const r = await fetch(`/api/cat/${catId}/prompt`); const d = await r.json();
             currentModalCatId=catId;
-            document.getElementById('modal-cat-name').textContent=`Промпт: ${d.cat.name}`;
+            document.getElementById('modal-cat-name').textContent=`${t('prompt_title')}: ${d.cat.name}`;
             document.getElementById('prompt-text').value=d.prompt;
             document.getElementById('prompt-modal').classList.add('active');
         }
@@ -1105,8 +1256,8 @@
                 if(d.success){ currentUser.generations_count++;renderAuthArea();
                     const c=allCats.find(x=>x.db_id===currentModalCatId);if(c){c.has_image=true;c.image_url=d.image_url;c._bust=Date.now();}
                     renderCats();
-                } else { if(err){err.textContent=d.error;err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Генерация';} }
-            } catch(e){ if(err){err.textContent='Ошибка';err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Генерация';} }
+                } else { if(err){err.textContent=d.error;err.style.display='block';} if(btn){btn.disabled=false;btn.textContent=t('generate');} }
+            } catch(e){ if(err){err.textContent=t('error');err.style.display='block';} if(btn){btn.disabled=false;btn.textContent=t('generate');} }
         }
 
         function closeModal(){document.getElementById('prompt-modal').classList.remove('active')}
@@ -1119,9 +1270,9 @@
             if (navigator.share) {
                 navigator.share({ title: catName + ' — Mewgenics', url: url }).catch(()=>{});
             } else if (navigator.clipboard) {
-                navigator.clipboard.writeText(url).then(() => showToast('Ссылка скопирована!'));
+                navigator.clipboard.writeText(url).then(() => showToast(t('link_copied')));
             } else {
-                prompt('Скопируйте ссылку:', url);
+                prompt(t('copy_link'), url);
             }
         }
 
@@ -1136,9 +1287,9 @@
         function closeFeedback() { document.getElementById('feedback-modal').classList.remove('active'); }
         async function submitFeedback() {
             const msg = document.getElementById('fb-message').value.trim();
-            if (!msg) { showToast('Напишите сообщение'); return; }
+            if (!msg) { showToast(t('fb_empty')); return; }
             const btn = document.getElementById('fb-submit');
-            btn.disabled = true; btn.textContent = 'Отправка...';
+            btn.disabled = true; btn.textContent = t('sending');
             try {
                 const r = await fetch('/api/feedback', {
                     method: 'POST',
@@ -1152,12 +1303,12 @@
                 });
                 const d = await r.json();
                 if (d.success) {
-                    showToast('Спасибо за обратную связь!');
+                    showToast(t('fb_thanks'));
                     closeFeedback();
                     document.getElementById('fb-message').value = '';
-                } else showToast(d.error || 'Ошибка');
-            } catch(e) { showToast('Ошибка сети'); }
-            btn.disabled = false; btn.textContent = 'Отправить';
+                } else showToast(d.error || t('error'));
+            } catch(e) { showToast(t('net_error')); }
+            btn.disabled = false; btn.textContent = t('fb_send');
         }
 
         document.getElementById('prompt-modal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});

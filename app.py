@@ -7,7 +7,7 @@ import tempfile
 from flask import Flask, render_template, jsonify, request, redirect, make_response, Response
 
 from cat_parser import load_all_cats, get_save_info, CatData, CatStats
-from prompt_builder import build_prompt, build_cat_summary_ru
+from prompt_builder import build_prompt, build_cat_summary_ru, build_cat_summary
 from prompt_writer import (generate_visual_prompt, get_image_model, get_system_instruction,
                            get_user_prompt_template, get_prompt_model,
                            DEFAULT_SYSTEM_INSTRUCTION, DEFAULT_USER_PROMPT_TEMPLATE,
@@ -22,9 +22,16 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB max upload
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+SUPPORTED_LANGS = ('en', 'ru')
 
 
 # === Helpers ===
+
+def get_lang():
+    """Get current language from cookie, default to 'ru'."""
+    lang = request.cookies.get('lang', 'ru')
+    return lang if lang in SUPPORTED_LANGS else 'ru'
+
 
 def require_auth():
     return get_current_user(request)
@@ -155,16 +162,27 @@ def auth_me():
     })
 
 
+@app.route("/api/set-lang", methods=["POST"])
+def api_set_lang():
+    data = request.get_json() or {}
+    lang = data.get("lang", "ru")
+    if lang not in SUPPORTED_LANGS:
+        lang = "ru"
+    resp = jsonify({"success": True, "lang": lang})
+    resp.set_cookie("lang", lang, max_age=365*24*3600, samesite="Lax")
+    return resp
+
+
 # === Pages ===
 
 @app.route("/")
 def index():
-    return render_template("index.html", page="feed")
+    return render_template("index.html", page="feed", lang=get_lang())
 
 
 @app.route("/cabinet")
 def cabinet():
-    return render_template("index.html", page="cabinet")
+    return render_template("index.html", page="cabinet", lang=get_lang())
 
 
 @app.route("/img/<int:cat_id>")
@@ -224,10 +242,11 @@ def api_feed():
     if user:
         user_likes = db.get_user_likes(user["user_id"])
 
+    lang = get_lang()
     result = []
     for row in rows:
         cat = _cat_data_from_row(row)
-        summary = build_cat_summary_ru(cat)
+        summary = build_cat_summary(cat, lang=lang)
         summary["db_id"] = row["id"]
         summary["image_url"] = row.get("image_url")
         summary["owner_name"] = row.get("owner_name", "")
@@ -303,11 +322,12 @@ def api_cats():
         return jsonify([])
 
     rows = db.get_cats_for_save(saves[0]["id"])
+    lang = get_lang()
 
     result = []
     for row in rows:
         cat = _cat_data_from_row(row)
-        summary = build_cat_summary_ru(cat)
+        summary = build_cat_summary(cat, lang=lang)
         summary["db_id"] = row["id"]
         summary["has_image"] = bool(row.get("image_url"))
         summary["image_url"] = row.get("image_url")
@@ -382,7 +402,7 @@ def api_cat_prompt(db_cat_id):
         return jsonify({"error": "Кот не найден"}), 404
 
     cat = _cat_data_from_row(row)
-    summary = build_cat_summary_ru(cat)
+    summary = build_cat_summary(cat, lang='en')
     # Generate AI prompt for preview
     ai_prompt = generate_visual_prompt(summary)
     fallback = build_prompt(cat)
@@ -413,7 +433,7 @@ def api_generate(db_cat_id):
         return jsonify({"error": "Кот не найден"}), 404
 
     cat = _cat_data_from_row(row)
-    summary = build_cat_summary_ru(cat)
+    summary = build_cat_summary(cat, lang='en')
 
     data = request.get_json(silent=True) or {}
     if data.get("custom_prompt"):
@@ -730,7 +750,7 @@ def api_admin_preview_cat_data(db_cat_id):
         return jsonify({"error": "Cat not found"}), 404
 
     cat = _cat_data_from_row(row)
-    summary = build_cat_summary_ru(cat)
+    summary = build_cat_summary(cat, lang='en')
     data_text = _build_cat_data_text(summary)
 
     user_template = get_user_prompt_template()

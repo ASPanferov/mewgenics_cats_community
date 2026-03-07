@@ -1,6 +1,6 @@
 """Build image generation prompts from cat data in Edmund McMillen's Mewgenics style."""
 
-from cat_parser import (CatData, CLASS_RU, STAT_LABELS, STAT_LABELS_RU, PART_NAME_RU,
+from cat_parser import (CatData, CLASS_RU, STAT_LABELS, STAT_LABELS_RU, PART_NAME_RU, PART_NAME_EN,
                         _BIRTH_DEFECT_FRAME_THRESHOLD, BIRTH_DEFECT_PASSIVES)
 from game_descriptions import game_desc
 
@@ -472,13 +472,14 @@ def build_prompt(cat: CatData) -> str:
     return ". ".join(parts)
 
 
-def build_cat_summary_ru(cat: CatData) -> dict:
-    """Build a Russian summary of cat data for the UI."""
+def build_cat_summary(cat: CatData, lang: str = 'ru') -> dict:
+    """Build a localized summary of cat data for the UI."""
     class_ru = CLASS_RU.get(cat.cat_class, cat.cat_class)
 
     stats_dict = {}
     for i, (label, label_ru) in enumerate(zip(STAT_LABELS, STAT_LABELS_RU)):
         stats_dict[label] = {
+            "label_en": label,
             "label_ru": label_ru,
             "base": cat.stats.base[i],
             "bonus": cat.stats.bonus[i],
@@ -490,11 +491,13 @@ def build_cat_summary_ru(cat: CatData) -> dict:
     mutations_list = []
     for part_name, frame in cat.mutations.items():
         part_ru = PART_NAME_RU.get(part_name, part_name)
-        desc = game_desc.get_mutation(part_name, frame)
+        part_en = PART_NAME_EN.get(part_name, part_name)
+        desc = game_desc.get_mutation(part_name, frame, lang=lang)
         is_defect = frame >= _BIRTH_DEFECT_FRAME_THRESHOLD
         mutations_list.append({
             "part": part_name,
             "part_ru": part_ru,
+            "part_en": part_en,
             "frame": frame,
             "desc": desc or "",
             "is_defect": is_defect,
@@ -503,7 +506,7 @@ def build_cat_summary_ru(cat: CatData) -> dict:
     # Build rich ability/passive/item info with names + descriptions
     abilities_rich = []
     for a in cat.abilities:
-        info = game_desc.get_ability(a)
+        info = game_desc.get_ability(a, lang=lang)
         name = (info[0] if info and info[0] else '') or a
         abilities_rich.append({
             "key": a,
@@ -513,7 +516,7 @@ def build_cat_summary_ru(cat: CatData) -> dict:
 
     passives_rich = []
     for p in cat.passives:
-        info = game_desc.get_passive(p)
+        info = game_desc.get_passive(p, lang=lang)
         name = (info[0] if info and info[0] else '') or p
         passives_rich.append({
             "key": p,
@@ -523,7 +526,7 @@ def build_cat_summary_ru(cat: CatData) -> dict:
 
     items_rich = []
     for it in cat.items:
-        info = game_desc.get_item(it)
+        info = game_desc.get_item(it, lang=lang)
         name = (info[0] if info and info[0] else '') or it
         items_rich.append({
             "key": it,
@@ -537,15 +540,23 @@ def build_cat_summary_ru(cat: CatData) -> dict:
         if p in BIRTH_DEFECT_PASSIVES and p not in birth_defect_passives:
             birth_defect_passives.append(p)
 
+    # Gender localized
+    gender_map = {
+        'en': {'кот': 'male', 'кошка': 'female', 'кот-паук': 'spider-cat'},
+        'ru': {'кот': 'кот', 'кошка': 'кошка', 'кот-паук': 'кот-паук'},
+    }
+    gender_display = gender_map.get(lang, gender_map['en']).get(cat.gender, cat.gender or ('unknown' if lang == 'en' else 'неизвестно'))
+
     return {
         "id": cat.id,
         "name": cat.name,
-        "class": class_ru,
+        "class": class_ru if lang == 'ru' else cat.cat_class,
         "class_en": cat.cat_class,
-        "gender": cat.gender or "неизвестно",
+        "class_ru": class_ru,
+        "gender": gender_display,
         "gender_code": cat.gender_code,
-        "voice": cat.voice or "неизвестно",
-        "stat_focus": cat.stat_focus or "нет",
+        "voice": cat.voice or "",
+        "stat_focus": cat.stat_focus or ("none" if lang == 'en' else "нет"),
         "status": cat.status,
         "is_dead": cat.is_dead,
         "is_retired": cat.is_retired,
@@ -565,3 +576,8 @@ def build_cat_summary_ru(cat: CatData) -> dict:
         "mutations": mutations_list,
         "stats": stats_dict,
     }
+
+
+# Backward compatibility alias
+def build_cat_summary_ru(cat: CatData) -> dict:
+    return build_cat_summary(cat, lang='ru')

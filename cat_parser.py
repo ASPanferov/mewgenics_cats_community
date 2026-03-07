@@ -95,6 +95,12 @@ PART_NAME_RU = {
     'lefteye': 'Левый глаз', 'righteye': 'Правый глаз',
     'lefteyebrow': 'Левая бровь', 'righteyebrow': 'Правая бровь',
 }
+PART_NAME_EN = {
+    'texture': 'Texture', 'body': 'Body', 'head': 'Head', 'tail': 'Tail',
+    'leg1': 'Leg 1', 'leg2': 'Leg 2', 'arm1': 'Arm 1', 'arm2': 'Arm 2',
+    'lefteye': 'Left eye', 'righteye': 'Right eye',
+    'lefteyebrow': 'Left eyebrow', 'righteyebrow': 'Right eyebrow',
+}
 
 # Known stat types
 STAT_TYPES = {'none', 'str', 'dex', 'con', 'int', 'spd', 'cha', 'lck',
