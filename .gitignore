@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+static/generated/
+MewgenicsSaveEditor-v3.0.1/
+MewgenicsSaveEditor-v3.0.1*.zip

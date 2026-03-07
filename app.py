@@ -1,0 +1,346 @@
+"""Mewgenics Cat Viewer — Flask app for local dev and Vercel deployment."""
+
+import json
+import os
+import tempfile
+
+from flask import Flask, render_template, jsonify, request, redirect, make_response
+
+from cat_parser import load_all_cats, get_save_info, CatData, CatStats
+from prompt_builder import build_prompt, build_cat_summary_ru
+from auth import get_google_auth_url, exchange_code, create_jwt, get_current_user
+import db
+import storage
+
+app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB max upload
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+
+
+# === Helpers ===
+
+def require_auth():
+    """Check auth, return user payload or None."""
+    return get_current_user(request)
+
+
+def _cat_data_from_row(row):
+    """Reconstruct CatData from DB row for prompt building."""
+    d = row["data"] if isinstance(row["data"], dict) else json.loads(row["data"])
+    stats = CatStats(
+        base=d.get("stats_base", [0]*7),
+        bonus=d.get("stats_bonus", [0]*7),
+        extra=d.get("stats_extra", [0]*7),
+    )
+    cat = CatData(
+        id=row["cat_key"],
+        name=d.get("name", ""),
+        voice=d.get("voice", ""),
+        gender=d.get("gender", ""),
+        stat_focus=d.get("stat_focus", ""),
+        cat_class=d.get("cat_class", "Colorless"),
+        basic_attack=d.get("basic_attack", ""),
+        abilities=d.get("abilities", []),
+        passives=d.get("passives", []),
+        items=d.get("items", []),
+        mutations=d.get("mutations", {}),
+        stats=stats,
+        status=d.get("status", "OK"),
+    )
+    return cat
+
+
+def _cat_to_db_data(cat):
+    """Convert CatData to JSON-serializable dict for DB storage."""
+    return {
+        "name": cat.name,
+        "voice": cat.voice,
+        "gender": cat.gender,
+        "stat_focus": cat.stat_focus,
+        "cat_class": cat.cat_class,
+        "basic_attack": cat.basic_attack,
+        "abilities": cat.abilities,
+        "passives": cat.passives,
+        "items": cat.items,
+        "mutations": cat.mutations,
+        "status": cat.status,
+        "stats_base": cat.stats.base,
+        "stats_bonus": cat.stats.bonus,
+        "stats_extra": cat.stats.extra,
+    }
+
+
+# === Auth routes ===
+
+@app.route("/auth/google")
+def auth_google():
+    return redirect(get_google_auth_url())
+
+
+@app.route("/auth/callback")
+def auth_callback():
+    code = request.args.get("code")
+    if not code:
+        return redirect("/?error=no_code")
+
+    user_info = exchange_code(code)
+    if not user_info:
+        return redirect("/?error=auth_failed")
+
+    google_id = user_info.get("id", "")
+    email = user_info.get("email", "")
+    name = user_info.get("name", "")
+    avatar = user_info.get("picture", "")
+
+    user = db.upsert_user(google_id, email, name, avatar)
+    token = create_jwt(user["id"], email, name)
+
+    resp = make_response(redirect("/"))
+    resp.set_cookie("auth_token", token, httponly=True, secure=True,
+                     samesite="Lax", max_age=60*60*24*30)
+    return resp
+
+
+@app.route("/auth/logout")
+def auth_logout():
+    resp = make_response(redirect("/"))
+    resp.delete_cookie("auth_token")
+    return resp
+
+
+@app.route("/auth/me")
+def auth_me():
+    user = require_auth()
+    if not user:
+        return jsonify({"authenticated": False})
+    db_user = db.get_user(user["user_id"])
+    if not db_user:
+        return jsonify({"authenticated": False})
+    return jsonify({
+        "authenticated": True,
+        "user": {
+            "id": db_user["id"],
+            "name": db_user["name"],
+            "email": db_user["email"],
+            "avatar_url": db_user["avatar_url"],
+            "generations_count": db_user["generations_count"],
+        }
+    })
+
+
+# === Pages ===
+
+@app.route("/")
+def index():
+    user = require_auth()
+    return render_template("index.html", user=user)
+
+
+# === Save upload ===
+
+@app.route("/api/upload", methods=["POST"])
+def api_upload():
+    user = require_auth()
+    if not user:
+        return jsonify({"error": "Требуется авторизация"}), 401
+
+    file = request.files.get("save_file")
+    if not file or not file.filename:
+        return jsonify({"error": "Файл не выбран"}), 400
+
+    # Save to temp, parse, store in DB
+    with tempfile.NamedTemporaryFile(suffix=".sav", delete=False) as tmp:
+        file.save(tmp.name)
+        tmp_path = tmp.name
+
+    try:
+        save_info = get_save_info(tmp_path)
+        cats = load_all_cats(tmp_path)
+    except Exception as e:
+        os.unlink(tmp_path)
+        return jsonify({"error": f"Ошибка парсинга: {e}"}), 400
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+    # Delete old saves for this user (keep only latest)
+    old_saves = db.get_user_saves(user["user_id"])
+    for old in old_saves:
+        # Delete old cat images from blob
+        old_cats = db.get_cats_for_save(old["id"])
+        for oc in old_cats:
+            if oc.get("image_url"):
+                storage.delete_blob(oc["image_url"])
+        db.delete_save(old["id"])
+
+    # Create new save
+    save = db.create_save(user["user_id"], file.filename, save_info)
+
+    # Insert cats
+    cats_data = []
+    for cat in cats:
+        cats_data.append((cat.id, cat.name, _cat_to_db_data(cat)))
+    db.insert_cats(save["id"], cats_data)
+
+    return jsonify({
+        "success": True,
+        "save_id": save["id"],
+        "cat_count": len(cats),
+        "save_info": save_info,
+    })
+
+
+# === Cat API ===
+
+@app.route("/api/cats")
+def api_cats():
+    user = require_auth()
+    if not user:
+        return jsonify([])
+
+    saves = db.get_user_saves(user["user_id"])
+    if not saves:
+        return jsonify([])
+
+    save = saves[0]  # Latest save
+    rows = db.get_cats_for_save(save["id"])
+
+    result = []
+    for row in rows:
+        cat = _cat_data_from_row(row)
+        summary = build_cat_summary_ru(cat)
+        summary["db_id"] = row["id"]  # DB primary key for generation
+        summary["has_image"] = bool(row.get("image_url"))
+        summary["image_url"] = row.get("image_url")
+        result.append(summary)
+
+    return jsonify(result)
+
+
+@app.route("/api/save-info")
+def api_save_info():
+    user = require_auth()
+    if not user:
+        return jsonify({})
+
+    saves = db.get_user_saves(user["user_id"])
+    if not saves:
+        return jsonify({})
+
+    save = saves[0]
+    info = save["save_info"] if isinstance(save["save_info"], dict) else json.loads(save["save_info"])
+    info["save_id"] = save["id"]
+    info["filename"] = save["filename"]
+    return jsonify(info)
+
+
+@app.route("/api/cat/<int:db_cat_id>/prompt")
+def api_cat_prompt(db_cat_id):
+    user = require_auth()
+    if not user:
+        return jsonify({"error": "Требуется авторизация"}), 401
+
+    row = db.get_cat(db_cat_id)
+    if not row:
+        return jsonify({"error": "Кот не найден"}), 404
+
+    cat = _cat_data_from_row(row)
+    prompt = build_prompt(cat)
+    return jsonify({"prompt": prompt, "cat": build_cat_summary_ru(cat)})
+
+
+@app.route("/api/cat/<int:db_cat_id>/generate", methods=["POST"])
+def api_generate(db_cat_id):
+    user = require_auth()
+    if not user:
+        return jsonify({"error": "Требуется авторизация"}), 401
+
+    row = db.get_cat(db_cat_id)
+    if not row:
+        return jsonify({"error": "Кот не найден"}), 404
+
+    cat = _cat_data_from_row(row)
+    prompt = build_prompt(cat)
+
+    data = request.get_json(silent=True) or {}
+    if data.get("custom_prompt"):
+        prompt = data["custom_prompt"]
+
+    try:
+        from google import genai
+
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model="gemini-3.1-flash-image-preview",
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                response_modalities=["IMAGE", "TEXT"],
+            ),
+        )
+
+        for part in response.candidates[0].content.parts:
+            if part.inline_data is not None:
+                image_data = part.inline_data.data
+                mime_type = part.inline_data.mime_type or "image/png"
+
+                ext = "png"
+                if "jpeg" in mime_type or "jpg" in mime_type:
+                    ext = "jpg"
+                elif "webp" in mime_type:
+                    ext = "webp"
+
+                filename = f"cat_{db_cat_id}_{cat.name[:20]}.{ext}"
+
+                # Delete old image if exists
+                if row.get("image_url"):
+                    storage.delete_blob(row["image_url"])
+
+                # Upload to Vercel Blob
+                blob_url = storage.upload_blob(filename, image_data, mime_type)
+
+                if not blob_url:
+                    # Fallback: local storage for dev
+                    gen_dir = os.path.join(os.path.dirname(__file__), "static", "generated")
+                    os.makedirs(gen_dir, exist_ok=True)
+                    local_path = os.path.join(gen_dir, f"cat_{db_cat_id}.{ext}")
+                    with open(local_path, "wb") as f:
+                        f.write(image_data)
+                    blob_url = f"/static/generated/cat_{db_cat_id}.{ext}"
+
+                # Save URL to DB
+                db.set_cat_image(db_cat_id, blob_url)
+                db.increment_generations(user["user_id"])
+
+                return jsonify({
+                    "success": True,
+                    "image_url": blob_url,
+                })
+
+        return jsonify({"error": "Нет изображения в ответе", "text": response.text}), 500
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# === DB init on startup ===
+
+try:
+    db.init_db()
+except Exception:
+    pass  # DB might not be available (e.g., no POSTGRES_URL set yet)
+
+
+if __name__ == "__main__":
+    # Local dev mode
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    try:
+        db.init_db()
+        print("Database initialized")
+    except Exception as e:
+        print(f"DB init failed (ok for local dev without Postgres): {e}")
+
+    os.makedirs(os.path.join(os.path.dirname(__file__), "static", "generated"), exist_ok=True)
+    app.run(debug=True, port=5000)
