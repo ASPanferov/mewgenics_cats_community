@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mewgenics - Cat Community</title>
-    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #c8b898;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b0a080' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             color: #3a2e1e;
-            font-family: 'Patrick Hand', 'Comic Sans MS', cursive;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
 
@@ -32,7 +32,7 @@
         }
         .header-brand { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
         .header-logo { font-size: 32px; filter: drop-shadow(2px 2px 0 #2a1a0e); }
-        .header h1 { font-family: 'Caveat', cursive; font-size: 32px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e, -1px -1px 0 #2a1a0e, 1px -1px 0 #2a1a0e; letter-spacing: 3px; position: relative; z-index: 1; }
+        .header h1 { font-family: 'Nunito', sans-serif; font-size: 28px; font-weight: 800; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e; letter-spacing: 3px; text-transform: uppercase; position: relative; z-index: 1; }
         .header-right { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
         .lang-switch {
             display: flex; gap: 2px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 2px;
@@ -145,7 +145,7 @@
         }
         .card-name-wrap { display: flex; align-items: baseline; gap: 4px; min-width: 0; flex: 1; }
         .card-name {
-            font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700;
+            font-family: inherit; font-size: 22px; font-weight: 800;
             color: #2a1a0e; line-height: 1;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
@@ -223,7 +223,7 @@
         }
         .stat-cell:last-child { border-right: none; }
         .stat-icon { font-size: 9px; font-weight: bold; color: #8a7a58; display: block; line-height: 1; text-transform: uppercase; }
-        .stat-val { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: #2a1a0e; line-height: 1.1; }
+        .stat-val { font-family: inherit; font-size: 20px; font-weight: 800; color: #2a1a0e; line-height: 1.1; }
         .stat-val.hurt { color: #c03030; }
         .stat-val.buff { color: #2a8a2a; }
         .stat-mod { font-size: 9px; color: #8a7050; display: block; line-height: 1; }
@@ -294,7 +294,7 @@
         .feed-card img.feed-img { width: 100%; object-fit: cover; cursor: pointer; display: block; border-bottom: 3px solid #5c4428; }
         .feed-card-info { padding: 14px 20px; }
         .feed-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .feed-cat-name { font-family: 'Caveat', cursive; font-size: 34px; font-weight: 700; color: #2a1a0e; }
+        .feed-cat-name { font-family: inherit; font-size: 26px; font-weight: 800; color: #2a1a0e; }
         .feed-owner { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8a7050; margin-bottom: 8px; }
         .feed-owner img { width: 24px; height: 24px; border-radius: 50%; }
         .feed-tags { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -314,7 +314,7 @@
         .loading-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 4px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .page-center { text-align: center; padding: 80px 24px; }
-        .page-center h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 36px; margin-bottom: 12px; }
+        .page-center h2 { font-family: inherit; color: #5c3d2e; font-size: 28px; font-weight: 800; margin-bottom: 12px; }
         .page-center p { color: #6a5030; font-size: 16px; margin-bottom: 8px; }
         .btn-google { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #3a2e1e; border: 2px solid #8a6e48; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: bold; text-decoration: none; box-shadow: 3px 3px 0 #8a6e48; transition: all 0.2s; }
         .btn-google:hover { transform: translateY(-2px); box-shadow: 4px 5px 0 #8a6e48; }
@@ -322,7 +322,7 @@
         .upload-box { max-width: 480px; margin: 0 auto; background: #efe0c0; border: 3px dashed #8a6e48; border-radius: 12px; padding: 36px; cursor: pointer; transition: all 0.2s; }
         .upload-box:hover { border-color: #6b4830; background: #f0e8d0; }
         .upload-box.dragover { border-color: #f0d878; background: #f8f0d8; }
-        .upload-box h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 26px; margin-bottom: 8px; }
+        .upload-box h2 { font-family: inherit; color: #5c3d2e; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
         .upload-box p { margin: 6px 0; font-size: 14px; }
         .upload-box .hint { font-size: 12px; color: #a08060; margin-top: 12px; }
         .empty-feed { text-align: center; padding: 60px; color: #8a7050; font-size: 18px; }
@@ -331,7 +331,7 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(42,26,14,0.85); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
         .modal { background: #efe0c0; border-radius: 8px; padding: 20px; max-width: 680px; width: 90%; max-height: 90vh; overflow-y: auto; border: 3px solid #6b4830; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
-        .modal h2 { font-family: 'Caveat', cursive; color: #5c3d2e; margin-bottom: 12px; font-size: 26px; }
+        .modal h2 { font-family: inherit; color: #5c3d2e; margin-bottom: 12px; font-size: 22px; font-weight: 700; }
         .modal textarea { width: 100%; min-height: 120px; background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 10px; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; margin-bottom: 12px; }
         .modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; }
         .modal .btn-close { background: #b89a6a; color: #3a2e1e; padding: 7px 18px; border: 2px solid #8a6e48; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 13px; }
@@ -412,7 +412,7 @@
             position: relative; z-index: 1;
         }
         .footer-col { flex: 1; min-width: 200px; }
-        .footer-col h3 { font-family: 'Caveat', cursive; font-size: 22px; color: #f0d878; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+        .footer-col h3 { font-family: inherit; font-size: 18px; font-weight: 700; color: #f0d878; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
         .footer-col p { margin-bottom: 4px; line-height: 1.5; }
         .footer-col a { color: #f0d878; text-decoration: none; }
         .footer-col a:hover { text-decoration: underline; }
@@ -840,7 +840,7 @@
                     <input type="file" id="file-input" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])">
                 </div>
                 <div style="max-width:520px;margin:20px auto 0;text-align:left;background:#e8dcc0;border:2px solid #8a6e48;border-radius:8px;padding:16px 20px;font-size:13px;color:#5c3d2e;line-height:1.6">
-                    <h3 style="font-family:'Caveat',cursive;font-size:20px;color:#3a2e1e;margin-bottom:8px">&#128269; ${t('where_save')}</h3>
+                    <h3 style="font-size:18px;font-weight:700;color:#3a2e1e;margin-bottom:8px">&#128269; ${t('where_save')}</h3>
                     <p><b>Windows:</b> ${t('win_path_hint')}</p>
                     <code style="display:block;background:#d8cca8;padding:8px 12px;border-radius:4px;margin:6px 0;word-break:break-all;font-size:12px">%AppData%\\Glaiel Games\\Mewgenics</code>
                     <p>${t('win_full_path')} <code style="font-size:11px">C:\\Users\\&lt;YourName&gt;\\AppData\\Roaming\\Glaiel Games\\Mewgenics\\</code></p>
