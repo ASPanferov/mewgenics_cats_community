@@ -401,12 +401,13 @@ def _parse_trailing_data(data: bytes, strings: list[tuple[int, str]]) -> dict:
             result['birth_day'] = raw_val
 
     # Parent keys at +16 (6 u32s)
+    # 0xFFFFFFFF = no parent (sentinel value)
     parents_off = class_end + _TRAIL_PARENTS_OFFSET
     if parents_off + _TRAIL_PARENTS_SIZE <= len(data):
         parent_keys = []
         for i in range(6):
             pk = struct.unpack_from('<I', data, parents_off + i * 4)[0]
-            if pk > 0:
+            if pk > 0 and pk != 0xFFFFFFFF:
                 parent_keys.append(pk)
         result['parent_keys'] = parent_keys
 
@@ -612,6 +613,22 @@ def parse_cat_blob(cat_id: int, blob: bytes) -> CatData:
         # Flags
         cat.is_retired = bool(cat.pre_meta_flags & _RETIRED_FLAG)
         cat.is_donated = bool(cat.pre_meta_flags & _DONATED_FLAG)
+
+    # Fallback: infer gender from voice string if pre-meta gender is 0
+    if cat.gender_code == 0:
+        for idx, (off, s) in enumerate(all_strings):
+            if re.match(r'^male\d', s):
+                cat.gender = "кот"
+                cat.gender_code = _GENDER_MALE
+                break
+            elif re.match(r'^female\d', s):
+                cat.gender = "кошка"
+                cat.gender_code = _GENDER_FEMALE
+                break
+            elif re.match(r'^spidercat\d', s):
+                cat.gender = "кот-паук"
+                cat.gender_code = _GENDER_ANY
+                break
 
     # === Equipment block (mutations + appearance frames) ===
     cat.mutations, cat.all_frames, _ = _parse_equipment_block(raw, all_strings)

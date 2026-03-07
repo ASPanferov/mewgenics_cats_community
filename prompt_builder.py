@@ -504,27 +504,30 @@ def build_cat_summary_ru(cat: CatData) -> dict:
     abilities_rich = []
     for a in cat.abilities:
         info = game_desc.get_ability(a)
+        name = (info[0] if info and info[0] else '') or a
         abilities_rich.append({
             "key": a,
-            "name": info[0] if info else a,
+            "name": name,
             "desc": info[1] if info else "",
         })
 
     passives_rich = []
     for p in cat.passives:
         info = game_desc.get_passive(p)
+        name = (info[0] if info and info[0] else '') or p
         passives_rich.append({
             "key": p,
-            "name": info[0] if info else p,
+            "name": name,
             "desc": info[1] if info else "",
         })
 
     items_rich = []
     for it in cat.items:
         info = game_desc.get_item(it)
+        name = (info[0] if info and info[0] else '') or it
         items_rich.append({
             "key": it,
-            "name": info[0] if info else it,
+            "name": name,
             "desc": info[1] if info else "",
         })
 
