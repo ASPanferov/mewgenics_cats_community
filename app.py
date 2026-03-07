@@ -423,7 +423,7 @@ def api_migrate():
         db.init_db()
 
         # Grant premium to founders
-        for email in ["panfyorov@gmail.com", "insaneramzes@gmail.com"]:
+        for email in ["pafa0712@gmail.com", "insaneramzes@gmail.com"]:
             db.set_premium_by_email(email, True)
 
         cols = db.query("""
