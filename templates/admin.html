@@ -173,6 +173,7 @@
         <button class="active" onclick="switchTab('playground',this)">Playground</button>
         <button onclick="switchTab('prompts',this)">Промпты</button>
         <button onclick="switchTab('analytics',this)">Аналитика</button>
+        <button onclick="switchTab('feedback',this)">Фидбек <span id="fb-badge" style="background:#c03030;color:#fff;padding:1px 6px;border-radius:8px;font-size:11px;margin-left:4px;display:none">0</span></button>
     </div>
 
     <!-- ========== PLAYGROUND TAB ========== -->
@@ -326,6 +327,12 @@
         <table id="images-table"><thead><tr>
             <th>ID</th><th>Кот</th><th>Владелец</th><th>Арт</th>
         </tr></thead><tbody></tbody></table>
+    </div>
+
+    <!-- ========== FEEDBACK TAB ========== -->
+    <div class="tab-content" id="tab-feedback">
+        <p style="color:#a09070;margin-bottom:16px">Сообщения от пользователей — баги и обратная связь</p>
+        <div id="feedback-list"></div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -652,7 +659,48 @@
         // Init
         loadCatsList();
         loadPrompts();
+        async function loadFeedback() {
+            try {
+                const r = await fetch('/api/admin/feedback');
+                const d = await r.json();
+                const list = d.feedback || [];
+                const unread = d.unread_count || 0;
+                const badge = document.getElementById('fb-badge');
+                if (unread > 0) {
+                    badge.textContent = unread;
+                    badge.style.display = 'inline';
+                }
+                const el = document.getElementById('feedback-list');
+                if (!list.length) {
+                    el.innerHTML = '<p style="color:#706040">Пока нет сообщений</p>';
+                    return;
+                }
+                el.innerHTML = list.map(f => `
+                    <div class="section" style="margin-bottom:12px;${f.is_read?'opacity:0.6':''}">
+                        <div class="section-header" style="cursor:pointer" onclick="markFbRead(${f.id}, this)">
+                            <h3 style="font-size:16px">${f.is_read?'':'&#128308; '}${esc(f.name||'Аноним')} &mdash; ${esc(f.email||'нет email')}</h3>
+                            <span class="hint">${f.created_at ? new Date(f.created_at).toLocaleString('ru') : ''}</span>
+                        </div>
+                        <div class="section-body">
+                            <p style="white-space:pre-wrap;margin-bottom:6px">${esc(f.message)}</p>
+                            ${f.page_url ? `<p style="font-size:11px;color:#706040">Страница: ${esc(f.page_url)}</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) { console.error(e); }
+        }
+
+        async function markFbRead(id, el) {
+            try {
+                await fetch(`/api/admin/feedback/${id}/read`, {method:'POST'});
+                el.closest('.section').style.opacity = '0.6';
+            } catch(e) {}
+        }
+
+        function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
         loadAnalytics();
+        loadFeedback();
     </script>
 </body>
 </html>

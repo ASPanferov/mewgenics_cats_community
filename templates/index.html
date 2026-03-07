@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mewgenics Cat Viewer</title>
+    <title>Mewgenics - Cat Community</title>
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,22 +17,35 @@
 
         /* HEADER */
         .header {
-            background: linear-gradient(180deg, #6b4830 0%, #4a2e1e 100%);
+            background: linear-gradient(180deg, #6b4830 0%, #3a1e0e 100%);
             padding: 10px 24px;
             border-bottom: 4px solid #2a1a0e;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
         }
-        .header h1 { font-family: 'Caveat', cursive; font-size: 30px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e; letter-spacing: 2px; }
+        .header::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0,0,0,0.05) 20px, rgba(0,0,0,0.05) 21px);
+            pointer-events: none;
+        }
+        .header-brand { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+        .header-logo { font-size: 32px; filter: drop-shadow(2px 2px 0 #2a1a0e); }
+        .header h1 { font-family: 'Caveat', cursive; font-size: 32px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e, -1px -1px 0 #2a1a0e, 1px -1px 0 #2a1a0e; letter-spacing: 3px; position: relative; z-index: 1; }
         .header-right { display: flex; align-items: center; gap: 12px; }
         .user-info { display: flex; align-items: center; gap: 8px; color: #c9b48a; font-size: 14px; }
         .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #f0d878; }
         .gen-counter { font-size: 12px; color: #c9b48a; background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 8px; }
         .premium-badge { font-size: 11px; color: #f0d878; background: linear-gradient(135deg, #b8860b, #daa520); padding: 2px 8px; border-radius: 8px; font-weight: bold; border: 1px solid #f0d878; }
-        .nav { background: #c4a870; border-bottom: 3px solid #8a6e48; display: flex; padding: 0 24px; }
-        .nav a { padding: 10px 24px; color: #5c3d2e; text-decoration: none; font-size: 17px; font-weight: bold; border-bottom: 3px solid transparent; transition: all 0.15s; }
+        .nav {
+            background: linear-gradient(180deg, #d4b880, #c4a870);
+            border-bottom: 3px solid #8a6e48; display: flex; padding: 0 24px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+        .nav a { padding: 10px 24px; color: #5c3d2e; text-decoration: none; font-size: 17px; font-weight: bold; border-bottom: 3px solid transparent; transition: all 0.15s; position: relative; }
         .nav a:hover { background: rgba(0,0,0,0.05); }
-        .nav a.active { border-bottom-color: #5c3d2e; color: #2a1a0e; }
+        .nav a.active { border-bottom-color: #5c3d2e; color: #2a1a0e; background: rgba(0,0,0,0.04); }
 
         /* BUTTONS */
         .btn-auth { background: #6b4830; color: #f0d878; border: 2px solid #f0d878; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; text-decoration: none; }
@@ -362,15 +375,106 @@
             .feed-cat-name { font-size: 24px; }
             .feed-owner { font-size: 12px; }
         }
+
+        /* === FOOTER === */
+        .site-footer {
+            background: linear-gradient(180deg, #3a1e0e 0%, #2a1208 100%);
+            border-top: 4px solid #5c4428;
+            padding: 28px 24px 20px;
+            color: #a08a60;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+        }
+        .site-footer::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(255,255,255,0.02) 30px, rgba(255,255,255,0.02) 31px);
+            pointer-events: none;
+        }
+        .footer-inner {
+            max-width: 900px; margin: 0 auto;
+            display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-start;
+            position: relative; z-index: 1;
+        }
+        .footer-col { flex: 1; min-width: 200px; }
+        .footer-col h3 { font-family: 'Caveat', cursive; font-size: 22px; color: #f0d878; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+        .footer-col p { margin-bottom: 4px; line-height: 1.5; }
+        .footer-col a { color: #f0d878; text-decoration: none; }
+        .footer-col a:hover { text-decoration: underline; }
+        .footer-bottom {
+            max-width: 900px; margin: 16px auto 0; padding-top: 12px;
+            border-top: 1px solid rgba(160,138,96,0.3);
+            text-align: center; font-size: 11px; color: #706040;
+            position: relative; z-index: 1;
+        }
+        .btn-feedback {
+            background: #6b4830; color: #f0d878; border: 2px solid #f0d878;
+            padding: 8px 18px; border-radius: 8px; cursor: pointer;
+            font-family: inherit; font-size: 14px; font-weight: bold;
+            transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-feedback:hover { background: #8a5a3a; transform: translateY(-1px); }
+
+        /* Feedback modal */
+        .feedback-form { display: flex; flex-direction: column; gap: 10px; }
+        .feedback-form input, .feedback-form textarea {
+            width: 100%; background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e;
+            padding: 10px 12px; border-radius: 6px; font-family: inherit; font-size: 14px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .feedback-form textarea { min-height: 100px; resize: vertical; }
+        .feedback-form input::placeholder, .feedback-form textarea::placeholder { color: #a09070; }
+
+        /* Floating bug report button */
+        .fab-feedback {
+            position: fixed; bottom: 24px; left: 24px; z-index: 900;
+            background: #6b4830; color: #f0d878; border: 2px solid #f0d878;
+            width: 48px; height: 48px; border-radius: 50%;
+            cursor: pointer; font-size: 22px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            transition: all 0.15s;
+        }
+        .fab-feedback:hover { background: #8a5a3a; transform: scale(1.1); }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>MEWGENICS</h1>
+        <div class="header-brand">
+            <span class="header-logo">&#128049;</span>
+            <h1>MEWGENICS</h1>
+        </div>
         <div class="header-right"><div id="auth-area"></div></div>
     </div>
     <div class="nav" id="nav-bar"></div>
     <div id="main-content"></div>
+
+    <!-- Footer -->
+    <footer class="site-footer" id="site-footer">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h3>Mewgenics Cat Community</h3>
+                <p>Fan-made проект для просмотра и генерации артов котов из игры <b>Mewgenics</b> от Edmund McMillen.</p>
+                <p>Не является официальным продуктом Team Meat.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Автор</h3>
+                <p>Создано <a href="https://t.me/arpanferov" target="_blank">@arpanferov</a></p>
+                <p style="margin-top:8px"><button class="btn-feedback" onclick="openFeedback()">&#128172; Обратная связь</button></p>
+            </div>
+            <div class="footer-col">
+                <h3>Лицензия</h3>
+                <p>Все игровые ассеты и персонажи принадлежат Edmund McMillen / Team Meat.</p>
+                <p>Данный проект носит исключительно фанатский характер и не преследует коммерческих целей.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            Mewgenics Cat Community &copy; 2025-2026 &mdash; Fan project. Not affiliated with Team Meat.
+        </div>
+    </footer>
+
+    <!-- Floating feedback button -->
+    <button class="fab-feedback" onclick="openFeedback()" title="Сообщить о баге">&#128027;</button>
 
     <div class="modal-overlay" id="prompt-modal">
         <div class="modal">
@@ -382,6 +486,22 @@
             </div>
         </div>
     </div>
+    <!-- Feedback modal -->
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal">
+            <h2>&#128027; Обратная связь / Баг-репорт</h2>
+            <div class="feedback-form">
+                <input type="text" id="fb-name" placeholder="Ваше имя (необязательно)">
+                <input type="email" id="fb-email" placeholder="Email для ответа">
+                <textarea id="fb-message" placeholder="Опишите баг или оставьте пожелание..."></textarea>
+            </div>
+            <div class="btn-row" style="margin-top:12px">
+                <button class="btn-close" onclick="closeFeedback()">Отмена</button>
+                <button class="btn btn-generate" id="fb-submit" onclick="submitFeedback()">Отправить</button>
+            </div>
+        </div>
+    </div>
+
     <div class="image-fullscreen" id="fullscreen-viewer" onclick="this.classList.remove('active')">
         <img id="fullscreen-img" src="">
     </div>
@@ -553,11 +673,21 @@
         function renderUploadPage() {
             document.getElementById('main-content').innerHTML = `<div class="page-center">
                 <div class="upload-box" id="upload-box" onclick="document.getElementById('file-input').click()">
-                    <h2>Загрузите сохранение</h2>
-                    <p>Перетащите <strong>steamcampaign01.sav</strong> сюда или нажмите</p>
+                    <h2>&#128190; Загрузите сохранение</h2>
+                    <p>Перетащите файл <strong>.sav</strong> сюда или нажмите для выбора</p>
                     <input type="file" id="file-input" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])">
-                    <div class="hint">Windows: <code>%APPDATA%\\Glaiel Games\\Mewgenics\\{steamid}\\saves\\</code></div>
-                </div></div>`;
+                </div>
+                <div style="max-width:520px;margin:20px auto 0;text-align:left;background:#e8dcc0;border:2px solid #8a6e48;border-radius:8px;padding:16px 20px;font-size:13px;color:#5c3d2e;line-height:1.6">
+                    <h3 style="font-family:'Caveat',cursive;font-size:20px;color:#3a2e1e;margin-bottom:8px">&#128269; Где найти файл сохранения?</h3>
+                    <p><b>Windows:</b> Откройте проводник и вставьте в адресную строку:</p>
+                    <code style="display:block;background:#d8cca8;padding:8px 12px;border-radius:4px;margin:6px 0;word-break:break-all;font-size:12px">%AppData%\\Glaiel Games\\Mewgenics</code>
+                    <p>Полный путь: <code style="font-size:11px">C:\\Users\\ВашеИмя\\AppData\\Roaming\\Glaiel Games\\Mewgenics\\</code></p>
+                    <p style="margin-top:6px">Внутри найдите папку с вашим <b>Steam ID</b>, затем <code>saves</code>. Файлы называются <b>steamcampaign01.sav</b>, <b>steamcampaign02.sav</b> и т.д. — по одному на каждый кампейн (максимум 3).</p>
+                    <p style="margin-top:6px"><b>Steam Deck / Linux:</b></p>
+                    <code style="display:block;background:#d8cca8;padding:8px 12px;border-radius:4px;margin:6px 0;word-break:break-all;font-size:12px">~/.local/share/Glaiel Games/Mewgenics/</code>
+                    <p style="margin-top:8px;font-size:11px;color:#8a7050">&#9888; AppData — скрытая папка. Если не видите её, включите показ скрытых файлов в проводнике, либо просто вставьте путь с %AppData% в адресную строку.</p>
+                </div>
+            </div>`;
             const b = document.getElementById('upload-box');
             b.addEventListener('dragover', e=>{e.preventDefault();b.classList.add('dragover')});
             b.addEventListener('dragleave', ()=>b.classList.remove('dragover'));
@@ -749,7 +879,6 @@
                             : `<div class="no-portrait">&#128049;</div>`}
                         <div class="card-actions">
                             <button class="btn btn-generate" id="gen-btn-${id}" onclick="generateImage(${id})" ${!canGen?'disabled':''}>${cat.has_image?'Перегенерить':'Генерация'}</button>
-                            <button class="btn btn-prompt" onclick="showPrompt(${id})">Промпт</button>
                             ${cat.has_image?(cat.published
                                 ?`<button class="btn btn-unpublish" onclick="togglePublish(${id},false)">Убрать</button>`
                                 :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">В ленту</button>`):''}
@@ -973,8 +1102,44 @@
         function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
         function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
+        function openFeedback() {
+            const m = document.getElementById('feedback-modal');
+            if (currentUser) {
+                document.getElementById('fb-name').value = currentUser.name || '';
+                document.getElementById('fb-email').value = '';
+            }
+            m.classList.add('active');
+        }
+        function closeFeedback() { document.getElementById('feedback-modal').classList.remove('active'); }
+        async function submitFeedback() {
+            const msg = document.getElementById('fb-message').value.trim();
+            if (!msg) { showToast('Напишите сообщение'); return; }
+            const btn = document.getElementById('fb-submit');
+            btn.disabled = true; btn.textContent = 'Отправка...';
+            try {
+                const r = await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name: document.getElementById('fb-name').value,
+                        email: document.getElementById('fb-email').value,
+                        message: msg,
+                        page_url: window.location.href,
+                    })
+                });
+                const d = await r.json();
+                if (d.success) {
+                    showToast('Спасибо за обратную связь!');
+                    closeFeedback();
+                    document.getElementById('fb-message').value = '';
+                } else showToast(d.error || 'Ошибка');
+            } catch(e) { showToast('Ошибка сети'); }
+            btn.disabled = false; btn.textContent = 'Отправить';
+        }
+
         document.getElementById('prompt-modal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
-        document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();document.getElementById('fullscreen-viewer')?.classList.remove('active')}});
+        document.getElementById('feedback-modal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeFeedback()});
+        document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFeedback();document.getElementById('fullscreen-viewer')?.classList.remove('active')}});
         init();
     </script>
 </body>

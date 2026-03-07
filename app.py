@@ -434,6 +434,64 @@ def api_generate(db_cat_id):
         return jsonify({"error": str(e)}), 500
 
 
+# === Feedback ===
+
+@app.route("/api/feedback", methods=["POST"])
+def api_feedback():
+    data = request.get_json()
+    if not data or not data.get("message", "").strip():
+        return jsonify({"error": "Сообщение обязательно"}), 400
+
+    user = require_auth()
+    user_id = user["user_id"] if user else None
+    email = data.get("email", "")
+    name = data.get("name", "")
+    message = data["message"].strip()
+    page_url = data.get("page_url", "")
+
+    if not user_id and not email:
+        return jsonify({"error": "Укажите email или войдите в аккаунт"}), 400
+
+    if user and not email:
+        u = db.get_user(user["user_id"])
+        if u:
+            email = u.get("email", "")
+            name = name or u.get("name", "")
+
+    db.create_feedback(user_id, email, name, message, page_url)
+    return jsonify({"success": True})
+
+
+@app.route("/api/admin/feedback")
+def api_admin_feedback():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    rows = db.get_all_feedback()
+    result = []
+    for r in rows:
+        result.append({
+            "id": r["id"],
+            "email": r.get("email", ""),
+            "name": r.get("name", ""),
+            "message": r["message"],
+            "page_url": r.get("page_url", ""),
+            "is_read": r.get("is_read", False),
+            "created_at": r["created_at"].isoformat() if r.get("created_at") else None,
+        })
+    unread = db.get_unread_feedback_count()
+    return jsonify({"feedback": result, "unread_count": unread})
+
+
+@app.route("/api/admin/feedback/<int:fid>/read", methods=["POST"])
+def api_admin_feedback_read(fid):
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    db.mark_feedback_read(fid)
+    return jsonify({"success": True})
+
+
 # === Likes ===
 
 @app.route("/api/cat/<int:db_cat_id>/like", methods=["POST"])

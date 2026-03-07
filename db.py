@@ -127,6 +127,19 @@ def init_db():
     """)
     if not user_cols:
         execute("ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE")
+    # Feedback table
+    execute("""
+        CREATE TABLE IF NOT EXISTS feedback (
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(id) ON DELETE SET NULL,
+            email TEXT,
+            name TEXT,
+            message TEXT NOT NULL,
+            page_url TEXT,
+            is_read BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT NOW()
+        )
+    """)
     # Settings table
     init_settings()
 
@@ -326,6 +339,31 @@ def set_setting(key, value):
         VALUES (%s, %s, NOW())
         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
     """, (key, value))
+
+
+# === Feedback ===
+
+def create_feedback(user_id, email, name, message, page_url=None):
+    return query_one("""
+        INSERT INTO feedback (user_id, email, name, message, page_url)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING *
+    """, (user_id, email, name, message, page_url))
+
+
+def get_all_feedback(limit=50, offset=0):
+    return query("""
+        SELECT * FROM feedback ORDER BY created_at DESC LIMIT %s OFFSET %s
+    """, (limit, offset))
+
+
+def get_unread_feedback_count():
+    row = query_one("SELECT COUNT(*) as cnt FROM feedback WHERE is_read = FALSE")
+    return row["cnt"] if row else 0
+
+
+def mark_feedback_read(feedback_id):
+    execute("UPDATE feedback SET is_read = TRUE WHERE id = %s", (feedback_id,))
 
 
 # === Analytics ===
