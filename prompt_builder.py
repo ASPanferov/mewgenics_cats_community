@@ -1,6 +1,7 @@
 """Build image generation prompts from cat data in Edmund McMillen's Mewgenics style."""
 
-from cat_parser import CatData, CLASS_RU, STAT_LABELS, STAT_LABELS_RU, PART_NAME_RU, _BIRTH_DEFECT_FRAME_THRESHOLD
+from cat_parser import (CatData, CLASS_RU, STAT_LABELS, STAT_LABELS_RU, PART_NAME_RU,
+                        _BIRTH_DEFECT_FRAME_THRESHOLD, BIRTH_DEFECT_PASSIVES)
 from game_descriptions import game_desc
 
 # === CORE STYLE ===
@@ -527,15 +528,31 @@ def build_cat_summary_ru(cat: CatData) -> dict:
             "desc": info[1] if info else "",
         })
 
+    # Detect birth defect passives
+    birth_defect_passives = [a for a in cat.abilities if a in BIRTH_DEFECT_PASSIVES]
+    for p in cat.passives:
+        if p in BIRTH_DEFECT_PASSIVES and p not in birth_defect_passives:
+            birth_defect_passives.append(p)
+
     return {
         "id": cat.id,
         "name": cat.name,
         "class": class_ru,
         "class_en": cat.cat_class,
         "gender": cat.gender or "неизвестно",
+        "gender_code": cat.gender_code,
         "voice": cat.voice or "неизвестно",
         "stat_focus": cat.stat_focus or "нет",
         "status": cat.status,
+        "is_dead": cat.is_dead,
+        "is_retired": cat.is_retired,
+        "is_donated": cat.is_donated,
+        "breed": getattr(cat, 'breed', ''),
+        "birth_day": cat.birth_day,
+        "age_days": cat.age_days,
+        "parent_keys": getattr(cat, 'parent_keys', []),
+        "inbreeding_level": getattr(cat, 'inbreeding_level', 0),
+        "birth_defect_passives": birth_defect_passives,
         "abilities": [a["name"] for a in abilities_rich],
         "passives": [p["name"] for p in passives_rich],
         "items": [i["name"] for i in items_rich],

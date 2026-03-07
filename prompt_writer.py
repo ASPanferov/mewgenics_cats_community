@@ -52,7 +52,17 @@ def _build_cat_data_text(cat_data: dict) -> str:
     lines.append(f"GENDER: {cat_data.get('gender', 'unknown')}")
     lines.append(f"CLASS: {cat_data.get('class_en', 'Colorless')} ({cat_data.get('class_ru', '')})")
     lines.append(f"STATUS: {cat_data.get('status', 'OK')}")
+    if cat_data.get('is_dead'):
+        lines.append("THIS CAT IS DEAD — draw as a ghost or spirit")
+    if cat_data.get('is_retired'):
+        lines.append("RETIRED: this cat has adventured and retired")
     lines.append(f"STAT FOCUS: {cat_data.get('stat_focus', 'none')}")
+    if cat_data.get('breed') and cat_data['breed'] != 'None':
+        lines.append(f"BREED: {cat_data['breed']}")
+    if cat_data.get('age_days'):
+        lines.append(f"AGE: {cat_data['age_days']} days")
+    if cat_data.get('birth_defect_passives'):
+        lines.append(f"BIRTH DEFECTS: {', '.join(cat_data['birth_defect_passives'])}")
 
     # Stats
     stats = cat_data.get("stats", {})

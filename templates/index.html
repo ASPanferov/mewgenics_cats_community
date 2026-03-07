@@ -175,6 +175,31 @@
         .focus-label { font-size: 12px; color: #6a5830; }
         .focus-value { font-size: 12px; font-weight: bold; color: #3a2e1e; }
 
+        /* Cat details row */
+        .card-details {
+            display: flex; flex-wrap: wrap; gap: 4px 12px;
+            padding: 6px 12px;
+            border-bottom: 2px solid #a89870;
+            background: #f0e8d0;
+            font-size: 12px;
+            color: #5c4428;
+        }
+        .card-details .detail-item { display: flex; gap: 3px; align-items: center; }
+        .card-details .detail-label { color: #8a7050; }
+        .card-details .detail-value { font-weight: bold; color: #3a2e1e; }
+        .card-details .detail-value.dead { color: #8a2020; }
+        .card-details .detail-value.retired { color: #7a6030; }
+        .card-details .detail-value.donated { color: #4a6a8a; }
+
+        /* Breed badge */
+        .badge-breed { background: #a89870; color: #3a2e1e; font-size: 10px; }
+        .badge-age { background: #7a9a60; color: #fff; font-size: 10px; }
+        .badge-retired { background: #7a6030; color: #fff; }
+        .badge-donated { background: #4a6a8a; color: #fff; }
+
+        /* Birth defect indicator */
+        .tag.birth-defect { background: #581818; color: #fcc; border: 1px solid #c03030; }
+
         .error-msg { color: #b03020; font-size: 12px; padding: 4px 12px; font-weight: bold; }
 
         /* === FEED === */
@@ -328,6 +353,7 @@
                             <span class="badge badge-class bc-${c.class_en}">${esc(c['class'])}</span>
                         </div>
                         <div class="feed-owner">${c.owner_avatar?`<img src="${c.owner_avatar}">`:''}${esc(c.owner_name)}</div>
+                        ${renderFeedDetails(c)}
                         <div class="feed-tags">
                             ${(c.abilities_rich||c.abilities||[]).map(a => {
                                 const nm = typeof a === 'object' ? a.name : a;
@@ -400,10 +426,11 @@
                         <option value="Fighter">Боец</option><option value="Tank">Танк</option><option value="Hunter">Охотник</option>
                         <option value="Mage">Маг</option><option value="Medic">Медик</option><option value="Necromancer">Некромант</option>
                         <option value="Druid">Друид</option><option value="Thief">Вор</option><option value="Tinkerer">Механик</option>
-                        <option value="Colorless">Бесцветный</option></select>
-                    <select id="status-filter"><option value="">Все</option><option value="OK">Здоровые</option><option value="Injured">Раненые</option></select>
+                        <option value="Monk">Монах</option><option value="Jester">Шут</option><option value="Psychic">Психик</option>
+                        <option value="Butcher">Мясник</option><option value="Colorless">Бесцветный</option></select>
+                    <select id="status-filter"><option value="">Все</option><option value="OK">Здоровые</option><option value="Injured">Раненые</option><option value="Dead">Мёртвые</option><option value="retired">Ретирован</option><option value="donated">Отдан NPC</option></select>
                     <label class="ctrl-btn" style="cursor:pointer">Новый сейв<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
-                    <span style="font-size:12px;color:#7a6040">День ${info.current_day||'?'} | Золото: ${info.house_gold||'?'} | Котов: ${info.total_cats||'?'}</span>
+                    <span style="font-size:12px;color:#7a6040">День ${info.current_day||'?'} | Золото: ${info.house_gold||'?'} | Еда: ${info.house_food||'?'} | Котов: ${info.total_cats||'?'}${info.adventure_coins?' | Монеты: '+info.adventure_coins:''}${info.blank_collars?' | Ошейники: '+info.blank_collars:''}</span>
                 </div>
                 <div class="cat-grid" id="cat-grid"></div>`;
             document.getElementById('search').addEventListener('input', renderCats);
@@ -423,7 +450,13 @@
             const fl = allCats.filter(c => {
                 if (s && !c.name.toLowerCase().includes(s)) return false;
                 if (cf && c.class_en !== cf) return false;
-                if (sf && c.status !== sf) return false;
+                if (sf) {
+                    if (sf === 'retired' && !c.is_retired) return false;
+                    if (sf === 'donated' && !c.is_donated) return false;
+                    if (sf === 'OK' && c.status !== 'OK') return false;
+                    if (sf === 'Injured' && c.status !== 'Injured') return false;
+                    if (sf === 'Dead' && !c.is_dead) return false;
+                }
                 return true;
             });
             // Sort: cats with images first, then by name
@@ -437,7 +470,7 @@
 
             const canGen = currentUser && currentUser.generations_count < currentUser.max_generations;
             g.innerHTML = fl.map(cat => {
-                const gi = cat.gender==='кот'?'&#9794;':cat.gender==='кошка'?'&#9792;':'?';
+                const gi = cat.gender==='кот'?'&#9794;':cat.gender==='кошка'?'&#9792;':cat.gender==='любой'?'&#9894;':'?';
                 const id = cat.db_id;
                 return `<div class="cat-card">
                     <div class="card-top">
@@ -458,11 +491,14 @@
                                 <span class="card-name">${esc(cat.name)}</span><span class="card-gender">${gi}</span>
                             </div>
                             <div class="card-badges">
-                                ${cat.status!=='OK'?`<span class="badge ${cat.status==='Dead'?'badge-dead':'badge-status'}">${cat.status==='Injured'?'Ранен':'Мёртв'}</span>`:''}
+                                ${cat.is_dead?'<span class="badge badge-dead">Мёртв</span>':cat.status==='Injured'?'<span class="badge badge-status">Ранен</span>':''}
+                                ${cat.is_retired?'<span class="badge badge-retired">Ретирован</span>':''}
+                                ${cat.is_donated?'<span class="badge badge-donated">Отдан NPC</span>':''}
                                 ${cat.published?'<span class="badge badge-published">В ленте</span>':''}
                                 <span class="badge badge-class bc-${cat.class_en}">${esc(cat['class'])}</span>
                             </div>
                         </div>
+                        ${renderDetailsRow(cat)}
                         ${renderStatsRow(cat.stats)}
                         <div class="card-body">
                             <div class="card-section">
@@ -473,6 +509,7 @@
                             ${renderRichSection(cat.passives_rich || cat.passives, 'passive', '&#9733;')}
                             ${renderRichSection(cat.items_rich || cat.items, 'item', '&#9874;')}
                             ${renderMutations(cat.mutations)}
+                            ${renderBirthDefects(cat)}
                         </div>
                         <div id="error-${id}" class="error-msg" style="display:none"></div>
                     </div>
@@ -516,6 +553,47 @@
                 `<span class="tag ${m.is_defect?'defect':'mutation'}" ${m.desc?`data-tip="${esc(m.desc)}"`:''}>${esc(m.part_ru)}${m.desc?' — '+esc(m.desc.substring(0,30))+(m.desc.length>30?'...':''):''}</span>`
             ).join('');
             return `<div class="card-section"><span class="card-section-icon">&#9763;</span><div class="card-section-content">${tags}</div></div>`;
+        }
+
+        function renderDetailsRow(cat) {
+            const parts = [];
+            // Gender
+            const genderText = cat.gender_code === 1 ? 'Кот' : cat.gender_code === 2 ? 'Кошка' : cat.gender === 'кот-паук' ? 'Кот-паук' : '';
+            if (genderText) parts.push(`<span class="detail-item"><span class="detail-label">Пол:</span><span class="detail-value">${genderText}</span></span>`);
+            // Breed
+            if (cat.breed && cat.breed !== 'None' && cat.breed !== '') parts.push(`<span class="detail-item"><span class="detail-label">Порода:</span><span class="detail-value">${esc(cat.breed)}</span></span>`);
+            // Age
+            if (cat.age_days) parts.push(`<span class="detail-item"><span class="detail-label">Возраст:</span><span class="detail-value">${cat.age_days} дн.</span></span>`);
+            // Birth day
+            if (cat.birth_day != null) parts.push(`<span class="detail-item"><span class="detail-label">Рождён:</span><span class="detail-value">день ${cat.birth_day}</span></span>`);
+            // Inbreeding
+            if (cat.inbreeding_level > 0) parts.push(`<span class="detail-item"><span class="detail-label">Инбридинг:</span><span class="detail-value">${cat.inbreeding_level}</span></span>`);
+            // Parents
+            if (cat.parent_keys && cat.parent_keys.length > 0) parts.push(`<span class="detail-item"><span class="detail-label">Родители:</span><span class="detail-value">${cat.parent_keys.length} шт. (${cat.parent_keys.join(', ')})</span></span>`);
+            // Voice
+            if (cat.voice && cat.voice !== 'неизвестно') parts.push(`<span class="detail-item"><span class="detail-label">Голос:</span><span class="detail-value">${esc(cat.voice)}</span></span>`);
+
+            if (!parts.length) return '';
+            return `<div class="card-details">${parts.join('')}</div>`;
+        }
+
+        function renderFeedDetails(cat) {
+            const parts = [];
+            const genderText = cat.gender_code === 1 ? 'Кот' : cat.gender_code === 2 ? 'Кошка' : '';
+            if (genderText) parts.push(genderText);
+            if (cat.age_days) parts.push(`${cat.age_days} дн.`);
+            if (cat.is_dead) parts.push('Мёртв');
+            else if (cat.status === 'Injured') parts.push('Ранен');
+            if (cat.is_retired) parts.push('Ретирован');
+            if (!parts.length) return '';
+            return `<div style="font-size:12px;color:#6a5830;margin-bottom:4px">${parts.join(' · ')}</div>`;
+        }
+
+        function renderBirthDefects(cat) {
+            const defects = cat.birth_defect_passives || [];
+            if (!defects.length) return '';
+            const tags = defects.map(d => `<span class="tag birth-defect" data-tip="Врождённый дефект">${esc(d)}</span>`).join('');
+            return `<div class="card-section"><span class="card-section-icon">&#9888;</span><div class="card-section-content">${tags}</div></div>`;
         }
 
         // ====== ACTIONS ======
