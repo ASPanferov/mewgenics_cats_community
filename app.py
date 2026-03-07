@@ -507,12 +507,10 @@ def api_migrate():
         col_names = [r["column_name"] for r in cols]
 
         premium_users = db.query("SELECT id, name, email, is_premium FROM users WHERE is_premium = TRUE")
-        all_users = db.query("SELECT id, name, email, is_premium FROM users")
 
         return jsonify({
             "ok": True,
             "users_columns": col_names,
-            "all_users": [dict(r) for r in all_users],
             "premium_users": [dict(r) for r in premium_users],
         })
     except Exception as e:

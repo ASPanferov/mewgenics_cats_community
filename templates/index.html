@@ -50,36 +50,108 @@
         .btn-unpublish { background: #a08060; color: #fff; }
         .btn-unpublish:hover { background: #b09070; }
 
-        /* CONTROLS BAR */
-        .controls { padding: 10px 24px; background: #d4c4a0; border-bottom: 2px solid #b89a6a; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .controls input[type="text"], .controls select { background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 6px 12px; border-radius: 6px; font-family: inherit; font-size: 14px; }
-        .controls input[type="text"] { width: 240px; }
-        .controls button, .controls label.ctrl-btn { background: #6b4830; color: #f0d878; border: 2px solid #2a1a0e; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; }
+        /* === CONTROLS BAR === */
+        .controls {
+            padding: 12px 24px;
+            background: linear-gradient(180deg, #dac8a0, #d0bc94);
+            border-bottom: 3px solid #a08458;
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .controls-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
+        .ctrl-group { display: flex; align-items: center; gap: 4px; }
+        .ctrl-group label { font-size: 12px; color: #6a5830; white-space: nowrap; }
+        .controls input[type="text"], .controls select {
+            background: #f0e8d0; border: 2px solid #8a6e48; color: #3a2e1e;
+            padding: 5px 10px; border-radius: 6px; font-family: inherit; font-size: 13px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .controls input[type="text"] { width: 200px; }
+        .controls select { min-width: 100px; }
+        .controls button, .controls label.ctrl-btn {
+            background: #6b4830; color: #f0d878; border: 2px solid #2a1a0e;
+            padding: 5px 14px; border-radius: 6px; cursor: pointer;
+            font-family: inherit; font-size: 13px; font-weight: bold;
+        }
         .controls button:hover, .controls label.ctrl-btn:hover { background: #8a5a3a; }
+        .save-info {
+            margin-left: auto;
+            font-size: 12px; color: #6a5830;
+            background: rgba(0,0,0,0.06); padding: 4px 10px; border-radius: 6px;
+            display: flex; gap: 10px; align-items: center;
+        }
+        .save-info b { color: #3a2e1e; }
+        .cat-count-badge {
+            background: #6b4830; color: #f0d878; padding: 2px 8px;
+            border-radius: 10px; font-size: 12px; font-weight: bold;
+        }
 
-        /* === GAME-STYLE CAT CARD === */
+        /* === CAT GRID === */
         .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px 16px; }
 
+        /* === GAME-STYLE CAT CARD === */
         .cat-card {
             background: #e8dbb8;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23e0d4b0'/%3E%3Crect x='0' y='0' width='2' height='2' fill='%23e8dbb8'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23e8dbb8'/%3E%3C/svg%3E");
             border: 3px solid #5c4428;
-            border-radius: 4px;
-            box-shadow: 4px 4px 0 #8a7a5a, inset 0 0 20px rgba(140,120,80,0.15);
+            border-radius: 6px;
+            box-shadow: 4px 4px 0 #8a7a5a, inset 0 0 20px rgba(140,120,80,0.1);
             display: flex; flex-direction: column;
             overflow: hidden;
             position: relative;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .cat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 5px 6px 0 #8a7a5a, inset 0 0 20px rgba(140,120,80,0.1);
         }
         .cat-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(160,140,100,0.04) 2px, rgba(160,140,100,0.04) 4px);
             pointer-events: none; z-index: 1;
         }
+        .cat-card.dead-card { border-color: #5a3030; opacity: 0.85; }
+        .cat-card.dead-card .card-top { background: #b8a0a0; }
 
-        /* Top: image area */
+        /* Card header: name + class badge */
+        .card-header {
+            background: linear-gradient(180deg, #f0e4c8, #e0d4b0);
+            border-bottom: 2px solid #a89870;
+            padding: 8px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative; z-index: 2;
+        }
+        .card-name-wrap { display: flex; align-items: baseline; gap: 4px; min-width: 0; flex: 1; }
+        .card-name {
+            font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700;
+            color: #2a1a0e; line-height: 1;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .card-gender { font-size: 16px; flex-shrink: 0; }
+        .card-badges { display: flex; gap: 4px; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+        .badge {
+            font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: bold;
+            border: 1px solid rgba(0,0,0,0.15); white-space: nowrap;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-class { color: #fff; }
+        .badge-status { background: #d87030; color: #fff; }
+        .badge-dead { background: #8a2020; color: #fff; }
+        .badge-published { background: #4a8848; color: #fff; font-size: 9px; }
+        .badge-retired { background: #7a6030; color: #fff; }
+        .badge-donated { background: #4a6a8a; color: #fff; }
+        .bc-Fighter { background: #c03030; } .bc-Tank { background: #d07020; }
+        .bc-Hunter { background: #308850; } .bc-Mage { background: #8858b0; }
+        .bc-Medic { background: #a09880; } .bc-Necromancer { background: #2a2a2a; }
+        .bc-Druid { background: #4a6a2a; } .bc-Thief { background: #b8a840; color: #3a2e1e; }
+        .bc-Tinkerer { background: #58a030; } .bc-Colorless { background: #908070; }
+        .bc-Monk { background: #b89828; } .bc-Psychic { background: #9038b0; }
+        .bc-Jester { background: linear-gradient(90deg,#c03030,#3858a8,#308850); } .bc-Butcher { background: #701818; }
+
+        /* Image area */
         .card-top {
             background: #d0c4a0;
-            border-bottom: 3px solid #5c4428;
+            border-bottom: 2px solid #5c4428;
             display: flex; flex-direction: column; align-items: center;
             padding: 8px;
             position: relative;
@@ -101,104 +173,87 @@
         .card-actions { display: flex; gap: 4px; margin-top: 6px; width: 100%; flex-wrap: wrap; }
         .card-actions .btn { flex: 1; font-size: 11px; padding: 4px 3px; min-width: 50px; }
 
-        /* Bottom: info area */
-        .card-right { flex: 1; display: flex; flex-direction: column; padding: 0; position: relative; z-index: 2; min-width: 0; }
-
-        /* Name bar */
-        .card-name-bar {
-            background: linear-gradient(180deg, #f0e4c8, #e0d4b0);
-            border-bottom: 2px solid #a89870;
-            padding: 8px 12px;
-            display: flex; justify-content: space-between; align-items: center;
+        /* Info strip below image */
+        .card-info-strip {
+            display: flex; flex-wrap: wrap; gap: 3px 8px;
+            padding: 6px 10px;
+            background: #f0e8d0;
+            border-bottom: 1px solid #d0c4a0;
+            font-size: 11px; color: #6a5830;
+            position: relative; z-index: 2;
         }
-        .card-name { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: #2a1a0e; line-height: 1; }
-        .card-gender { font-size: 16px; margin-left: 4px; }
-        .card-badges { display: flex; gap: 4px; align-items: center; }
-        .badge { font-size: 11px; padding: 2px 8px; border-radius: 3px; font-weight: bold; border: 1px solid rgba(0,0,0,0.2); }
-        .badge-class { color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
-        .badge-status { background: #d87030; color: #fff; }
-        .badge-dead { background: #8a2020; color: #fff; }
-        .badge-published { background: #4a8848; color: #fff; }
-        .bc-Fighter { background: #c03030; } .bc-Tank { background: #d07020; }
-        .bc-Hunter { background: #308850; } .bc-Mage { background: #8858b0; }
-        .bc-Medic { background: #a09880; } .bc-Necromancer { background: #2a2a2a; }
-        .bc-Druid { background: #4a6a2a; } .bc-Thief { background: #b8a840; color: #3a2e1e; }
-        .bc-Tinkerer { background: #58a030; } .bc-Colorless { background: #908070; }
-        .bc-Monk { background: #b89828; } .bc-Psychic { background: #9038b0; }
-        .bc-Jester { background: linear-gradient(90deg,#c03030,#3858a8,#308850); } .bc-Butcher { background: #701818; }
+        .info-chip {
+            display: inline-flex; align-items: center; gap: 3px;
+        }
+        .info-chip .ic-label { color: #9a8a68; }
+        .info-chip .ic-val { color: #3a2e1e; font-weight: bold; }
 
-        /* Stats grid — compact like game */
+        /* Stats grid */
         .card-stats {
             display: grid; grid-template-columns: repeat(7, 1fr);
             border-bottom: 2px solid #a89870;
-            background: #f0e8d0;
+            background: #f5edd5;
         }
         .stat-cell {
             text-align: center; padding: 4px 2px;
-            border-right: 1px solid #c8b890;
+            border-right: 1px solid #d8cca8;
             position: relative;
         }
         .stat-cell:last-child { border-right: none; }
-        .stat-icon { font-size: 10px; font-weight: bold; color: #7a6840; display: block; line-height: 1; }
+        .stat-icon { font-size: 9px; font-weight: bold; color: #8a7a58; display: block; line-height: 1; text-transform: uppercase; }
         .stat-val { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: #2a1a0e; line-height: 1.1; }
         .stat-val.hurt { color: #c03030; }
         .stat-val.buff { color: #2a8a2a; }
         .stat-mod { font-size: 9px; color: #8a7050; display: block; line-height: 1; }
 
         /* Card body sections */
-        .card-body { padding: 6px 12px 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; }
-        .card-section { display: flex; gap: 6px; align-items: flex-start; }
-        .card-section-icon { font-size: 12px; min-width: 16px; text-align: center; margin-top: 2px; }
+        .card-body { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; position: relative; z-index: 2; }
+
+        .card-section { display: flex; gap: 5px; align-items: flex-start; }
+        .card-section-label {
+            font-size: 10px; color: #8a7a58; text-transform: uppercase; letter-spacing: 0.5px;
+            min-width: 18px; padding-top: 3px; font-weight: bold; flex-shrink: 0;
+        }
         .card-section-content { display: flex; flex-wrap: wrap; gap: 3px; flex: 1; min-width: 0; }
 
         /* Skill/item tags with tooltips */
         .tag {
             font-size: 11px; padding: 2px 7px; border-radius: 3px;
-            border: 1px solid rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.15);
             cursor: default; position: relative;
             max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            transition: filter 0.15s;
         }
+        .tag:hover { filter: brightness(1.1); z-index: 50; }
         .tag.ability { background: #c83030; color: #fff; }
         .tag.passive { background: #2a7a50; color: #fff; }
         .tag.item { background: #b89828; color: #2a1a0e; }
         .tag.mutation { background: #7838a0; color: #fff; }
         .tag.defect { background: #581818; color: #fcc; }
-        .tag[data-tip]:hover::after {
-            content: attr(data-tip);
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: #2a1a0e; color: #f0e4c8; padding: 6px 10px; border-radius: 4px;
-            font-size: 12px; white-space: normal; width: max-content; max-width: 280px;
-            z-index: 100; pointer-events: none; margin-bottom: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4); line-height: 1.3;
+        .tag.birth-defect { background: #581818; color: #fcc; border: 1px solid #c03030; }
+
+        /* Tooltip */
+        .tooltip-wrap { position: relative; display: inline-flex; }
+        .tooltip-wrap .tip {
+            display: none;
+            position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+            background: #2a1a0e; color: #f0e4c8; padding: 8px 12px; border-radius: 6px;
+            font-size: 12px; white-space: normal; width: max-content; max-width: 300px;
+            z-index: 200; pointer-events: none;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.5); line-height: 1.35;
+            border: 1px solid #5c4428;
         }
+        .tooltip-wrap .tip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: #2a1a0e;
+        }
+        .tooltip-wrap .tip .tip-title { font-weight: bold; color: #f0d878; display: block; margin-bottom: 3px; font-size: 12px; }
+        .tooltip-wrap .tip .tip-key { font-size: 10px; color: #a09070; display: block; margin-bottom: 2px; }
+        .tooltip-wrap .tip .tip-desc { color: #ddd; font-size: 11px; }
+        .tooltip-wrap:hover .tip { display: block; }
 
         .focus-label { font-size: 12px; color: #6a5830; }
         .focus-value { font-size: 12px; font-weight: bold; color: #3a2e1e; }
-
-        /* Cat details row */
-        .card-details {
-            display: flex; flex-wrap: wrap; gap: 4px 12px;
-            padding: 6px 12px;
-            border-bottom: 2px solid #a89870;
-            background: #f0e8d0;
-            font-size: 12px;
-            color: #5c4428;
-        }
-        .card-details .detail-item { display: flex; gap: 3px; align-items: center; }
-        .card-details .detail-label { color: #8a7050; }
-        .card-details .detail-value { font-weight: bold; color: #3a2e1e; }
-        .card-details .detail-value.dead { color: #8a2020; }
-        .card-details .detail-value.retired { color: #7a6030; }
-        .card-details .detail-value.donated { color: #4a6a8a; }
-
-        /* Breed badge */
-        .badge-breed { background: #a89870; color: #3a2e1e; font-size: 10px; }
-        .badge-age { background: #7a9a60; color: #fff; font-size: 10px; }
-        .badge-retired { background: #7a6030; color: #fff; }
-        .badge-donated { background: #4a6a8a; color: #fff; }
-
-        /* Birth defect indicator */
-        .tag.birth-defect { background: #581818; color: #fcc; border: 1px solid #c03030; }
 
         .error-msg { color: #b03020; font-size: 12px; padding: 4px 12px; font-weight: bold; }
 
@@ -209,7 +264,7 @@
             background: #e8dbb8;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23e0d4b0'/%3E%3Crect x='0' y='0' width='2' height='2' fill='%23e8dbb8'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23e8dbb8'/%3E%3C/svg%3E");
             border: 3px solid #5c4428;
-            border-radius: 4px;
+            border-radius: 6px;
             box-shadow: 4px 4px 0 #8a7a5a;
             width: 100%; max-width: 520px;
             overflow: hidden;
@@ -258,8 +313,36 @@
         .toast { position: fixed; bottom: 30px; right: 30px; background: #5c3d2e; color: #f0d878; padding: 10px 20px; border-radius: 8px; border: 2px solid #f0d878; font-family: inherit; font-size: 14px; z-index: 3000; display: none; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
         .toast.show { display: block; }
 
+        /* Pagination */
+        .pagination {
+            display: flex; justify-content: center; align-items: center; gap: 6px;
+            padding: 16px; flex-wrap: wrap;
+        }
+        .pagination button {
+            background: #e0d4b0; border: 2px solid #8a6e48; color: #3a2e1e;
+            padding: 6px 14px; border-radius: 6px; cursor: pointer;
+            font-family: inherit; font-size: 14px; font-weight: bold;
+            transition: all 0.15s;
+        }
+        .pagination button:hover { background: #d0c4a0; }
+        .pagination button.active { background: #6b4830; color: #f0d878; border-color: #2a1a0e; }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination .page-info { font-size: 13px; color: #6a5830; padding: 0 8px; }
+
+        .feed-loader {
+            text-align: center; padding: 20px; color: #8a7050; font-size: 15px;
+        }
+        .feed-end {
+            text-align: center; padding: 20px; color: #a09070; font-size: 13px;
+        }
+
         @media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 700px) { .cat-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 700px) {
+            .cat-grid { grid-template-columns: 1fr; }
+            .controls { padding: 10px 12px; }
+            .controls input[type="text"] { width: 140px; }
+            .save-info { margin-left: 0; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -288,6 +371,10 @@
     <script>
         const PAGE = "{{ page }}";
         let currentUser = null, allCats = [], feedCats = [], currentModalCatId = null;
+        const CATS_PER_PAGE = 25;
+        let currentPage = 0;
+        let feedOffset = 0, feedTotal = 0, feedLoading = false, feedDone = false;
+        const FEED_PAGE_SIZE = 20;
         const GOOGLE_SVG = `<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
         const STAT_ICONS = ['STR','DEX','CON','INT','SPD','CHA','LCK'];
 
@@ -328,51 +415,93 @@
                 <a href="/cabinet" class="${PAGE==='cabinet'?'active':''}">Мои коты</a>`;
         }
 
-        // ====== FEED ======
+        // ====== FEED (infinite scroll) ======
         async function loadFeed() {
-            try {
-                const r = await fetch('/api/feed');
-                const d = await r.json();
-                feedCats = d.cats;
-            } catch(e) { feedCats = []; }
-            renderFeed();
+            feedCats = []; feedOffset = 0; feedDone = false;
+            document.getElementById('main-content').innerHTML = `<div class="feed-grid" id="feed-grid"></div><div id="feed-bottom"></div>`;
+            await loadMoreFeed();
+            window.addEventListener('scroll', onFeedScroll);
         }
 
-        function renderFeed() {
-            const m = document.getElementById('main-content');
-            if (!feedCats.length) {
-                m.innerHTML = `<div class="empty-feed"><p style="font-size:48px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:13px;color:#a08060">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
-                return;
+        function onFeedScroll() {
+            if (feedLoading || feedDone) return;
+            const bottom = document.getElementById('feed-bottom');
+            if (!bottom) return;
+            const rect = bottom.getBoundingClientRect();
+            if (rect.top < window.innerHeight + 300) loadMoreFeed();
+        }
+
+        async function loadMoreFeed() {
+            if (feedLoading || feedDone) return;
+            feedLoading = true;
+            const fg = document.getElementById('feed-grid');
+            if (!fg) { feedLoading = false; return; }
+            // Show loader
+            let loader = document.getElementById('feed-loader');
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.id = 'feed-loader';
+                loader.className = 'feed-loader';
+                loader.innerHTML = '<span class="loading-spinner"></span> Загрузка...';
+                fg.parentNode.insertBefore(loader, document.getElementById('feed-bottom'));
             }
-            m.innerHTML = `<div class="feed-grid">${feedCats.map((c,i) => `
-                <div class="feed-card">
-                    <img class="feed-img" src="${c.image_url}" alt="${esc(c.name)}" onclick="showFullscreen('${c.image_url}')">
-                    <div class="feed-card-info">
-                        <div class="feed-card-top">
-                            <span class="feed-cat-name">${esc(c.name)}</span>
-                            <span class="badge badge-class bc-${c.class_en}">${esc(c['class'])}</span>
-                        </div>
-                        <div class="feed-owner">${c.owner_avatar?`<img src="${c.owner_avatar}">`:''}${esc(c.owner_name)}</div>
-                        ${renderFeedDetails(c)}
-                        <div class="feed-tags">
-                            ${(c.abilities_rich||c.abilities||[]).map(a => {
-                                const nm = typeof a === 'object' ? a.name : a;
-                                const ds = typeof a === 'object' ? a.desc : '';
-                                return `<span class="tag ability" ${ds?`data-tip="${esc(ds)}"`:''}>${esc(nm)}</span>`;
-                            }).join('')}
-                            ${(c.passives_rich||c.passives||[]).map(p => {
-                                const nm = typeof p === 'object' ? p.name : p;
-                                const ds = typeof p === 'object' ? p.desc : '';
-                                return `<span class="tag passive" ${ds?`data-tip="${esc(ds)}"`:''}>${esc(nm)}</span>`;
-                            }).join('')}
-                        </div>
+            try {
+                const r = await fetch(`/api/feed?offset=${feedOffset}&limit=${FEED_PAGE_SIZE}`);
+                const d = await r.json();
+                feedTotal = d.total || 0;
+                const newCats = d.cats || [];
+                const startIdx = feedCats.length;
+                feedCats.push(...newCats);
+                feedOffset += newCats.length;
+                if (newCats.length < FEED_PAGE_SIZE || feedOffset >= feedTotal) feedDone = true;
+                // Append cards
+                fg.innerHTML += newCats.map((c, i) => renderFeedCard(c, startIdx + i)).join('');
+                // Update loader
+                if (feedDone) {
+                    loader.className = 'feed-end';
+                    loader.textContent = feedCats.length ? '' : '';
+                    if (!feedCats.length) {
+                        fg.innerHTML = `<div class="empty-feed"><p style="font-size:48px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:13px;color:#a08060">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
+                    }
+                    loader.remove();
+                } else {
+                    loader.remove();
+                }
+            } catch(e) {
+                if (loader) loader.remove();
+            }
+            feedLoading = false;
+        }
+
+        function renderFeedCard(c, i) {
+            return `<div class="feed-card">
+                <img class="feed-img" src="${c.image_url}" alt="${esc(c.name)}" onclick="showFullscreen('${c.image_url}')">
+                <div class="feed-card-info">
+                    <div class="feed-card-top">
+                        <span class="feed-cat-name">${esc(c.name)}</span>
+                        <span class="badge badge-class bc-${c.class_en}">${esc(c['class'])}</span>
                     </div>
-                    <div class="feed-card-bottom">
-                        <button class="like-btn ${c.liked?'liked':''}" onclick="toggleLike(${c.db_id},${i})">
-                            ${c.liked?'&#10084;':'&#9825;'} <span class="like-count">${c.like_count||0}</span>
-                        </button>
+                    <div class="feed-owner">${c.owner_avatar?`<img src="${c.owner_avatar}">`:''}${esc(c.owner_name)}</div>
+                    ${renderFeedDetails(c)}
+                    <div class="feed-tags">
+                        ${(c.abilities_rich||c.abilities||[]).map(a => {
+                            const nm = typeof a === 'object' ? a.name : a;
+                            const ds = typeof a === 'object' ? a.desc : '';
+                            return `<span class="tag ability" ${ds?`data-tip="${esc(ds)}"`:''}>${esc(nm)}</span>`;
+                        }).join('')}
+                        ${(c.passives_rich||c.passives||[]).map(p => {
+                            const nm = typeof p === 'object' ? p.name : p;
+                            const ds = typeof p === 'object' ? p.desc : '';
+                            return `<span class="tag passive" ${ds?`data-tip="${esc(ds)}"`:''}>${esc(nm)}</span>`;
+                        }).join('')}
                     </div>
-                </div>`).join('')}</div>`;
+                </div>
+                <div class="feed-card-bottom">
+                    <button class="like-btn ${c.liked?'liked':''}" onclick="toggleLike(${c.db_id},${i})">
+                        ${c.liked?'&#10084;':'&#9825;'} <span class="like-count">${c.like_count||0}</span>
+                    </button>
+                </div>
+            </div>`;
         }
 
         // ====== CABINET ======
@@ -421,21 +550,80 @@
         function renderCabinetUI(info) {
             document.getElementById('main-content').innerHTML = `
                 <div class="controls">
-                    <input type="text" id="search" placeholder="Поиск по имени...">
-                    <select id="class-filter"><option value="">Все классы</option>
-                        <option value="Fighter">Боец</option><option value="Tank">Танк</option><option value="Hunter">Охотник</option>
-                        <option value="Mage">Маг</option><option value="Medic">Медик</option><option value="Necromancer">Некромант</option>
-                        <option value="Druid">Друид</option><option value="Thief">Вор</option><option value="Tinkerer">Механик</option>
-                        <option value="Monk">Монах</option><option value="Jester">Шут</option><option value="Psychic">Психик</option>
-                        <option value="Butcher">Мясник</option><option value="Colorless">Бесцветный</option></select>
-                    <select id="status-filter"><option value="">Все</option><option value="OK">Здоровые</option><option value="Injured">Раненые</option><option value="Dead">Мёртвые</option><option value="retired">Ретирован</option><option value="donated">Отдан NPC</option></select>
-                    <label class="ctrl-btn" style="cursor:pointer">Новый сейв<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
-                    <span style="font-size:12px;color:#7a6040">День ${info.current_day||'?'} | Золото: ${info.house_gold||'?'} | Еда: ${info.house_food||'?'} | Котов: ${info.total_cats||'?'}${info.adventure_coins?' | Монеты: '+info.adventure_coins:''}${info.blank_collars?' | Ошейники: '+info.blank_collars:''}</span>
+                    <div class="controls-row">
+                        <input type="text" id="search" placeholder="Поиск по имени...">
+                        <div class="ctrl-group">
+                            <label>Класс:</label>
+                            <select id="class-filter">
+                                <option value="">Все</option>
+                                <option value="Fighter">Боец</option><option value="Tank">Танк</option>
+                                <option value="Hunter">Охотник</option><option value="Mage">Маг</option>
+                                <option value="Medic">Медик</option><option value="Necromancer">Некромант</option>
+                                <option value="Druid">Друид</option><option value="Thief">Вор</option>
+                                <option value="Tinkerer">Механик</option><option value="Monk">Монах</option>
+                                <option value="Jester">Шут</option><option value="Psychic">Психик</option>
+                                <option value="Butcher">Мясник</option><option value="Colorless">Бесцветный</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Статус:</label>
+                            <select id="status-filter">
+                                <option value="">Все</option>
+                                <option value="alive">Живые</option>
+                                <option value="OK">Здоровые</option>
+                                <option value="Injured">Раненые</option>
+                                <option value="Dead">Мёртвые</option>
+                                <option value="retired">Ретированные</option>
+                                <option value="donated">Отданы NPC</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Пол:</label>
+                            <select id="gender-filter">
+                                <option value="">Все</option>
+                                <option value="1">Коты</option>
+                                <option value="2">Кошки</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Арт:</label>
+                            <select id="image-filter">
+                                <option value="">Все</option>
+                                <option value="yes">С артом</option>
+                                <option value="no">Без арта</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Сортировка:</label>
+                            <select id="sort-select">
+                                <option value="birth_desc">Новорождённые</option>
+                                <option value="birth_asc">Старейшие</option>
+                                <option value="name_asc">Имя А-Я</option>
+                                <option value="name_desc">Имя Я-А</option>
+                                <option value="class">По классу</option>
+                                <option value="image_first">Арт первые</option>
+                            </select>
+                        </div>
+                        <label class="ctrl-btn" style="cursor:pointer">Новый сейв<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
+                        <div class="save-info">
+                            <span>День <b>${info.current_day||'?'}</b></span>
+                            <span>Золото <b>${info.house_gold||'?'}</b></span>
+                            ${info.house_food?`<span>Еда <b>${info.house_food}</b></span>`:''}
+                            ${info.adventure_coins?`<span>Монеты <b>${info.adventure_coins}</b></span>`:''}
+                            ${info.blank_collars?`<span>Ошейники <b>${info.blank_collars}</b></span>`:''}
+                            <span class="cat-count-badge" id="cat-count-badge"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="cat-grid" id="cat-grid"></div>`;
-            document.getElementById('search').addEventListener('input', renderCats);
-            document.getElementById('class-filter').addEventListener('change', renderCats);
-            document.getElementById('status-filter').addEventListener('change', renderCats);
+                <div class="cat-grid" id="cat-grid"></div>
+                <div class="pagination" id="pagination"></div>`;
+            const resetPage = () => { currentPage = 0; renderCats(); };
+            document.getElementById('search').addEventListener('input', resetPage);
+            document.getElementById('class-filter').addEventListener('change', resetPage);
+            document.getElementById('status-filter').addEventListener('change', resetPage);
+            document.getElementById('gender-filter').addEventListener('change', resetPage);
+            document.getElementById('image-filter').addEventListener('change', resetPage);
+            document.getElementById('sort-select').addEventListener('change', renderCats);
         }
 
         async function loadCats() {
@@ -447,32 +635,85 @@
             const s = (document.getElementById('search')?.value||'').toLowerCase();
             const cf = document.getElementById('class-filter')?.value||'';
             const sf = document.getElementById('status-filter')?.value||'';
+            const gf = document.getElementById('gender-filter')?.value||'';
+            const imgf = document.getElementById('image-filter')?.value||'';
+            const sort = document.getElementById('sort-select')?.value||'birth_desc';
+
             const fl = allCats.filter(c => {
                 if (s && !c.name.toLowerCase().includes(s)) return false;
                 if (cf && c.class_en !== cf) return false;
+                if (gf && String(c.gender_code) !== gf) return false;
+                if (imgf === 'yes' && !c.has_image) return false;
+                if (imgf === 'no' && c.has_image) return false;
                 if (sf) {
+                    if (sf === 'alive' && c.is_dead) return false;
                     if (sf === 'retired' && !c.is_retired) return false;
                     if (sf === 'donated' && !c.is_donated) return false;
-                    if (sf === 'OK' && c.status !== 'OK') return false;
+                    if (sf === 'OK' && (c.status !== 'OK' || c.is_dead)) return false;
                     if (sf === 'Injured' && c.status !== 'Injured') return false;
                     if (sf === 'Dead' && !c.is_dead) return false;
                 }
                 return true;
             });
-            // Sort: cats with images first, then by name
+
+            // Sorting
             fl.sort((a, b) => {
-                if (a.has_image && !b.has_image) return -1;
-                if (!a.has_image && b.has_image) return 1;
-                if (a.published && !b.published) return -1;
-                if (!a.published && b.published) return 1;
-                return a.name.localeCompare(b.name);
+                switch (sort) {
+                    case 'birth_desc':
+                        return (b.birth_day ?? -1) - (a.birth_day ?? -1);
+                    case 'birth_asc':
+                        return (a.birth_day ?? 9999) - (b.birth_day ?? 9999);
+                    case 'name_asc':
+                        return a.name.localeCompare(b.name, 'ru');
+                    case 'name_desc':
+                        return b.name.localeCompare(a.name, 'ru');
+                    case 'class':
+                        return (a.class_en||'').localeCompare(b.class_en||'');
+                    case 'image_first':
+                        if (a.has_image && !b.has_image) return -1;
+                        if (!a.has_image && b.has_image) return 1;
+                        return (b.birth_day ?? -1) - (a.birth_day ?? -1);
+                    default:
+                        return 0;
+                }
             });
 
+            // Update counter
+            const badge = document.getElementById('cat-count-badge');
+            if (badge) badge.textContent = `${fl.length} / ${allCats.length}`;
+
+            // Pagination
+            const totalPages = Math.ceil(fl.length / CATS_PER_PAGE);
+            if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
+            const pageStart = currentPage * CATS_PER_PAGE;
+            const pageCats = fl.slice(pageStart, pageStart + CATS_PER_PAGE);
+
+            renderPagination(fl.length, totalPages);
+
             const canGen = currentUser && currentUser.generations_count < currentUser.max_generations;
-            g.innerHTML = fl.map(cat => {
-                const gi = cat.gender==='кот'?'&#9794;':cat.gender==='кошка'?'&#9792;':cat.gender==='любой'?'&#9894;':'?';
+
+            g.innerHTML = pageCats.map(cat => {
+                const gi = cat.gender_code===1?'&#9794;':cat.gender_code===2?'&#9792;':cat.gender==='кот-паук'?'&#128375;':'';
                 const id = cat.db_id;
-                return `<div class="cat-card">
+                const deadClass = cat.is_dead ? ' dead-card' : '';
+                return `<div class="cat-card${deadClass}">
+                    <!-- HEADER: name + badges -->
+                    <div class="card-header">
+                        <div class="card-name-wrap">
+                            <span class="card-name">${esc(cat.name)}</span>
+                            ${gi?`<span class="card-gender">${gi}</span>`:''}
+                        </div>
+                        <div class="card-badges">
+                            ${cat.is_dead?'<span class="badge badge-dead">Мёртв</span>':''}
+                            ${cat.status==='Injured'&&!cat.is_dead?'<span class="badge badge-status">Ранен</span>':''}
+                            ${cat.is_retired?'<span class="badge badge-retired">Рет.</span>':''}
+                            ${cat.is_donated?'<span class="badge badge-donated">NPC</span>':''}
+                            ${cat.published?'<span class="badge badge-published">В ленте</span>':''}
+                            <span class="badge badge-class bc-${cat.class_en}">${esc(cat['class'])}</span>
+                        </div>
+                    </div>
+
+                    <!-- IMAGE -->
                     <div class="card-top">
                         ${cat.has_image
                             ? `<img class="cat-portrait" src="${cat.image_url}" onclick="showFullscreen('${cat.image_url}')">`
@@ -485,36 +726,39 @@
                                 :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">В ленту</button>`):''}
                         </div>
                     </div>
-                    <div class="card-right">
-                        <div class="card-name-bar">
-                            <div>
-                                <span class="card-name">${esc(cat.name)}</span><span class="card-gender">${gi}</span>
-                            </div>
-                            <div class="card-badges">
-                                ${cat.is_dead?'<span class="badge badge-dead">Мёртв</span>':cat.status==='Injured'?'<span class="badge badge-status">Ранен</span>':''}
-                                ${cat.is_retired?'<span class="badge badge-retired">Ретирован</span>':''}
-                                ${cat.is_donated?'<span class="badge badge-donated">Отдан NPC</span>':''}
-                                ${cat.published?'<span class="badge badge-published">В ленте</span>':''}
-                                <span class="badge badge-class bc-${cat.class_en}">${esc(cat['class'])}</span>
-                            </div>
-                        </div>
-                        ${renderDetailsRow(cat)}
-                        ${renderStatsRow(cat.stats)}
-                        <div class="card-body">
-                            <div class="card-section">
-                                <span class="focus-label">Фокус:</span>
-                                <span class="focus-value">${esc(cat.stat_focus)}</span>
-                            </div>
-                            ${renderRichSection(cat.abilities_rich || cat.abilities, 'ability', '&#9876;')}
-                            ${renderRichSection(cat.passives_rich || cat.passives, 'passive', '&#9733;')}
-                            ${renderRichSection(cat.items_rich || cat.items, 'item', '&#9874;')}
-                            ${renderMutations(cat.mutations)}
-                            ${renderBirthDefects(cat)}
-                        </div>
-                        <div id="error-${id}" class="error-msg" style="display:none"></div>
+
+                    <!-- INFO STRIP -->
+                    ${renderInfoStrip(cat)}
+
+                    <!-- STATS -->
+                    ${renderStatsRow(cat.stats)}
+
+                    <!-- BODY: abilities, passives, items, mutations -->
+                    <div class="card-body">
+                        ${cat.stat_focus && cat.stat_focus !== 'нет' ? `<div class="card-section"><span class="card-section-label">Фокус</span><span class="focus-value">${esc(cat.stat_focus)}</span></div>` : ''}
+                        ${renderTagSection(cat.abilities_rich || cat.abilities, 'ability', 'Атаки')}
+                        ${renderTagSection(cat.passives_rich || cat.passives, 'passive', 'Пассивки')}
+                        ${renderTagSection(cat.items_rich || cat.items, 'item', 'Предметы')}
+                        ${renderMutations(cat.mutations)}
+                        ${renderBirthDefects(cat)}
                     </div>
+                    <div id="error-${id}" class="error-msg" style="display:none"></div>
                 </div>`;
             }).join('');
+        }
+
+        function renderInfoStrip(cat) {
+            const chips = [];
+            const genderText = cat.gender_code === 1 ? 'Кот' : cat.gender_code === 2 ? 'Кошка' : cat.gender === 'кот-паук' ? 'Кот-паук' : '';
+            if (genderText) chips.push(`<span class="info-chip"><span class="ic-val">${genderText}</span></span>`);
+            if (cat.breed && cat.breed !== 'None' && cat.breed !== '') chips.push(`<span class="info-chip"><span class="ic-label">Порода:</span><span class="ic-val">${esc(cat.breed)}</span></span>`);
+            if (cat.age_days != null) chips.push(`<span class="info-chip"><span class="ic-label">Возраст:</span><span class="ic-val">${cat.age_days} дн.</span></span>`);
+            if (cat.birth_day != null) chips.push(`<span class="info-chip"><span class="ic-label">Рождён:</span><span class="ic-val">день ${cat.birth_day}</span></span>`);
+            if (cat.inbreeding_level > 0) chips.push(`<span class="info-chip"><span class="ic-label">Инбридинг:</span><span class="ic-val">${cat.inbreeding_level}</span></span>`);
+            if (cat.parent_keys && cat.parent_keys.length > 0) chips.push(`<span class="info-chip"><span class="ic-label">Родители:</span><span class="ic-val">${cat.parent_keys.length}</span></span>`);
+            if (cat.voice && cat.voice !== 'неизвестно') chips.push(`<span class="info-chip"><span class="ic-label">Голос:</span><span class="ic-val">${esc(cat.voice)}</span></span>`);
+            if (!chips.length) return '';
+            return `<div class="card-info-strip">${chips.join('')}</div>`;
         }
 
         function renderStatsRow(stats) {
@@ -535,46 +779,83 @@
             return h + '</div>';
         }
 
-        function renderRichSection(items, tagClass, icon) {
+        function renderTagSection(items, tagClass, label) {
             if (!items || !items.length) return '';
             const tags = items.map(it => {
-                if (typeof it === 'object') {
-                    const tip = it.desc ? esc(it.desc) : '';
-                    return `<span class="tag ${tagClass}" ${tip?`data-tip="${tip}"`:''}>${esc(it.name)}</span>`;
+                if (typeof it === 'object' && it.name) {
+                    const hasDesc = it.desc && it.desc.trim();
+                    const showKey = it.key && it.key !== it.name;
+                    if (hasDesc) {
+                        return `<span class="tooltip-wrap">
+                            <span class="tag ${tagClass}">${esc(it.name)}</span>
+                            <span class="tip">
+                                <span class="tip-title">${esc(it.name)}</span>
+                                ${showKey?`<span class="tip-key">${esc(it.key)}</span>`:''}
+                                <span class="tip-desc">${esc(it.desc)}</span>
+                            </span>
+                        </span>`;
+                    }
+                    return `<span class="tag ${tagClass}">${esc(it.name)}</span>`;
                 }
                 return `<span class="tag ${tagClass}">${esc(it)}</span>`;
             }).join('');
-            return `<div class="card-section"><span class="card-section-icon">${icon}</span><div class="card-section-content">${tags}</div></div>`;
+            return `<div class="card-section"><span class="card-section-label">${label}</span><div class="card-section-content">${tags}</div></div>`;
         }
 
         function renderMutations(mutations) {
             if (!mutations || !mutations.length) return '';
-            const tags = mutations.map(m =>
-                `<span class="tag ${m.is_defect?'defect':'mutation'}" ${m.desc?`data-tip="${esc(m.desc)}"`:''}>${esc(m.part_ru)}${m.desc?' — '+esc(m.desc.substring(0,30))+(m.desc.length>30?'...':''):''}</span>`
-            ).join('');
-            return `<div class="card-section"><span class="card-section-icon">&#9763;</span><div class="card-section-content">${tags}</div></div>`;
+            const tags = mutations.map(m => {
+                const cls = m.is_defect ? 'defect' : 'mutation';
+                const hasDesc = m.desc && m.desc.trim();
+                if (hasDesc) {
+                    return `<span class="tooltip-wrap">
+                        <span class="tag ${cls}">${esc(m.part_ru)}</span>
+                        <span class="tip">
+                            <span class="tip-title">${esc(m.part_ru)}</span>
+                            ${m.is_defect?'<span class="tip-key">Врождённый дефект</span>':''}
+                            <span class="tip-desc">${esc(m.desc)}</span>
+                        </span>
+                    </span>`;
+                }
+                return `<span class="tag ${cls}">${esc(m.part_ru)}${m.is_defect?' (дефект)':''}</span>`;
+            }).join('');
+            return `<div class="card-section"><span class="card-section-label">Мутации</span><div class="card-section-content">${tags}</div></div>`;
         }
 
-        function renderDetailsRow(cat) {
-            const parts = [];
-            // Gender
-            const genderText = cat.gender_code === 1 ? 'Кот' : cat.gender_code === 2 ? 'Кошка' : cat.gender === 'кот-паук' ? 'Кот-паук' : '';
-            if (genderText) parts.push(`<span class="detail-item"><span class="detail-label">Пол:</span><span class="detail-value">${genderText}</span></span>`);
-            // Breed
-            if (cat.breed && cat.breed !== 'None' && cat.breed !== '') parts.push(`<span class="detail-item"><span class="detail-label">Порода:</span><span class="detail-value">${esc(cat.breed)}</span></span>`);
-            // Age
-            if (cat.age_days) parts.push(`<span class="detail-item"><span class="detail-label">Возраст:</span><span class="detail-value">${cat.age_days} дн.</span></span>`);
-            // Birth day
-            if (cat.birth_day != null) parts.push(`<span class="detail-item"><span class="detail-label">Рождён:</span><span class="detail-value">день ${cat.birth_day}</span></span>`);
-            // Inbreeding
-            if (cat.inbreeding_level > 0) parts.push(`<span class="detail-item"><span class="detail-label">Инбридинг:</span><span class="detail-value">${cat.inbreeding_level}</span></span>`);
-            // Parents
-            if (cat.parent_keys && cat.parent_keys.length > 0) parts.push(`<span class="detail-item"><span class="detail-label">Родители:</span><span class="detail-value">${cat.parent_keys.length} шт. (${cat.parent_keys.join(', ')})</span></span>`);
-            // Voice
-            if (cat.voice && cat.voice !== 'неизвестно') parts.push(`<span class="detail-item"><span class="detail-label">Голос:</span><span class="detail-value">${esc(cat.voice)}</span></span>`);
+        function renderBirthDefects(cat) {
+            const defects = cat.birth_defect_passives || [];
+            if (!defects.length) return '';
+            const tags = defects.map(d => `<span class="tag birth-defect">${esc(d)}</span>`).join('');
+            return `<div class="card-section"><span class="card-section-label">Дефекты</span><div class="card-section-content">${tags}</div></div>`;
+        }
 
-            if (!parts.length) return '';
-            return `<div class="card-details">${parts.join('')}</div>`;
+        function renderPagination(totalItems, totalPages) {
+            const pg = document.getElementById('pagination');
+            if (!pg || totalPages <= 1) { if (pg) pg.innerHTML = ''; return; }
+
+            let html = '';
+            html += `<button ${currentPage===0?'disabled':''} onclick="goToPage(0)">&laquo;</button>`;
+            html += `<button ${currentPage===0?'disabled':''} onclick="goToPage(${currentPage-1})">&lsaquo;</button>`;
+
+            // Show max 7 page buttons around current
+            let start = Math.max(0, currentPage - 3);
+            let end = Math.min(totalPages, start + 7);
+            if (end - start < 7) start = Math.max(0, end - 7);
+
+            for (let i = start; i < end; i++) {
+                html += `<button class="${i===currentPage?'active':''}" onclick="goToPage(${i})">${i+1}</button>`;
+            }
+
+            html += `<button ${currentPage>=totalPages-1?'disabled':''} onclick="goToPage(${currentPage+1})">&rsaquo;</button>`;
+            html += `<button ${currentPage>=totalPages-1?'disabled':''} onclick="goToPage(${totalPages-1})">&raquo;</button>`;
+            html += `<span class="page-info">${currentPage*CATS_PER_PAGE+1}-${Math.min((currentPage+1)*CATS_PER_PAGE, totalItems)} из ${totalItems}</span>`;
+            pg.innerHTML = html;
+        }
+
+        function goToPage(p) {
+            currentPage = p;
+            renderCats();
+            document.getElementById('cat-grid')?.scrollIntoView({behavior:'smooth', block:'start'});
         }
 
         function renderFeedDetails(cat) {
@@ -587,13 +868,6 @@
             if (cat.is_retired) parts.push('Ретирован');
             if (!parts.length) return '';
             return `<div style="font-size:12px;color:#6a5830;margin-bottom:4px">${parts.join(' · ')}</div>`;
-        }
-
-        function renderBirthDefects(cat) {
-            const defects = cat.birth_defect_passives || [];
-            if (!defects.length) return '';
-            const tags = defects.map(d => `<span class="tag birth-defect" data-tip="Врождённый дефект">${esc(d)}</span>`).join('');
-            return `<div class="card-section"><span class="card-section-icon">&#9888;</span><div class="card-section-content">${tags}</div></div>`;
         }
 
         // ====== ACTIONS ======
