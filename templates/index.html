@@ -8,35 +8,37 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #d4c4a0;
-            background-image:
-                radial-gradient(ellipse at 20% 50%, rgba(180,160,120,0.4) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(200,180,140,0.3) 0%, transparent 50%);
+            background: #c8b898;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b0a080' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             color: #3a2e1e;
             font-family: 'Patrick Hand', 'Comic Sans MS', cursive;
             min-height: 100vh;
         }
+
+        /* HEADER */
         .header {
             background: linear-gradient(180deg, #6b4830 0%, #4a2e1e 100%);
-            padding: 12px 30px;
+            padding: 10px 24px;
             border-bottom: 4px solid #2a1a0e;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .header h1 { font-family: 'Caveat', cursive; font-size: 32px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e; letter-spacing: 2px; }
-        .header-right { display: flex; align-items: center; gap: 14px; }
+        .header h1 { font-family: 'Caveat', cursive; font-size: 30px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e; letter-spacing: 2px; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
         .user-info { display: flex; align-items: center; gap: 8px; color: #c9b48a; font-size: 14px; }
-        .user-info img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #f0d878; }
-        .gen-counter { font-size: 12px; color: #c9b48a; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 8px; }
-        .nav { background: #c4a870; border-bottom: 3px solid #8a6e48; display: flex; padding: 0 30px; }
+        .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #f0d878; }
+        .gen-counter { font-size: 12px; color: #c9b48a; background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 8px; }
+        .nav { background: #c4a870; border-bottom: 3px solid #8a6e48; display: flex; padding: 0 24px; }
         .nav a { padding: 10px 24px; color: #5c3d2e; text-decoration: none; font-size: 17px; font-weight: bold; border-bottom: 3px solid transparent; transition: all 0.15s; }
         .nav a:hover { background: rgba(0,0,0,0.05); }
         .nav a.active { border-bottom-color: #5c3d2e; color: #2a1a0e; }
+
+        /* BUTTONS */
         .btn-auth { background: #6b4830; color: #f0d878; border: 2px solid #f0d878; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; text-decoration: none; }
         .btn-auth:hover { background: #8a5a3a; }
         .btn-logout { background: transparent; color: #c9b48a; border: 1px solid #8a6e48; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; text-decoration: none; }
         .btn-logout:hover { background: rgba(255,255,255,0.1); }
-        .btn { padding: 7px 14px; border: 2px solid #2a1a0e; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; transition: all 0.15s; flex: 1; text-align: center; }
+        .btn { padding: 6px 12px; border: 2px solid #2a1a0e; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: bold; transition: all 0.15s; text-align: center; }
         .btn-generate { background: #6b4830; color: #f0d878; }
         .btn-generate:hover { background: #8a5a3a; }
         .btn-generate:disabled { background: #a09080; color: #c0b090; cursor: not-allowed; }
@@ -46,89 +48,198 @@
         .btn-publish:hover { background: #5a9a58; }
         .btn-unpublish { background: #a08060; color: #fff; }
         .btn-unpublish:hover { background: #b09070; }
-        .controls { padding: 12px 30px; background: #d4c4a0; border-bottom: 2px solid #b89a6a; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .controls input[type="text"], .controls select { background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 7px 14px; border-radius: 8px; font-family: inherit; font-size: 15px; }
-        .controls input[type="text"] { width: 280px; }
-        .controls button, .controls label.ctrl-btn { background: #6b4830; color: #f0d878; border: 2px solid #2a1a0e; padding: 7px 18px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: bold; }
+
+        /* CONTROLS BAR */
+        .controls { padding: 10px 24px; background: #d4c4a0; border-bottom: 2px solid #b89a6a; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .controls input[type="text"], .controls select { background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 6px 12px; border-radius: 6px; font-family: inherit; font-size: 14px; }
+        .controls input[type="text"] { width: 240px; }
+        .controls button, .controls label.ctrl-btn { background: #6b4830; color: #f0d878; border: 2px solid #2a1a0e; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; }
         .controls button:hover, .controls label.ctrl-btn:hover { background: #8a5a3a; }
-        .feed-grid { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 25px 30px; }
-        .feed-card { background: #efe0c0; border-radius: 12px; border: 3px solid #6b4830; overflow: hidden; box-shadow: 3px 3px 0 #8a6e48; transition: transform 0.15s, box-shadow 0.15s; width: 100%; max-width: 520px; }
-        .feed-card:hover { transform: translateY(-3px); box-shadow: 5px 7px 0 #8a6e48; }
-        .feed-card img { width: 100%; object-fit: cover; cursor: pointer; display: block; }
-        .feed-card-info { padding: 12px 16px; }
-        .feed-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .feed-cat-name { font-family: 'Caveat', cursive; font-size: 28px; font-weight: 700; color: #2a1a0e; }
-        .feed-owner { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8a7050; margin-bottom: 6px; }
-        .feed-owner img { width: 22px; height: 22px; border-radius: 50%; }
-        .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; padding: 25px 30px; }
-        .cat-card { background: #efe0c0; border-radius: 10px; border: 3px solid #6b4830; overflow: hidden; box-shadow: 3px 3px 0 #8a6e48; transition: transform 0.15s, box-shadow 0.15s; }
-        .cat-card:hover { transform: translateY(-3px); box-shadow: 5px 7px 0 #8a6e48; }
-        .cat-card-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #b89a6a; }
-        .cat-name { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: #2a1a0e; }
-        .cat-class { font-size: 13px; padding: 3px 12px; border-radius: 14px; font-weight: bold; text-transform: uppercase; border: 2px solid rgba(0,0,0,0.3); letter-spacing: 0.5px; }
-        .class-Fighter { background: #d44; color: #fff; } .class-Tank { background: #e88030; color: #fff; }
-        .class-Hunter { background: #4a8; color: #fff; } .class-Mage { background: #a67ad8; color: #fff; }
-        .class-Medic { background: #e8e0d0; color: #4a3820; border-color: #8a6e48; }
-        .class-Necromancer { background: #2a2a2a; color: #8f8; } .class-Druid { background: #5a7a3a; color: #dfd; }
-        .class-Thief { background: #d8c878; color: #4a3820; border-color: #8a6e48; }
-        .class-Tinkerer { background: #78c848; color: #fff; } .class-Colorless { background: #a09080; color: #fff; }
-        .class-Monk { background: #c8a838; color: #fff; } .class-Psychic { background: #a848c8; color: #fff; }
-        .class-Jester { background: linear-gradient(90deg, #d44, #48a, #4a8); color: #fff; }
-        .class-Butcher { background: #8a2020; color: #fff; }
-        .cat-card-body { padding: 10px 16px 6px; }
-        .cat-info-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 14px; align-items: flex-start; }
-        .cat-info-label { color: #7a6040; min-width: 70px; font-weight: bold; }
-        .stats-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 8px 0; text-align: center; }
-        .stat-cell { background: #d8c8a0; border: 2px solid #8a6e48; border-radius: 6px; padding: 4px 2px; font-size: 12px; }
-        .stat-label { font-size: 10px; font-weight: bold; color: #6a5030; display: block; }
-        .stat-value { font-size: 18px; font-weight: bold; color: #2a1a0e; font-family: 'Caveat', cursive; }
-        .stat-value.injured { color: #c03030; } .stat-value.buffed { color: #2a8a2a; }
-        .stat-detail { font-size: 9px; color: #8a7050; }
-        .status-badge { font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: bold; margin-left: 8px; }
-        .status-OK { background: #7ab85a; color: #fff; } .status-Injured { background: #d87030; color: #fff; } .status-Dead { background: #8a2020; color: #fff; }
-        .cat-tags, .feed-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
-        .tag { font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.2); }
-        .tag.ability { background: #d44; color: #fff; } .tag.passive { background: #4a8; color: #fff; }
-        .tag.item { background: #c8a030; color: #2a1a0e; } .tag.mutation { background: #8a48a8; color: #fff; }
-        .tag.defect { background: #6a1a1a; color: #fcc; }
-        .cat-image-area { padding: 0 16px 10px; }
-        .cat-image-area img { width: 100%; border-radius: 8px; border: 3px solid #6b4830; max-height: 320px; object-fit: cover; }
-        .cat-card-actions { padding: 8px 16px 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .error-msg { color: #b03020; font-size: 13px; padding: 5px 16px 8px; font-weight: bold; }
-        .gender-icon { font-size: 16px; margin-right: 2px; }
-        .published-badge { font-size: 11px; padding: 1px 8px; border-radius: 10px; background: #4a8848; color: #fff; font-weight: bold; margin-left: 6px; }
-        .like-btn { background: none; border: none; cursor: pointer; font-size: 22px; padding: 4px 8px; border-radius: 8px; transition: transform 0.15s; display: flex; align-items: center; gap: 6px; font-family: inherit; color: #8a7050; }
+
+        /* === GAME-STYLE CAT CARD === */
+        .cat-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px 16px; }
+
+        .cat-card {
+            background: #e8dbb8;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23e0d4b0'/%3E%3Crect x='0' y='0' width='2' height='2' fill='%23e8dbb8'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23e8dbb8'/%3E%3C/svg%3E");
+            border: 3px solid #5c4428;
+            border-radius: 4px;
+            box-shadow: 4px 4px 0 #8a7a5a, inset 0 0 20px rgba(140,120,80,0.15);
+            width: 100%; max-width: 680px;
+            display: flex; flex-direction: row;
+            overflow: hidden;
+            position: relative;
+        }
+        .cat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(160,140,100,0.04) 2px, rgba(160,140,100,0.04) 4px);
+            pointer-events: none; z-index: 1;
+        }
+
+        /* Left: image area */
+        .card-left {
+            width: 240px; min-width: 240px; max-width: 240px;
+            background: #d0c4a0;
+            border-right: 3px solid #5c4428;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 10px;
+            position: relative;
+        }
+        .card-left .cat-portrait {
+            width: 100%; aspect-ratio: 1; border-radius: 4px;
+            border: 2px solid #5c4428;
+            background: #c8b890;
+            object-fit: cover; cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+        }
+        .card-left .no-portrait {
+            width: 100%; aspect-ratio: 1; border-radius: 4px;
+            border: 2px dashed #a09070;
+            background: #d8cca8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 60px; color: #b0a080;
+        }
+        .card-left .card-actions { display: flex; gap: 6px; margin-top: 8px; width: 100%; flex-wrap: wrap; }
+        .card-left .card-actions .btn { flex: 1; font-size: 12px; padding: 5px 4px; min-width: 60px; }
+
+        /* Right: info area */
+        .card-right { flex: 1; display: flex; flex-direction: column; padding: 0; position: relative; z-index: 2; min-width: 0; }
+
+        /* Name bar */
+        .card-name-bar {
+            background: linear-gradient(180deg, #f0e4c8, #e0d4b0);
+            border-bottom: 2px solid #a89870;
+            padding: 8px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-name { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: #2a1a0e; line-height: 1; }
+        .card-gender { font-size: 16px; margin-left: 4px; }
+        .card-badges { display: flex; gap: 4px; align-items: center; }
+        .badge { font-size: 11px; padding: 2px 8px; border-radius: 3px; font-weight: bold; border: 1px solid rgba(0,0,0,0.2); }
+        .badge-class { color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-status { background: #d87030; color: #fff; }
+        .badge-dead { background: #8a2020; color: #fff; }
+        .badge-published { background: #4a8848; color: #fff; }
+        .bc-Fighter { background: #c03030; } .bc-Tank { background: #d07020; }
+        .bc-Hunter { background: #308850; } .bc-Mage { background: #8858b0; }
+        .bc-Medic { background: #a09880; } .bc-Necromancer { background: #2a2a2a; }
+        .bc-Druid { background: #4a6a2a; } .bc-Thief { background: #b8a840; color: #3a2e1e; }
+        .bc-Tinkerer { background: #58a030; } .bc-Colorless { background: #908070; }
+        .bc-Monk { background: #b89828; } .bc-Psychic { background: #9038b0; }
+        .bc-Jester { background: linear-gradient(90deg,#c03030,#3858a8,#308850); } .bc-Butcher { background: #701818; }
+
+        /* Stats grid — compact like game */
+        .card-stats {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            border-bottom: 2px solid #a89870;
+            background: #f0e8d0;
+        }
+        .stat-cell {
+            text-align: center; padding: 4px 2px;
+            border-right: 1px solid #c8b890;
+            position: relative;
+        }
+        .stat-cell:last-child { border-right: none; }
+        .stat-icon { font-size: 10px; font-weight: bold; color: #7a6840; display: block; line-height: 1; }
+        .stat-val { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: #2a1a0e; line-height: 1.1; }
+        .stat-val.hurt { color: #c03030; }
+        .stat-val.buff { color: #2a8a2a; }
+        .stat-mod { font-size: 9px; color: #8a7050; display: block; line-height: 1; }
+
+        /* Card body sections */
+        .card-body { padding: 6px 12px 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; }
+        .card-section { display: flex; gap: 6px; align-items: flex-start; }
+        .card-section-icon { font-size: 12px; min-width: 16px; text-align: center; margin-top: 2px; }
+        .card-section-content { display: flex; flex-wrap: wrap; gap: 3px; flex: 1; min-width: 0; }
+
+        /* Skill/item tags with tooltips */
+        .tag {
+            font-size: 11px; padding: 2px 7px; border-radius: 3px;
+            border: 1px solid rgba(0,0,0,0.2);
+            cursor: default; position: relative;
+            max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .tag.ability { background: #c83030; color: #fff; }
+        .tag.passive { background: #2a7a50; color: #fff; }
+        .tag.item { background: #b89828; color: #2a1a0e; }
+        .tag.mutation { background: #7838a0; color: #fff; }
+        .tag.defect { background: #581818; color: #fcc; }
+        .tag[data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: #2a1a0e; color: #f0e4c8; padding: 6px 10px; border-radius: 4px;
+            font-size: 12px; white-space: normal; width: max-content; max-width: 280px;
+            z-index: 100; pointer-events: none; margin-bottom: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4); line-height: 1.3;
+        }
+
+        .focus-label { font-size: 12px; color: #6a5830; }
+        .focus-value { font-size: 12px; font-weight: bold; color: #3a2e1e; }
+
+        .error-msg { color: #b03020; font-size: 12px; padding: 4px 12px; font-weight: bold; }
+
+        /* === FEED === */
+        .feed-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px 16px; }
+
+        .feed-card {
+            background: #e8dbb8;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23e0d4b0'/%3E%3Crect x='0' y='0' width='2' height='2' fill='%23e8dbb8'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23e8dbb8'/%3E%3C/svg%3E");
+            border: 3px solid #5c4428;
+            border-radius: 4px;
+            box-shadow: 4px 4px 0 #8a7a5a;
+            width: 100%; max-width: 520px;
+            overflow: hidden;
+        }
+        .feed-card img.feed-img { width: 100%; object-fit: cover; cursor: pointer; display: block; border-bottom: 3px solid #5c4428; }
+        .feed-card-info { padding: 10px 14px; }
+        .feed-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .feed-cat-name { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: #2a1a0e; }
+        .feed-owner { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8a7050; margin-bottom: 6px; }
+        .feed-owner img { width: 20px; height: 20px; border-radius: 50%; }
+        .feed-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+        .feed-card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px 10px; }
+        .like-btn { background: none; border: none; cursor: pointer; font-size: 22px; padding: 2px 6px; border-radius: 6px; transition: transform 0.15s; display: flex; align-items: center; gap: 6px; font-family: inherit; color: #8a7050; }
         .like-btn:hover { transform: scale(1.15); }
-        .like-btn.liked { color: #d44; }
+        .like-btn.liked { color: #c03030; }
         .like-btn .like-count { font-size: 15px; font-weight: bold; }
-        .feed-card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 4px 16px 10px; }
-        .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 5px; }
+
+        /* === UTILITY === */
+        .loading-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 4px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .page-center { text-align: center; padding: 80px 30px; }
-        .page-center h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 38px; margin-bottom: 15px; }
-        .page-center p { color: #6a5030; font-size: 17px; margin-bottom: 10px; }
-        .btn-google { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #3a2e1e; border: 2px solid #8a6e48; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: bold; text-decoration: none; box-shadow: 3px 3px 0 #8a6e48; transition: all 0.2s; }
+        .page-center { text-align: center; padding: 80px 24px; }
+        .page-center h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 36px; margin-bottom: 12px; }
+        .page-center p { color: #6a5030; font-size: 16px; margin-bottom: 8px; }
+        .btn-google { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #3a2e1e; border: 2px solid #8a6e48; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: bold; text-decoration: none; box-shadow: 3px 3px 0 #8a6e48; transition: all 0.2s; }
         .btn-google:hover { transform: translateY(-2px); box-shadow: 4px 5px 0 #8a6e48; }
         .btn-google svg { width: 22px; height: 22px; }
-        .upload-box { max-width: 500px; margin: 0 auto; background: #efe0c0; border: 3px dashed #8a6e48; border-radius: 16px; padding: 40px; cursor: pointer; transition: all 0.2s; }
+        .upload-box { max-width: 480px; margin: 0 auto; background: #efe0c0; border: 3px dashed #8a6e48; border-radius: 12px; padding: 36px; cursor: pointer; transition: all 0.2s; }
         .upload-box:hover { border-color: #6b4830; background: #f0e8d0; }
         .upload-box.dragover { border-color: #f0d878; background: #f8f0d8; }
-        .upload-box h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 28px; margin-bottom: 10px; }
-        .upload-box p { margin: 8px 0; font-size: 15px; }
-        .upload-box .hint { font-size: 12px; color: #a08060; margin-top: 15px; }
+        .upload-box h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 26px; margin-bottom: 8px; }
+        .upload-box p { margin: 6px 0; font-size: 14px; }
+        .upload-box .hint { font-size: 12px; color: #a08060; margin-top: 12px; }
         .empty-feed { text-align: center; padding: 60px; color: #8a7050; font-size: 18px; }
+
+        /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(42,26,14,0.85); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal { background: #efe0c0; border-radius: 12px; padding: 25px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; border: 3px solid #6b4830; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
-        .modal h2 { font-family: 'Caveat', cursive; color: #5c3d2e; margin-bottom: 15px; font-size: 28px; }
-        .modal textarea { width: 100%; min-height: 120px; background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 12px; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; margin-bottom: 15px; }
-        .modal .btn-row { display: flex; gap: 10px; justify-content: flex-end; }
-        .modal .btn-close { background: #b89a6a; color: #3a2e1e; padding: 8px 20px; border: 2px solid #8a6e48; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; }
+        .modal { background: #efe0c0; border-radius: 8px; padding: 20px; max-width: 680px; width: 90%; max-height: 90vh; overflow-y: auto; border: 3px solid #6b4830; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
+        .modal h2 { font-family: 'Caveat', cursive; color: #5c3d2e; margin-bottom: 12px; font-size: 26px; }
+        .modal textarea { width: 100%; min-height: 120px; background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 10px; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; margin-bottom: 12px; }
+        .modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; }
+        .modal .btn-close { background: #b89a6a; color: #3a2e1e; padding: 7px 18px; border: 2px solid #8a6e48; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 13px; }
         .image-fullscreen { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 2000; cursor: pointer; justify-content: center; align-items: center; }
         .image-fullscreen.active { display: flex; }
-        .image-fullscreen img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 8px; border: 3px solid #6b4830; }
-        .toast { position: fixed; bottom: 30px; right: 30px; background: #5c3d2e; color: #f0d878; padding: 12px 24px; border-radius: 10px; border: 2px solid #f0d878; font-family: inherit; font-size: 15px; z-index: 3000; display: none; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+        .image-fullscreen img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 4px; border: 3px solid #6b4830; }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #5c3d2e; color: #f0d878; padding: 10px 20px; border-radius: 8px; border: 2px solid #f0d878; font-family: inherit; font-size: 14px; z-index: 3000; display: none; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
         .toast.show { display: block; }
+
+        /* Responsive: stack card vertically on small screens */
+        @media (max-width: 600px) {
+            .cat-card { flex-direction: column; max-width: 100%; }
+            .card-left { width: 100%; max-width: 100%; min-width: 0; border-right: none; border-bottom: 3px solid #5c4428; }
+            .card-left .cat-portrait, .card-left .no-portrait { max-height: 300px; }
+        }
     </style>
 </head>
 <body>
@@ -158,6 +269,7 @@
         const PAGE = "{{ page }}";
         let currentUser = null, allCats = [], feedCats = [], currentModalCatId = null;
         const GOOGLE_SVG = `<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
+        const STAT_ICONS = ['STR','DEX','CON','INT','SPD','CHA','LCK'];
 
         async function init() {
             try {
@@ -195,7 +307,7 @@
                 <a href="/cabinet" class="${PAGE==='cabinet'?'active':''}">Мои коты</a>`;
         }
 
-        // FEED
+        // ====== FEED ======
         async function loadFeed() {
             try {
                 const r = await fetch('/api/feed');
@@ -208,21 +320,29 @@
         function renderFeed() {
             const m = document.getElementById('main-content');
             if (!feedCats.length) {
-                m.innerHTML = `<div class="empty-feed"><p style="font-size:40px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:14px">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
+                m.innerHTML = `<div class="empty-feed"><p style="font-size:48px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:13px;color:#a08060">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
                 return;
             }
             m.innerHTML = `<div class="feed-grid">${feedCats.map((c,i) => `
                 <div class="feed-card">
-                    <img src="${c.image_url}" alt="${esc(c.name)}" onclick="showFullscreen('${c.image_url}')">
+                    <img class="feed-img" src="${c.image_url}" alt="${esc(c.name)}" onclick="showFullscreen('${c.image_url}')">
                     <div class="feed-card-info">
                         <div class="feed-card-top">
                             <span class="feed-cat-name">${esc(c.name)}</span>
-                            <span class="cat-class class-${c.class_en}">${esc(c['class'])}</span>
+                            <span class="badge badge-class bc-${c.class_en}">${esc(c['class'])}</span>
                         </div>
                         <div class="feed-owner">${c.owner_avatar?`<img src="${c.owner_avatar}">`:''}${esc(c.owner_name)}</div>
                         <div class="feed-tags">
-                            ${(c.abilities||[]).map(a=>`<span class="tag ability">${esc(a)}</span>`).join('')}
-                            ${(c.passives||[]).map(p=>`<span class="tag passive">${esc(p)}</span>`).join('')}
+                            ${(c.abilities_rich||c.abilities||[]).map(a => {
+                                const nm = typeof a === 'object' ? a.name : a;
+                                const ds = typeof a === 'object' ? a.desc : '';
+                                return `<span class="tag ability" ${ds?`data-tip="${esc(ds)}"`:''}>${esc(nm)}</span>`;
+                            }).join('')}
+                            ${(c.passives_rich||c.passives||[]).map(p => {
+                                const nm = typeof p === 'object' ? p.name : p;
+                                const ds = typeof p === 'object' ? p.desc : '';
+                                return `<span class="tag passive" ${ds?`data-tip="${esc(ds)}"`:''}>${esc(nm)}</span>`;
+                            }).join('')}
                         </div>
                     </div>
                     <div class="feed-card-bottom">
@@ -233,7 +353,7 @@
                 </div>`).join('')}</div>`;
         }
 
-        // CABINET
+        // ====== CABINET ======
         async function initCabinet() {
             try {
                 const r = await fetch('/api/save-info');
@@ -287,7 +407,7 @@
                         <option value="Colorless">Бесцветный</option></select>
                     <select id="status-filter"><option value="">Все</option><option value="OK">Здоровые</option><option value="Injured">Раненые</option></select>
                     <label class="ctrl-btn" style="cursor:pointer">Новый сейв<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
-                    <span style="font-size:13px;color:#7a6040">День ${info.current_day||'?'} | Золото: ${info.house_gold||'?'} | Котов: ${info.total_cats||'?'}</span>
+                    <span style="font-size:12px;color:#7a6040">День ${info.current_day||'?'} | Золото: ${info.house_gold||'?'} | Котов: ${info.total_cats||'?'}</span>
                 </div>
                 <div class="cat-grid" id="cat-grid"></div>`;
             document.getElementById('search').addEventListener('input', renderCats);
@@ -315,48 +435,88 @@
                 const gi = cat.gender==='кот'?'&#9794;':cat.gender==='кошка'?'&#9792;':'?';
                 const id = cat.db_id;
                 return `<div class="cat-card">
-                    <div class="cat-card-header">
-                        <div><span class="cat-name">${esc(cat.name)}</span><span class="gender-icon">${gi}</span>
-                            ${cat.status!=='OK'?`<span class="status-badge status-${cat.status}">${cat.status==='Injured'?'Ранен':'Мёртв'}</span>`:''}
-                            ${cat.published?'<span class="published-badge">В ленте</span>':''}
+                    <div class="card-left">
+                        ${cat.has_image
+                            ? `<img class="cat-portrait" src="${cat.image_url}" onclick="showFullscreen('${cat.image_url}')">`
+                            : `<div class="no-portrait">&#128049;</div>`}
+                        <div class="card-actions">
+                            <button class="btn btn-generate" id="gen-btn-${id}" onclick="generateImage(${id})" ${!canGen?'disabled':''}>${cat.has_image?'Перегенерить':'Генерация'}</button>
+                            <button class="btn btn-prompt" onclick="showPrompt(${id})">Промпт</button>
+                            ${cat.has_image?(cat.published
+                                ?`<button class="btn btn-unpublish" onclick="togglePublish(${id},false)">Убрать</button>`
+                                :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">В ленту</button>`):''}
                         </div>
-                        <div class="cat-class class-${cat.class_en}">${esc(cat['class'])}</div>
                     </div>
-                    <div class="cat-card-body">
-                        ${renderStats(cat.stats)}
-                        <div class="cat-info-row"><span class="cat-info-label">Фокус:</span><span>${esc(cat.stat_focus)}</span></div>
-                        ${cat.abilities.length?`<div class="cat-info-row"><span class="cat-info-label">Скиллы:</span><div class="cat-tags">${cat.abilities.map(a=>`<span class="tag ability">${esc(a)}</span>`).join('')}</div></div>`:''}
-                        ${cat.passives.length?`<div class="cat-info-row"><span class="cat-info-label">Пассивки:</span><div class="cat-tags">${cat.passives.map(p=>`<span class="tag passive">${esc(p)}</span>`).join('')}</div></div>`:''}
-                        ${cat.items.length?`<div class="cat-info-row"><span class="cat-info-label">Предметы:</span><div class="cat-tags">${cat.items.map(i=>`<span class="tag item">${esc(i)}</span>`).join('')}</div></div>`:''}
-                        ${cat.mutations&&cat.mutations.length?`<div class="cat-info-row"><span class="cat-info-label">Мутации:</span><div class="cat-tags">${cat.mutations.map(m=>`<span class="tag ${m.is_defect?'defect':'mutation'}" title="${esc(m.desc)}">${esc(m.part_ru)}${m.desc?' ('+esc(m.desc.substring(0,35))+(m.desc.length>35?'...':'')+')':''}</span>`).join('')}</div></div>`:''}
-                    </div>
-                    ${cat.has_image?`<div class="cat-image-area"><img src="${cat.image_url}" onclick="showFullscreen('${cat.image_url}')" style="cursor:pointer"></div>`:''}
-                    <div id="error-${id}" class="error-msg" style="display:none"></div>
-                    <div class="cat-card-actions">
-                        <button class="btn btn-generate" id="gen-btn-${id}" onclick="generateImage(${id})" ${!canGen?'disabled':''}>${cat.has_image?'Перегенерировать':'Сгенерировать'}</button>
-                        <button class="btn btn-prompt" onclick="showPrompt(${id})">Промпт</button>
-                        ${cat.has_image?(cat.published
-                            ?`<button class="btn btn-unpublish" onclick="togglePublish(${id},false)">Убрать</button>`
-                            :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">В ленту</button>`):''}
+                    <div class="card-right">
+                        <div class="card-name-bar">
+                            <div>
+                                <span class="card-name">${esc(cat.name)}</span><span class="card-gender">${gi}</span>
+                            </div>
+                            <div class="card-badges">
+                                ${cat.status!=='OK'?`<span class="badge ${cat.status==='Dead'?'badge-dead':'badge-status'}">${cat.status==='Injured'?'Ранен':'Мёртв'}</span>`:''}
+                                ${cat.published?'<span class="badge badge-published">В ленте</span>':''}
+                                <span class="badge badge-class bc-${cat.class_en}">${esc(cat['class'])}</span>
+                            </div>
+                        </div>
+                        ${renderStatsRow(cat.stats)}
+                        <div class="card-body">
+                            <div class="card-section">
+                                <span class="focus-label">Фокус:</span>
+                                <span class="focus-value">${esc(cat.stat_focus)}</span>
+                            </div>
+                            ${renderRichSection(cat.abilities_rich || cat.abilities, 'ability', '&#9876;')}
+                            ${renderRichSection(cat.passives_rich || cat.passives, 'passive', '&#9733;')}
+                            ${renderRichSection(cat.items_rich || cat.items, 'item', '&#9874;')}
+                            ${renderMutations(cat.mutations)}
+                        </div>
+                        <div id="error-${id}" class="error-msg" style="display:none"></div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function renderStats(stats) {
+        function renderStatsRow(stats) {
             if (!stats) return '';
-            const ks = ['STR','DEX','CON','INT','SPD','CHA','LCK'];
-            let h = '<div class="stats-grid">';
-            for (const k of ks) { const s=stats[k]; if(!s)continue;
-                const c=s.extra<0?'injured':(s.bonus>0||s.extra>0)?'buffed':'';
-                const d=[]; if(s.bonus)d.push((s.bonus>0?'+':'')+s.bonus); if(s.extra)d.push((s.extra>0?'+':'')+s.extra);
-                h+=`<div class="stat-cell"><span class="stat-label">${s.label_ru}</span><span class="stat-value ${c}">${s.effective}</span>${d.length?`<span class="stat-detail">${s.base}${d.join('')}</span>`:''}</div>`;
-            } return h+'</div>';
+            let h = '<div class="card-stats">';
+            for (const k of STAT_ICONS) {
+                const s = stats[k]; if(!s) continue;
+                const c = s.extra<0 ? 'hurt' : (s.bonus>0||s.extra>0) ? 'buff' : '';
+                const mods = [];
+                if(s.bonus) mods.push((s.bonus>0?'+':'')+s.bonus);
+                if(s.extra) mods.push((s.extra>0?'+':'')+s.extra);
+                h += `<div class="stat-cell">
+                    <span class="stat-icon">${s.label_ru}</span>
+                    <span class="stat-val ${c}">${s.effective}</span>
+                    ${mods.length?`<span class="stat-mod">${s.base}${mods.join('')}</span>`:''}
+                </div>`;
+            }
+            return h + '</div>';
         }
 
+        function renderRichSection(items, tagClass, icon) {
+            if (!items || !items.length) return '';
+            const tags = items.map(it => {
+                if (typeof it === 'object') {
+                    const tip = it.desc ? esc(it.desc) : '';
+                    return `<span class="tag ${tagClass}" ${tip?`data-tip="${tip}"`:''}>${esc(it.name)}</span>`;
+                }
+                return `<span class="tag ${tagClass}">${esc(it)}</span>`;
+            }).join('');
+            return `<div class="card-section"><span class="card-section-icon">${icon}</span><div class="card-section-content">${tags}</div></div>`;
+        }
+
+        function renderMutations(mutations) {
+            if (!mutations || !mutations.length) return '';
+            const tags = mutations.map(m =>
+                `<span class="tag ${m.is_defect?'defect':'mutation'}" ${m.desc?`data-tip="${esc(m.desc)}"`:''}>${esc(m.part_ru)}${m.desc?' — '+esc(m.desc.substring(0,30))+(m.desc.length>30?'...':''):''}</span>`
+            ).join('');
+            return `<div class="card-section"><span class="card-section-icon">&#9763;</span><div class="card-section-content">${tags}</div></div>`;
+        }
+
+        // ====== ACTIONS ======
         async function generateImage(catId) {
             const btn=document.getElementById(`gen-btn-${catId}`), err=document.getElementById(`error-${catId}`);
-            if(!btn)return; btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span>Генерация...';
+            if(!btn)return; btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span>...';
             if(err)err.style.display='none';
             try {
                 const r = await fetch(`/api/cat/${catId}/generate`,{method:'POST'});
@@ -364,8 +524,8 @@
                 if(d.success){ currentUser.generations_count++; renderAuthArea();
                     const c=allCats.find(x=>x.db_id===catId); if(c){c.has_image=true;c.image_url=d.image_url+'?t='+Date.now();}
                     renderCats();
-                } else { err.textContent=d.error;err.style.display='block';btn.disabled=false;btn.textContent='Сгенерировать'; }
-            } catch(e){ err.textContent='Ошибка сети';err.style.display='block';btn.disabled=false;btn.textContent='Сгенерировать'; }
+                } else { err.textContent=d.error;err.style.display='block';btn.disabled=false;btn.textContent='Генерация'; }
+            } catch(e){ err.textContent='Ошибка сети';err.style.display='block';btn.disabled=false;btn.textContent='Генерация'; }
         }
 
         async function toggleLike(catId, feedIdx) {
@@ -402,7 +562,7 @@
             if(!currentModalCatId)return;
             const p=document.getElementById('prompt-text').value; closeModal();
             const btn=document.getElementById(`gen-btn-${currentModalCatId}`), err=document.getElementById(`error-${currentModalCatId}`);
-            if(btn){btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>Генерация...';}
+            if(btn){btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>...';}
             if(err)err.style.display='none';
             try {
                 const r = await fetch(`/api/cat/${currentModalCatId}/generate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({custom_prompt:p})});
@@ -410,8 +570,8 @@
                 if(d.success){ currentUser.generations_count++;renderAuthArea();
                     const c=allCats.find(x=>x.db_id===currentModalCatId);if(c){c.has_image=true;c.image_url=d.image_url+'?t='+Date.now();}
                     renderCats();
-                } else { if(err){err.textContent=d.error;err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Сгенерировать';} }
-            } catch(e){ if(err){err.textContent='Ошибка';err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Сгенерировать';} }
+                } else { if(err){err.textContent=d.error;err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Генерация';} }
+            } catch(e){ if(err){err.textContent='Ошибка';err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Генерация';} }
         }
 
         function closeModal(){document.getElementById('prompt-modal').classList.remove('active')}

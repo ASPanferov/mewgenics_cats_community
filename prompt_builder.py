@@ -499,6 +499,34 @@ def build_cat_summary_ru(cat: CatData) -> dict:
             "is_defect": is_defect,
         })
 
+    # Build rich ability/passive/item info with names + descriptions
+    abilities_rich = []
+    for a in cat.abilities:
+        info = game_desc.get_ability(a)
+        abilities_rich.append({
+            "key": a,
+            "name": info[0] if info else a,
+            "desc": info[1] if info else "",
+        })
+
+    passives_rich = []
+    for p in cat.passives:
+        info = game_desc.get_passive(p)
+        passives_rich.append({
+            "key": p,
+            "name": info[0] if info else p,
+            "desc": info[1] if info else "",
+        })
+
+    items_rich = []
+    for it in cat.items:
+        info = game_desc.get_item(it)
+        items_rich.append({
+            "key": it,
+            "name": info[0] if info else it,
+            "desc": info[1] if info else "",
+        })
+
     return {
         "id": cat.id,
         "name": cat.name,
@@ -508,9 +536,12 @@ def build_cat_summary_ru(cat: CatData) -> dict:
         "voice": cat.voice or "неизвестно",
         "stat_focus": cat.stat_focus or "нет",
         "status": cat.status,
-        "abilities": cat.abilities,
-        "passives": cat.passives,
-        "items": cat.items,
+        "abilities": [a["name"] for a in abilities_rich],
+        "passives": [p["name"] for p in passives_rich],
+        "items": [i["name"] for i in items_rich],
+        "abilities_rich": abilities_rich,
+        "passives_rich": passives_rich,
+        "items_rich": items_rich,
         "mutations": mutations_list,
         "stats": stats_dict,
     }
