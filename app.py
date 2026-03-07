@@ -121,7 +121,8 @@ def auth_me():
             "email": db_user["email"],
             "avatar_url": db_user["avatar_url"],
             "generations_count": db_user["generations_count"],
-            "max_generations": db.MAX_GENERATIONS,
+            "max_generations": db.get_user_max_generations(db_user),
+            "is_premium": bool(db_user.get("is_premium")),
         }
     })
 
@@ -420,12 +421,24 @@ def api_migrate():
     """One-time migration endpoint."""
     try:
         db.init_db()
+
+        # Grant premium to founders
+        for email in ["panfyorov@gmail.com", "insaneramzes@gmail.com"]:
+            db.set_premium_by_email(email, True)
+
         cols = db.query("""
             SELECT column_name FROM information_schema.columns
-            WHERE table_name = 'cats'
+            WHERE table_name = 'users'
         """)
         col_names = [r["column_name"] for r in cols]
-        return jsonify({"ok": True, "cats_columns": col_names})
+
+        premium_users = db.query("SELECT id, name, email, is_premium FROM users WHERE is_premium = TRUE")
+
+        return jsonify({
+            "ok": True,
+            "users_columns": col_names,
+            "premium_users": [dict(r) for r in premium_users],
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

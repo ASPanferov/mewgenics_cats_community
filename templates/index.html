@@ -28,6 +28,7 @@
         .user-info { display: flex; align-items: center; gap: 8px; color: #c9b48a; font-size: 14px; }
         .user-info img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #f0d878; }
         .gen-counter { font-size: 12px; color: #c9b48a; background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 8px; }
+        .premium-badge { font-size: 11px; color: #f0d878; background: linear-gradient(135deg, #b8860b, #daa520); padding: 2px 8px; border-radius: 8px; font-weight: bold; border: 1px solid #f0d878; }
         .nav { background: #c4a870; border-bottom: 3px solid #8a6e48; display: flex; padding: 0 24px; }
         .nav a { padding: 10px 24px; color: #5c3d2e; text-decoration: none; font-size: 17px; font-weight: bold; border-bottom: 3px solid transparent; transition: all 0.15s; }
         .nav a:hover { background: rgba(0,0,0,0.05); }
@@ -293,6 +294,7 @@
                 a.innerHTML = `<div class="user-info">
                     ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}">` : ''}
                     <span>${esc(currentUser.name)}</span>
+                    ${currentUser.is_premium ? '<span class="premium-badge">PRO</span>' : ''}
                     <span class="gen-counter">${currentUser.generations_count}/${currentUser.max_generations} генераций</span>
                     <a href="/auth/logout" class="btn-logout">Выйти</a>
                 </div>`;

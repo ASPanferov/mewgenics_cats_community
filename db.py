@@ -8,6 +8,7 @@ from psycopg2.extras import RealDictCursor
 _pool = None
 
 MAX_GENERATIONS = 5
+MAX_GENERATIONS_PREMIUM = 50
 
 
 def get_conn():
@@ -119,6 +120,13 @@ def init_db():
         )
     """)
     execute("CREATE INDEX IF NOT EXISTS idx_likes_cat_id ON likes(cat_id)")
+    # Migration: add is_premium column to users
+    user_cols = query("""
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'is_premium'
+    """)
+    if not user_cols:
+        execute("ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE")
 
 
 # === User operations ===
@@ -144,11 +152,26 @@ def increment_generations(user_id):
     execute("UPDATE users SET generations_count = generations_count + 1 WHERE id = %s", (user_id,))
 
 
+def get_user_max_generations(user):
+    """Return max generations limit based on premium status."""
+    if user and user.get("is_premium"):
+        return MAX_GENERATIONS_PREMIUM
+    return MAX_GENERATIONS
+
+
 def can_generate(user_id):
     user = get_user(user_id)
     if not user:
         return False
-    return user["generations_count"] < MAX_GENERATIONS
+    return user["generations_count"] < get_user_max_generations(user)
+
+
+def set_premium(user_id, is_premium=True):
+    execute("UPDATE users SET is_premium = %s WHERE id = %s", (is_premium, user_id))
+
+
+def set_premium_by_email(email, is_premium=True):
+    execute("UPDATE users SET is_premium = %s WHERE email = %s", (is_premium, email))
 
 
 # === Save operations ===
