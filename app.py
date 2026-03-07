@@ -609,6 +609,86 @@ def api_admin_preview_cat_data(db_cat_id):
     })
 
 
+@app.route("/api/admin/test-prompt-writer", methods=["POST"])
+def api_admin_test_prompt_writer():
+    """Run prompt writer with custom system instruction / user prompt. Returns the visual prompt text."""
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data"}), 400
+
+    system_instruction = data.get("system_instruction", "")
+    user_prompt = data.get("user_prompt", "")
+    model = data.get("model", get_prompt_model())
+
+    if not system_instruction or not user_prompt:
+        return jsonify({"error": "system_instruction and user_prompt required"}), 400
+
+    try:
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model=model,
+            contents=user_prompt,
+            config=genai.types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                max_output_tokens=800,
+                temperature=0.85,
+                top_p=0.92,
+            ),
+        )
+        if response and response.text:
+            return jsonify({"success": True, "visual_prompt": response.text.strip()})
+        return jsonify({"error": "Empty response from model"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/admin/test-image-gen", methods=["POST"])
+def api_admin_test_image_gen():
+    """Generate image from a given visual prompt. Returns base64 image data."""
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data"}), 400
+
+    visual_prompt = data.get("visual_prompt", "")
+    model = data.get("model", get_image_model())
+
+    if not visual_prompt:
+        return jsonify({"error": "visual_prompt required"}), 400
+
+    try:
+        import base64
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model=model,
+            contents=visual_prompt,
+            config=genai.types.GenerateContentConfig(
+                response_modalities=["IMAGE", "TEXT"],
+            ),
+        )
+        for part in response.candidates[0].content.parts:
+            if part.inline_data is not None:
+                img_b64 = base64.b64encode(part.inline_data.data).decode('utf-8')
+                mime = part.inline_data.mime_type or "image/png"
+                return jsonify({
+                    "success": True,
+                    "image_base64": img_b64,
+                    "mime_type": mime,
+                })
+        return jsonify({"error": "No image in response"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/admin/cats-list")
 def api_admin_cats_list():
     """Get all cats across all users for admin cat selector."""

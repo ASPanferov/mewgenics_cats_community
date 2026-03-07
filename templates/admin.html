@@ -21,9 +21,7 @@
         .header a { color: #c9b48a; text-decoration: none; font-size: 14px; }
         .header a:hover { color: #f0d878; }
 
-        .tabs {
-            display: flex; background: #3a2010; border-bottom: 2px solid #5c3020;
-        }
+        .tabs { display: flex; background: #3a2010; border-bottom: 2px solid #5c3020; }
         .tabs button {
             padding: 10px 24px; background: none; border: none; color: #a09070;
             font-family: inherit; font-size: 16px; cursor: pointer; border-bottom: 3px solid transparent;
@@ -34,66 +32,121 @@
         .tab-content { display: none; padding: 20px 24px; }
         .tab-content.active { display: block; }
 
-        /* Analytics */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px; margin-bottom: 24px;
-        }
-        .stat-card {
-            background: #3a2818; border: 2px solid #5c4428; border-radius: 8px;
-            padding: 16px; text-align: center;
-        }
-        .stat-card .num {
-            font-family: 'Caveat', cursive; font-size: 36px; color: #f0d878;
-            display: block; line-height: 1;
-        }
+        /* Stat cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: #3a2818; border: 2px solid #5c4428; border-radius: 8px; padding: 16px; text-align: center; }
+        .stat-card .num { font-family: 'Caveat', cursive; font-size: 36px; color: #f0d878; display: block; line-height: 1; }
         .stat-card .label { font-size: 13px; color: #a09070; margin-top: 4px; }
 
-        table {
-            width: 100%; border-collapse: collapse; margin-top: 12px;
-            font-size: 14px;
-        }
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
         th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #5c4428; color: #f0d878; font-size: 12px; text-transform: uppercase; }
         td { padding: 6px 12px; border-bottom: 1px solid #3a2818; }
         tr:hover td { background: rgba(240,216,120,0.05); }
         .premium-tag { color: #f0d878; font-weight: bold; }
 
-        /* Prompts */
-        .prompt-section {
-            margin-bottom: 24px; background: #3a2818; border: 2px solid #5c4428;
+        /* Sections */
+        .section {
+            margin-bottom: 20px; background: #3a2818; border: 2px solid #5c4428;
             border-radius: 8px; overflow: hidden;
         }
-        .prompt-header {
+        .section-header {
             padding: 12px 16px; background: #4a3020; display: flex;
             justify-content: space-between; align-items: center;
             border-bottom: 1px solid #5c4428;
         }
-        .prompt-header h3 { font-family: 'Caveat', cursive; font-size: 22px; color: #f0d878; }
-        .prompt-header .hint { font-size: 11px; color: #8a7050; }
-        .prompt-body { padding: 12px 16px; }
-        textarea.prompt-edit {
+        .section-header h3 { font-family: 'Caveat', cursive; font-size: 22px; color: #f0d878; }
+        .section-header .hint { font-size: 11px; color: #8a7050; max-width: 50%; text-align: right; }
+        .section-body { padding: 12px 16px; }
+
+        /* Inputs */
+        textarea.edit {
             width: 100%; min-height: 200px; background: #2a1a0e; border: 2px solid #5c4428;
             color: #e0d4b0; padding: 12px; border-radius: 6px; font-family: monospace;
             font-size: 12px; resize: vertical; line-height: 1.5;
         }
-        textarea.prompt-edit.tall { min-height: 500px; }
+        textarea.edit.tall { min-height: 500px; }
+        textarea.edit.medium { min-height: 300px; }
         input.model-input {
             background: #2a1a0e; border: 2px solid #5c4428; color: #e0d4b0;
             padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 14px;
             width: 100%; max-width: 500px;
         }
+        select.cat-select {
+            background: #2a1a0e; border: 2px solid #5c4428; color: #e0d4b0;
+            padding: 8px 12px; border-radius: 6px; font-family: inherit; font-size: 14px;
+            min-width: 300px;
+        }
 
-        .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+        /* Buttons */
+        .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         .btn {
             padding: 8px 20px; border: 2px solid #5c4428; border-radius: 6px;
             cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold;
+            display: inline-flex; align-items: center; gap: 6px;
         }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-save { background: #4a8848; color: #fff; border-color: #2a6828; }
-        .btn-save:hover { background: #5a9a58; }
+        .btn-save:hover:not(:disabled) { background: #5a9a58; }
+        .btn-run { background: #2858a8; color: #fff; border-color: #183878; }
+        .btn-run:hover:not(:disabled) { background: #3868b8; }
         .btn-reset { background: #8a3020; color: #fff; border-color: #5c2018; }
-        .btn-reset:hover { background: #a04030; }
+        .btn-reset:hover:not(:disabled) { background: #a04030; }
         .btn-default { background: #5c4428; color: #e0d4b0; }
-        .btn-default:hover { background: #6a5438; }
+        .btn-default:hover:not(:disabled) { background: #6a5438; }
+
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Preview blocks */
+        .preview-block {
+            background: #1a0e06; border: 2px solid #5c4428; border-radius: 6px;
+            padding: 16px; margin-top: 8px; font-family: monospace; font-size: 12px;
+            white-space: pre-wrap; line-height: 1.5; max-height: 500px; overflow-y: auto;
+            color: #c0b090;
+        }
+        .preview-block.editable {
+            color: #e0d4b0; cursor: text;
+        }
+
+        /* Step flow */
+        .step {
+            margin-bottom: 16px; background: #3a2818; border: 2px solid #5c4428;
+            border-radius: 8px; overflow: hidden; position: relative;
+        }
+        .step.completed { border-color: #4a8848; }
+        .step.active { border-color: #f0d878; }
+        .step.error { border-color: #8a3020; }
+        .step-header {
+            padding: 10px 16px; background: #4a3020; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #5c4428; cursor: pointer;
+        }
+        .step.completed .step-header { background: #2a4828; }
+        .step.active .step-header { background: #4a3820; }
+        .step.error .step-header { background: #4a2020; }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: bold;
+            font-size: 14px; margin-right: 10px; flex-shrink: 0;
+            background: #5c4428; color: #e0d4b0;
+        }
+        .step.completed .step-num { background: #4a8848; color: #fff; }
+        .step.active .step-num { background: #f0d878; color: #2a1a0e; }
+        .step.error .step-num { background: #8a3020; color: #fff; }
+        .step-title { font-family: 'Caveat', cursive; font-size: 20px; color: #f0d878; flex: 1; }
+        .step-status { font-size: 12px; color: #8a7050; }
+        .step-body { padding: 12px 16px; }
+        .step-body.collapsed { display: none; }
+
+        /* Image preview */
+        .img-result {
+            margin-top: 12px; text-align: center;
+        }
+        .img-result img {
+            max-width: 100%; max-height: 500px; border: 3px solid #5c4428;
+            border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
 
         .toast {
             position: fixed; bottom: 30px; right: 30px; background: #4a8848; color: #fff;
@@ -103,25 +156,12 @@
         .toast.show { display: block; }
         .toast.error { background: #8a3020; }
 
-        /* Cat preview */
-        .preview-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-        .preview-row select, .preview-row button {
-            font-family: inherit; font-size: 14px;
+        .section-title {
+            font-family: 'Caveat', cursive; font-size: 22px; color: #f0d878;
+            margin-bottom: 12px;
         }
-        .preview-row select {
-            background: #2a1a0e; border: 2px solid #5c4428; color: #e0d4b0;
-            padding: 6px 12px; border-radius: 6px; min-width: 250px;
-        }
-        .preview-block {
-            background: #1a0e06; border: 2px solid #5c4428; border-radius: 6px;
-            padding: 16px; margin-top: 12px; font-family: monospace; font-size: 12px;
-            white-space: pre-wrap; line-height: 1.5; max-height: 600px; overflow-y: auto;
-        }
-        .preview-label {
-            font-family: 'Caveat', cursive; font-size: 18px; color: #f0d878;
-            margin: 16px 0 8px; display: block;
-        }
-        .preview-meta { font-size: 12px; color: #8a7050; margin-bottom: 8px; }
+        .meta-line { font-size: 12px; color: #8a7050; margin-bottom: 8px; }
+        .char-count { font-size: 11px; color: #6a5a3a; float: right; }
     </style>
 </head>
 <body>
@@ -129,167 +169,421 @@
         <h1>MEWGENICS ADMIN</h1>
         <a href="/cabinet">&larr; Назад к котам</a>
     </div>
-    <div class="tabs">
-        <button class="active" onclick="switchTab('analytics')">Аналитика</button>
-        <button onclick="switchTab('prompts')">Промпты</button>
-        <button onclick="switchTab('preview')">Превью данных кота</button>
+    <div class="tabs" id="tabs">
+        <button class="active" onclick="switchTab('playground',this)">Playground</button>
+        <button onclick="switchTab('prompts',this)">Промпты</button>
+        <button onclick="switchTab('analytics',this)">Аналитика</button>
     </div>
 
-    <!-- Analytics Tab -->
-    <div class="tab-content active" id="tab-analytics">
-        <div class="stats-grid" id="stats-grid"></div>
-        <h3 style="color:#f0d878;font-family:'Caveat',cursive;font-size:22px;margin-bottom:8px">Пользователи</h3>
-        <table id="users-table"><thead><tr>
-            <th>ID</th><th>Имя</th><th>Email</th><th>Генерации</th><th>Сейвы</th><th>Коты</th><th>Premium</th>
-        </tr></thead><tbody></tbody></table>
+    <!-- ========== PLAYGROUND TAB ========== -->
+    <div class="tab-content active" id="tab-playground">
+        <p style="color:#a09070;margin-bottom:16px;font-size:15px">
+            Полный тестовый флоу генерации арта. Каждый шаг можно отредактировать и перезапустить.
+        </p>
 
-        <h3 style="color:#f0d878;font-family:'Caveat',cursive;font-size:22px;margin:24px 0 8px">Последние генерации</h3>
-        <table id="images-table"><thead><tr>
-            <th>ID</th><th>Кот</th><th>Владелец</th><th>Арт</th>
-        </tr></thead><tbody></tbody></table>
+        <!-- STEP 1: Select cat -->
+        <div class="step active" id="step-1">
+            <div class="step-header" onclick="toggleStep(1)">
+                <span class="step-num">1</span>
+                <span class="step-title">Выбор кота</span>
+                <span class="step-status" id="step-1-status"></span>
+            </div>
+            <div class="step-body" id="step-1-body">
+                <div class="btn-row" style="margin-top:0">
+                    <select class="cat-select" id="pg-cat-select"><option value="">Загрузка...</option></select>
+                    <button class="btn btn-run" onclick="pgStep1()">Собрать данные</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Cat data (editable) -->
+        <div class="step" id="step-2">
+            <div class="step-header" onclick="toggleStep(2)">
+                <span class="step-num">2</span>
+                <span class="step-title">Данные кота (cat_data)</span>
+                <span class="step-status" id="step-2-status"></span>
+            </div>
+            <div class="step-body collapsed" id="step-2-body">
+                <p class="meta-line">Структурированные данные кота которые передаются писателю промптов. Можно редактировать.</p>
+                <textarea class="edit medium" id="pg-cat-data" placeholder="Сначала выберите кота..."></textarea>
+                <div class="btn-row">
+                    <button class="btn btn-run" onclick="pgStep2()">Далее: собрать User Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Full user prompt (editable) -->
+        <div class="step" id="step-3">
+            <div class="step-header" onclick="toggleStep(3)">
+                <span class="step-num">3</span>
+                <span class="step-title">User Prompt для писателя промптов</span>
+                <span class="step-status" id="step-3-status"></span>
+            </div>
+            <div class="step-body collapsed" id="step-3-body">
+                <p class="meta-line">Полный промпт который отправляется в Gemini. {cat_data} заменён на данные кота. Можно редактировать.</p>
+                <textarea class="edit medium" id="pg-user-prompt" placeholder="..."></textarea>
+                <p class="meta-line" style="margin-top:8px">System Instruction (редактируется на вкладке "Промпты"):</p>
+                <div class="preview-block" id="pg-sys-preview" style="max-height:200px;font-size:11px"></div>
+                <div class="meta-line" style="margin-top:8px">
+                    Модель: <b id="pg-prompt-model-label"></b>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-run" id="pg-run-writer-btn" onclick="pgStep3()">
+                        Запустить писатель промптов (Gemini)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Visual prompt result (editable) -->
+        <div class="step" id="step-4">
+            <div class="step-header" onclick="toggleStep(4)">
+                <span class="step-num">4</span>
+                <span class="step-title">Visual Prompt (результат писателя)</span>
+                <span class="step-status" id="step-4-status"></span>
+            </div>
+            <div class="step-body collapsed" id="step-4-body">
+                <p class="meta-line">Готовый визуальный промпт на английском. Это то что пойдёт в генератор картинок. Можно отредактировать перед генерацией.</p>
+                <textarea class="edit medium" id="pg-visual-prompt" placeholder="..."></textarea>
+                <div class="meta-line" style="margin-top:8px">
+                    Модель генерации: <b id="pg-image-model-label"></b>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-run" id="pg-run-image-btn" onclick="pgStep4()">
+                        Сгенерировать картинку
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: Final image -->
+        <div class="step" id="step-5">
+            <div class="step-header" onclick="toggleStep(5)">
+                <span class="step-num">5</span>
+                <span class="step-title">Результат: Арт кота</span>
+                <span class="step-status" id="step-5-status"></span>
+            </div>
+            <div class="step-body collapsed" id="step-5-body">
+                <div class="img-result" id="pg-image-result">
+                    <p class="meta-line">Картинка появится здесь после генерации</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Prompts Tab -->
+    <!-- ========== PROMPTS TAB ========== -->
     <div class="tab-content" id="tab-prompts">
-        <div class="prompt-section">
-            <div class="prompt-header">
+        <div class="section">
+            <div class="section-header">
                 <h3>Модель писателя промптов</h3>
                 <span class="hint">Gemini модель для генерации текстовых промптов</span>
             </div>
-            <div class="prompt-body">
+            <div class="section-body">
                 <input class="model-input" id="prompt-model" placeholder="gemini-2.5-flash">
             </div>
         </div>
-
-        <div class="prompt-section">
-            <div class="prompt-header">
+        <div class="section">
+            <div class="section-header">
                 <h3>Модель генерации картинок</h3>
                 <span class="hint">Gemini модель для генерации изображений</span>
             </div>
-            <div class="prompt-body">
+            <div class="section-body">
                 <input class="model-input" id="image-model" placeholder="gemini-3.1-flash-image-preview">
             </div>
         </div>
-
-        <div class="prompt-section">
-            <div class="prompt-header">
+        <div class="section">
+            <div class="section-header">
                 <h3>System Instruction (писатель промптов)</h3>
-                <span class="hint">Системная инструкция для Gemini — описание стиля, правила, база знаний</span>
+                <span class="hint">Системная инструкция — описание стиля, правила, база знаний</span>
             </div>
-            <div class="prompt-body">
-                <textarea class="prompt-edit tall" id="system-instruction"></textarea>
+            <div class="section-body">
+                <textarea class="edit tall" id="system-instruction"></textarea>
             </div>
         </div>
-
-        <div class="prompt-section">
-            <div class="prompt-header">
+        <div class="section">
+            <div class="section-header">
                 <h3>User Prompt Template</h3>
-                <span class="hint">Шаблон промпта пользователя. {cat_data} заменяется на данные кота</span>
+                <span class="hint">{cat_data} заменяется на данные кота</span>
             </div>
-            <div class="prompt-body">
-                <textarea class="prompt-edit" id="user-prompt-template"></textarea>
+            <div class="section-body">
+                <textarea class="edit" id="user-prompt-template"></textarea>
             </div>
         </div>
-
         <div class="btn-row">
             <button class="btn btn-save" onclick="savePrompts()">Сохранить все</button>
             <button class="btn btn-default" onclick="resetToDefaults()">Сбросить к дефолтным</button>
         </div>
     </div>
 
-    <!-- Preview Tab -->
-    <div class="tab-content" id="tab-preview">
-        <p style="color:#a09070;margin-bottom:12px">Выберите кота чтобы увидеть какие данные отправляются писателю промптов:</p>
-        <div class="preview-row">
-            <select id="cat-select"><option value="">Загрузка...</option></select>
-            <button class="btn btn-save" onclick="previewCat()">Собрать данные</button>
-        </div>
-        <div id="preview-result"></div>
+    <!-- ========== ANALYTICS TAB ========== -->
+    <div class="tab-content" id="tab-analytics">
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="section-title">Пользователи</div>
+        <table id="users-table"><thead><tr>
+            <th>ID</th><th>Имя</th><th>Email</th><th>Генерации</th><th>Сейвы</th><th>Коты</th><th>PRO</th>
+        </tr></thead><tbody></tbody></table>
+        <div class="section-title" style="margin-top:24px">Последние генерации</div>
+        <table id="images-table"><thead><tr>
+            <th>ID</th><th>Кот</th><th>Владелец</th><th>Арт</th>
+        </tr></thead><tbody></tbody></table>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // Tab switching
-        function switchTab(name) {
+        let defaultPrompts = {};
+        let pgState = { catId: null, catName: '', catClass: '' };
+
+        function switchTab(name, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
-            event.target.classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function toggleStep(n) {
+            const body = document.getElementById(`step-${n}-body`);
+            body.classList.toggle('collapsed');
+        }
+
+        function setStepState(n, state, statusText) {
+            const el = document.getElementById(`step-${n}`);
+            el.className = 'step ' + state;
+            document.getElementById(`step-${n}-status`).textContent = statusText || '';
+            if (state === 'active' || state === 'completed') {
+                document.getElementById(`step-${n}-body`).classList.remove('collapsed');
+            }
+        }
+
+        function collapseStep(n) {
+            document.getElementById(`step-${n}-body`).classList.add('collapsed');
         }
 
         function showToast(msg, isError) {
             const t = document.getElementById('toast');
             t.textContent = msg;
             t.className = 'toast show' + (isError ? ' error' : '');
-            setTimeout(() => t.classList.remove('show'), 3000);
+            setTimeout(() => t.classList.remove('show'), 4000);
         }
 
-        // ====== ANALYTICS ======
-        async function loadAnalytics() {
+        function esc(s) {
+            if (!s) return '';
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function btnLoading(id, loading) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.disabled = loading;
+            if (loading) {
+                btn.dataset.origText = btn.textContent;
+                btn.innerHTML = '<span class="spinner"></span> Работаю...';
+            } else {
+                btn.textContent = btn.dataset.origText || 'Готово';
+            }
+        }
+
+        // ====== PLAYGROUND ======
+
+        async function loadCatsList() {
             try {
-                const r = await fetch('/api/admin/analytics');
-                const d = await r.json();
-                if (d.error) { showToast(d.error, true); return; }
-
-                document.getElementById('stats-grid').innerHTML = [
-                    ['total_users', 'Пользователей'],
-                    ['users_with_generations', 'Генерировали'],
-                    ['total_generations', 'Генераций всего'],
-                    ['total_cats', 'Котов всего'],
-                    ['cats_with_images', 'С артами'],
-                    ['published_cats', 'Опубликовано'],
-                    ['total_saves', 'Сейвов'],
-                    ['total_likes', 'Лайков'],
-                ].map(([k, label]) => `
-                    <div class="stat-card">
-                        <span class="num">${d[k] || 0}</span>
-                        <span class="label">${label}</span>
-                    </div>
-                `).join('');
-
-                // Users table
-                const tbody = document.querySelector('#users-table tbody');
-                tbody.innerHTML = (d.top_users || []).map(u => `
-                    <tr>
-                        <td>${u.id}</td>
-                        <td>${esc(u.name || '')}</td>
-                        <td>${esc(u.email || '')}</td>
-                        <td>${u.generations_count || 0}</td>
-                        <td>${u.saves_count || 0}</td>
-                        <td>${u.cats_count || 0}</td>
-                        <td>${u.is_premium ? '<span class="premium-tag">PRO</span>' : ''}</td>
-                    </tr>
-                `).join('');
-
-                // Images table
-                const itbody = document.querySelector('#images-table tbody');
-                itbody.innerHTML = (d.recent_images || []).map(c => `
-                    <tr>
-                        <td>${c.id}</td>
-                        <td>${esc(c.name || '')}</td>
-                        <td>${esc(c.owner_name || '')} (${esc(c.owner_email || '')})</td>
-                        <td>${c.image_url ? `<img src="${c.image_url}" style="height:40px;border-radius:4px">` : '-'}</td>
-                    </tr>
-                `).join('');
-            } catch(e) { showToast('Ошибка загрузки аналитики', true); }
+                const r = await fetch('/api/admin/cats-list');
+                const cats = await r.json();
+                const sel = document.getElementById('pg-cat-select');
+                sel.innerHTML = '<option value="">-- Выберите кота --</option>' +
+                    cats.map(c => {
+                        const cls = c.cat_class || '?';
+                        const art = c.image_url ? ' [ART]' : '';
+                        return `<option value="${c.id}">${esc(c.name||'?')} | ${cls} | ${esc(c.owner_name||'?')}${art}</option>`;
+                    }).join('');
+            } catch(e) { showToast('Ошибка загрузки котов', true); }
         }
 
-        // ====== PROMPTS ======
-        let defaultPrompts = {};
+        // Step 1: Load cat data
+        async function pgStep1() {
+            const catId = document.getElementById('pg-cat-select').value;
+            if (!catId) { showToast('Выберите кота!', true); return; }
+
+            setStepState(1, 'active', 'Загрузка...');
+            try {
+                const r = await fetch(`/api/admin/preview-cat-data/${catId}`);
+                const d = await r.json();
+                if (d.error) { setStepState(1, 'error', d.error); return; }
+
+                pgState.catId = catId;
+                pgState.catName = d.cat_name;
+                pgState.catClass = d.cat_class;
+
+                document.getElementById('pg-cat-data').value = d.data_text;
+                document.getElementById('pg-user-prompt').value = d.full_user_prompt;
+                document.getElementById('pg-sys-preview').textContent = d.system_instruction_preview;
+                document.getElementById('pg-prompt-model-label').textContent = d.prompt_model;
+                document.getElementById('pg-image-model-label').textContent = d.image_model;
+
+                setStepState(1, 'completed', `${d.cat_name} (${d.cat_class})`);
+                collapseStep(1);
+                setStepState(2, 'active', '');
+
+                // Reset later steps
+                setStepState(3, '', '');
+                document.getElementById('step-3-body').classList.add('collapsed');
+                setStepState(4, '', '');
+                document.getElementById('step-4-body').classList.add('collapsed');
+                setStepState(5, '', '');
+                document.getElementById('step-5-body').classList.add('collapsed');
+                document.getElementById('pg-visual-prompt').value = '';
+                document.getElementById('pg-image-result').innerHTML = '<p class="meta-line">Картинка появится здесь после генерации</p>';
+
+            } catch(e) { setStepState(1, 'error', 'Сетевая ошибка'); }
+        }
+
+        // Step 2: Build user prompt from (possibly edited) cat data
+        function pgStep2() {
+            const catData = document.getElementById('pg-cat-data').value;
+            if (!catData.trim()) { showToast('Данные кота пусты!', true); return; }
+
+            // Re-build user prompt with current template
+            const tpl = document.getElementById('user-prompt-template')?.value
+                || document.getElementById('pg-user-prompt').value;
+
+            // If user hasn't changed anything, just use what we have
+            // But if they edited cat_data, rebuild the user prompt
+            const currentPrompt = document.getElementById('pg-user-prompt').value;
+            if (currentPrompt.includes(catData.substring(0, 50))) {
+                // Cat data didn't change much, keep user prompt
+            } else {
+                // Cat data was edited, rebuild
+                const template = defaultPrompts.user_prompt_template || currentPrompt;
+                if (template.includes('{cat_data}')) {
+                    document.getElementById('pg-user-prompt').value = template.replace('{cat_data}', catData);
+                }
+            }
+
+            setStepState(2, 'completed', `${catData.split('\n').length} строк`);
+            collapseStep(2);
+            setStepState(3, 'active', '');
+
+            // Reset later steps
+            setStepState(4, '', '');
+            document.getElementById('step-4-body').classList.add('collapsed');
+            setStepState(5, '', '');
+            document.getElementById('step-5-body').classList.add('collapsed');
+            document.getElementById('pg-visual-prompt').value = '';
+        }
+
+        // Step 3: Run prompt writer (Gemini Flash)
+        async function pgStep3() {
+            const userPrompt = document.getElementById('pg-user-prompt').value;
+            const sysInstr = document.getElementById('system-instruction')?.value
+                || document.getElementById('pg-sys-preview').textContent;
+
+            if (!userPrompt.trim()) { showToast('User prompt пуст!', true); return; }
+
+            setStepState(3, 'active', 'Gemini думает...');
+            btnLoading('pg-run-writer-btn', true);
+
+            try {
+                const r = await fetch('/api/admin/test-prompt-writer', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        system_instruction: sysInstr,
+                        user_prompt: userPrompt,
+                        model: document.getElementById('pg-prompt-model-label').textContent,
+                    }),
+                });
+                const d = await r.json();
+
+                btnLoading('pg-run-writer-btn', false);
+                document.getElementById('pg-run-writer-btn').textContent = 'Запустить писатель промптов (Gemini)';
+
+                if (d.error) {
+                    setStepState(3, 'error', d.error);
+                    showToast(d.error, true);
+                    return;
+                }
+
+                document.getElementById('pg-visual-prompt').value = d.visual_prompt;
+                const wordCount = d.visual_prompt.split(/\s+/).length;
+
+                setStepState(3, 'completed', `Готово (${wordCount} слов)`);
+                collapseStep(3);
+                setStepState(4, 'active', '');
+
+                // Reset step 5
+                setStepState(5, '', '');
+                document.getElementById('step-5-body').classList.add('collapsed');
+
+            } catch(e) {
+                btnLoading('pg-run-writer-btn', false);
+                document.getElementById('pg-run-writer-btn').textContent = 'Запустить писатель промптов (Gemini)';
+                setStepState(3, 'error', 'Сетевая ошибка');
+            }
+        }
+
+        // Step 4: Generate image
+        async function pgStep4() {
+            const visualPrompt = document.getElementById('pg-visual-prompt').value;
+            if (!visualPrompt.trim()) { showToast('Visual prompt пуст!', true); return; }
+
+            setStepState(4, 'active', 'Генерация картинки...');
+            btnLoading('pg-run-image-btn', true);
+
+            try {
+                const r = await fetch('/api/admin/test-image-gen', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        visual_prompt: visualPrompt,
+                        model: document.getElementById('pg-image-model-label').textContent,
+                    }),
+                });
+                const d = await r.json();
+
+                btnLoading('pg-run-image-btn', false);
+                document.getElementById('pg-run-image-btn').textContent = 'Сгенерировать картинку';
+
+                if (d.error) {
+                    setStepState(4, 'error', d.error);
+                    showToast(d.error, true);
+                    return;
+                }
+
+                setStepState(4, 'completed', 'Картинка готова!');
+                collapseStep(4);
+
+                const imgSrc = `data:${d.mime_type};base64,${d.image_base64}`;
+                document.getElementById('pg-image-result').innerHTML = `
+                    <img src="${imgSrc}" alt="${esc(pgState.catName)}">
+                    <p style="margin-top:12px;color:#a09070;font-size:13px">
+                        ${esc(pgState.catName)} | ${esc(pgState.catClass)} |
+                        ${visualPrompt.split(/\s+/).length} слов в промпте
+                    </p>
+                `;
+                setStepState(5, 'completed', pgState.catName);
+
+            } catch(e) {
+                btnLoading('pg-run-image-btn', false);
+                document.getElementById('pg-run-image-btn').textContent = 'Сгенерировать картинку';
+                setStepState(4, 'error', 'Сетевая ошибка');
+            }
+        }
+
+        // ====== PROMPTS TAB ======
 
         async function loadPrompts() {
             try {
                 const r = await fetch('/api/admin/prompts');
                 const d = await r.json();
-                if (d.error) { showToast(d.error, true); return; }
-
+                if (d.error) return;
                 document.getElementById('system-instruction').value = d.system_instruction || '';
                 document.getElementById('user-prompt-template').value = d.user_prompt_template || '';
                 document.getElementById('prompt-model').value = d.prompt_model || '';
                 document.getElementById('image-model').value = d.image_model || '';
                 defaultPrompts = d.defaults || {};
-            } catch(e) { showToast('Ошибка загрузки промптов', true); }
+            } catch(e) {}
         }
 
         async function savePrompts() {
@@ -317,59 +611,48 @@
             document.getElementById('user-prompt-template').value = defaultPrompts.user_prompt_template || '';
             document.getElementById('prompt-model').value = defaultPrompts.prompt_model || '';
             document.getElementById('image-model').value = defaultPrompts.image_model || '';
-            showToast('Сброшено к дефолтным (нажмите Сохранить!)');
+            showToast('Сброшено (нажмите Сохранить!)');
         }
 
-        // ====== CAT PREVIEW ======
-        async function loadCatsList() {
-            try {
-                const r = await fetch('/api/admin/cats-list');
-                const cats = await r.json();
-                const sel = document.getElementById('cat-select');
-                sel.innerHTML = '<option value="">-- Выберите кота --</option>' +
-                    cats.map(c => `<option value="${c.id}">${esc(c.name || 'Без имени')} | ${c.cat_class || '?'} | ${esc(c.owner_name || '?')}${c.image_url ? ' [ART]' : ''}</option>`).join('');
-            } catch(e) { showToast('Ошибка загрузки котов', true); }
-        }
+        // ====== ANALYTICS TAB ======
 
-        async function previewCat() {
-            const catId = document.getElementById('cat-select').value;
-            if (!catId) { showToast('Выберите кота', true); return; }
-
+        async function loadAnalytics() {
             try {
-                const r = await fetch(`/api/admin/preview-cat-data/${catId}`);
+                const r = await fetch('/api/admin/analytics');
                 const d = await r.json();
-                if (d.error) { showToast(d.error, true); return; }
+                if (d.error) return;
 
-                document.getElementById('preview-result').innerHTML = `
-                    <div class="preview-meta">
-                        Кот: <b>${esc(d.cat_name)}</b> | Класс: <b>${esc(d.cat_class)}</b> |
-                        Модель промптов: <b>${esc(d.prompt_model)}</b> |
-                        Модель картинок: <b>${esc(d.image_model)}</b>
-                    </div>
+                document.getElementById('stats-grid').innerHTML = [
+                    ['total_users', 'Пользователей'],
+                    ['users_with_generations', 'Генерировали'],
+                    ['total_generations', 'Генераций'],
+                    ['total_cats', 'Котов'],
+                    ['cats_with_images', 'С артами'],
+                    ['published_cats', 'В ленте'],
+                    ['total_saves', 'Сейвов'],
+                    ['total_likes', 'Лайков'],
+                ].map(([k, l]) => `<div class="stat-card"><span class="num">${d[k]||0}</span><span class="label">${l}</span></div>`).join('');
 
-                    <span class="preview-label">1. Данные кота (data_text) — что видит писатель промптов:</span>
-                    <div class="preview-block">${esc(d.data_text)}</div>
+                document.querySelector('#users-table tbody').innerHTML = (d.top_users||[]).map(u => `
+                    <tr>
+                        <td>${u.id}</td><td>${esc(u.name||'')}</td><td>${esc(u.email||'')}</td>
+                        <td>${u.generations_count||0}</td><td>${u.saves_count||0}</td><td>${u.cats_count||0}</td>
+                        <td>${u.is_premium?'<span class="premium-tag">PRO</span>':''}</td>
+                    </tr>`).join('');
 
-                    <span class="preview-label">2. Полный User Prompt — что отправляется в Gemini:</span>
-                    <div class="preview-block">${esc(d.full_user_prompt)}</div>
-
-                    <span class="preview-label">3. System Instruction (первые 500 символов):</span>
-                    <div class="preview-block">${esc(d.system_instruction_preview)}</div>
-                `;
-            } catch(e) { showToast('Ошибка', true); }
-        }
-
-        function esc(s) {
-            if (!s) return '';
-            const d = document.createElement('div');
-            d.textContent = s;
-            return d.innerHTML;
+                document.querySelector('#images-table tbody').innerHTML = (d.recent_images||[]).map(c => `
+                    <tr>
+                        <td>${c.id}</td><td>${esc(c.name||'')}</td>
+                        <td>${esc(c.owner_name||'')} (${esc(c.owner_email||'')})</td>
+                        <td>${c.image_url?`<img src="${c.image_url}" style="height:40px;border-radius:4px">`:'-'}</td>
+                    </tr>`).join('');
+            } catch(e) {}
         }
 
         // Init
-        loadAnalytics();
-        loadPrompts();
         loadCatsList();
+        loadPrompts();
+        loadAnalytics();
     </script>
 </body>
 </html>
