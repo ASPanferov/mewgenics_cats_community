@@ -108,6 +108,17 @@ def init_db():
     if "published_at" not in existing_cols:
         execute("ALTER TABLE cats ADD COLUMN published_at TIMESTAMP")
     execute("CREATE INDEX IF NOT EXISTS idx_cats_published ON cats(published) WHERE published = TRUE")
+    # Likes table
+    execute("""
+        CREATE TABLE IF NOT EXISTS likes (
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(id) ON DELETE CASCADE,
+            cat_id INT REFERENCES cats(id) ON DELETE CASCADE,
+            created_at TIMESTAMP DEFAULT NOW(),
+            UNIQUE(user_id, cat_id)
+        )
+    """)
+    execute("CREATE INDEX IF NOT EXISTS idx_likes_cat_id ON likes(cat_id)")
 
 
 # === User operations ===
@@ -196,14 +207,16 @@ def unpublish_cat(cat_id):
 
 
 def get_published_cats(limit=50, offset=0):
-    """Get published cats with owner info for the public feed."""
+    """Get published cats with owner info, sorted by likes then date."""
     return query("""
-        SELECT c.*, u.name as owner_name, u.avatar_url as owner_avatar
+        SELECT c.*, u.name as owner_name, u.avatar_url as owner_avatar,
+               COALESCE(lk.like_count, 0) as like_count
         FROM cats c
         JOIN saves s ON c.save_id = s.id
         JOIN users u ON s.user_id = u.id
+        LEFT JOIN (SELECT cat_id, COUNT(*) as like_count FROM likes GROUP BY cat_id) lk ON lk.cat_id = c.id
         WHERE c.published = TRUE AND c.image_url IS NOT NULL
-        ORDER BY c.published_at DESC
+        ORDER BY like_count DESC, c.published_at DESC
         LIMIT %s OFFSET %s
     """, (limit, offset))
 
@@ -221,3 +234,31 @@ def get_cat_owner_id(cat_id):
         WHERE c.id = %s
     """, (cat_id,))
     return row["user_id"] if row else None
+
+
+# === Likes ===
+
+def toggle_like(user_id, cat_id):
+    """Toggle like. Returns (liked: bool, new_count: int)."""
+    existing = query_one(
+        "SELECT id FROM likes WHERE user_id = %s AND cat_id = %s", (user_id, cat_id)
+    )
+    if existing:
+        execute("DELETE FROM likes WHERE user_id = %s AND cat_id = %s", (user_id, cat_id))
+        liked = False
+    else:
+        execute("INSERT INTO likes (user_id, cat_id) VALUES (%s, %s)", (user_id, cat_id))
+        liked = True
+    row = query_one("SELECT COUNT(*) as cnt FROM likes WHERE cat_id = %s", (cat_id,))
+    return liked, row["cnt"] if row else 0
+
+
+def get_likes_count(cat_id):
+    row = query_one("SELECT COUNT(*) as cnt FROM likes WHERE cat_id = %s", (cat_id,))
+    return row["cnt"] if row else 0
+
+
+def get_user_likes(user_id):
+    """Get set of cat_ids liked by user."""
+    rows = query("SELECT cat_id FROM likes WHERE user_id = %s", (user_id,))
+    return {r["cat_id"] for r in rows}

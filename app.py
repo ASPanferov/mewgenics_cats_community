@@ -149,6 +149,12 @@ def api_feed():
     rows = db.get_published_cats(limit=limit, offset=offset)
     total = db.get_published_count()
 
+    # Get current user's likes
+    user = require_auth()
+    user_likes = set()
+    if user:
+        user_likes = db.get_user_likes(user["user_id"])
+
     result = []
     for row in rows:
         cat = _cat_data_from_row(row)
@@ -158,6 +164,8 @@ def api_feed():
         summary["owner_name"] = row.get("owner_name", "")
         summary["owner_avatar"] = row.get("owner_avatar", "")
         summary["published_at"] = row["published_at"].isoformat() if row.get("published_at") else None
+        summary["like_count"] = row.get("like_count", 0)
+        summary["liked"] = row["id"] in user_likes
         result.append(summary)
 
     return jsonify({"cats": result, "total": total})
@@ -341,6 +349,20 @@ def api_generate(db_cat_id):
 
         return jsonify({"error": "Нет изображения в ответе"}), 500
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# === Likes ===
+
+@app.route("/api/cat/<int:db_cat_id>/like", methods=["POST"])
+def api_like(db_cat_id):
+    user = require_auth()
+    if not user:
+        return jsonify({"error": "Требуется авторизация"}), 401
+    try:
+        liked, count = db.toggle_like(user["user_id"], db_cat_id)
+        return jsonify({"success": True, "liked": liked, "like_count": count})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

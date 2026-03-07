@@ -97,6 +97,11 @@
         .error-msg { color: #b03020; font-size: 13px; padding: 5px 16px 8px; font-weight: bold; }
         .gender-icon { font-size: 16px; margin-right: 2px; }
         .published-badge { font-size: 11px; padding: 1px 8px; border-radius: 10px; background: #4a8848; color: #fff; font-weight: bold; margin-left: 6px; }
+        .like-btn { background: none; border: none; cursor: pointer; font-size: 22px; padding: 4px 8px; border-radius: 8px; transition: transform 0.15s; display: flex; align-items: center; gap: 6px; font-family: inherit; color: #8a7050; }
+        .like-btn:hover { transform: scale(1.15); }
+        .like-btn.liked { color: #d44; }
+        .like-btn .like-count { font-size: 15px; font-weight: bold; }
+        .feed-card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 4px 16px 10px; }
         .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 5px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .page-center { text-align: center; padding: 80px 30px; }
@@ -206,7 +211,7 @@
                 m.innerHTML = `<div class="empty-feed"><p style="font-size:40px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:14px">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
                 return;
             }
-            m.innerHTML = `<div class="feed-grid">${feedCats.map(c => `
+            m.innerHTML = `<div class="feed-grid">${feedCats.map((c,i) => `
                 <div class="feed-card">
                     <img src="${c.image_url}" alt="${esc(c.name)}" onclick="showFullscreen('${c.image_url}')">
                     <div class="feed-card-info">
@@ -219,6 +224,11 @@
                             ${(c.abilities||[]).map(a=>`<span class="tag ability">${esc(a)}</span>`).join('')}
                             ${(c.passives||[]).map(p=>`<span class="tag passive">${esc(p)}</span>`).join('')}
                         </div>
+                    </div>
+                    <div class="feed-card-bottom">
+                        <button class="like-btn ${c.liked?'liked':''}" onclick="toggleLike(${c.db_id},${i})">
+                            ${c.liked?'&#10084;':'&#9825;'} <span class="like-count">${c.like_count||0}</span>
+                        </button>
                     </div>
                 </div>`).join('')}</div>`;
         }
@@ -356,6 +366,19 @@
                     renderCats();
                 } else { err.textContent=d.error;err.style.display='block';btn.disabled=false;btn.textContent='Сгенерировать'; }
             } catch(e){ err.textContent='Ошибка сети';err.style.display='block';btn.disabled=false;btn.textContent='Сгенерировать'; }
+        }
+
+        async function toggleLike(catId, feedIdx) {
+            if (!currentUser) { showToast('Войдите чтобы лайкать'); return; }
+            try {
+                const r = await fetch(`/api/cat/${catId}/like`, {method:'POST'});
+                const d = await r.json();
+                if (d.success) {
+                    feedCats[feedIdx].liked = d.liked;
+                    feedCats[feedIdx].like_count = d.like_count;
+                    renderFeed();
+                } else showToast(d.error || 'Ошибка');
+            } catch(e) { showToast('Ошибка сети'); }
         }
 
         async function togglePublish(catId, pub) {
