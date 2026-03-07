@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             background: #d4c4a0;
             background-image:
@@ -17,552 +16,127 @@
             font-family: 'Patrick Hand', 'Comic Sans MS', cursive;
             min-height: 100vh;
         }
-
         .header {
-            background: #5c3d2e;
-            background-image: linear-gradient(180deg, #6b4830 0%, #4a2e1e 100%);
-            padding: 16px 30px;
+            background: linear-gradient(180deg, #6b4830 0%, #4a2e1e 100%);
+            padding: 12px 30px;
             border-bottom: 4px solid #2a1a0e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-
-        .header h1 {
-            font-family: 'Caveat', cursive;
-            font-size: 36px;
-            color: #f0d878;
-            text-shadow: 2px 2px 0 #2a1a0e, -1px -1px 0 #2a1a0e;
-            letter-spacing: 2px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .header .stats {
-            display: flex;
-            gap: 18px;
-            font-size: 15px;
-            color: #c9b48a;
-        }
-
-        .header .stats span { color: #f0d878; font-weight: bold; }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #c9b48a;
-            font-size: 14px;
-        }
-
-        .user-info img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid #f0d878;
-        }
-
-        .btn-auth {
-            background: #6b4830;
-            color: #f0d878;
-            border: 2px solid #f0d878;
-            padding: 6px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
+        .header h1 { font-family: 'Caveat', cursive; font-size: 32px; color: #f0d878; text-shadow: 2px 2px 0 #2a1a0e; letter-spacing: 2px; }
+        .header-right { display: flex; align-items: center; gap: 14px; }
+        .user-info { display: flex; align-items: center; gap: 8px; color: #c9b48a; font-size: 14px; }
+        .user-info img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #f0d878; }
+        .gen-counter { font-size: 12px; color: #c9b48a; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 8px; }
+        .nav { background: #c4a870; border-bottom: 3px solid #8a6e48; display: flex; padding: 0 30px; }
+        .nav a { padding: 10px 24px; color: #5c3d2e; text-decoration: none; font-size: 17px; font-weight: bold; border-bottom: 3px solid transparent; transition: all 0.15s; }
+        .nav a:hover { background: rgba(0,0,0,0.05); }
+        .nav a.active { border-bottom-color: #5c3d2e; color: #2a1a0e; }
+        .btn-auth { background: #6b4830; color: #f0d878; border: 2px solid #f0d878; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; text-decoration: none; }
         .btn-auth:hover { background: #8a5a3a; }
-
-        .btn-logout {
-            background: transparent;
-            color: #c9b48a;
-            border: 1px solid #8a6e48;
-            padding: 4px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 12px;
-            text-decoration: none;
-        }
+        .btn-logout { background: transparent; color: #c9b48a; border: 1px solid #8a6e48; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; text-decoration: none; }
         .btn-logout:hover { background: rgba(255,255,255,0.1); }
-
-        .controls {
-            padding: 12px 30px;
-            background: #c4a870;
-            border-bottom: 3px solid #8a6e48;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .controls input[type="text"] {
-            background: #e8dcc0;
-            border: 2px solid #8a6e48;
-            color: #3a2e1e;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 15px;
-            width: 280px;
-        }
-
-        .controls select {
-            background: #e8dcc0;
-            border: 2px solid #8a6e48;
-            color: #3a2e1e;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 15px;
-        }
-
-        .controls button, .controls label {
-            background: #6b4830;
-            color: #f0d878;
-            border: 2px solid #2a1a0e;
-            padding: 7px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        .controls button:hover, .controls label:hover { background: #8a5a3a; }
-
-        .upload-area {
-            text-align: center;
-            padding: 60px 30px;
-            color: #6a5030;
-        }
-
-        .upload-box {
-            max-width: 500px;
-            margin: 0 auto;
-            background: #efe0c0;
-            border: 3px dashed #8a6e48;
-            border-radius: 16px;
-            padding: 40px;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
-        }
+        .btn { padding: 7px 14px; border: 2px solid #2a1a0e; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: bold; transition: all 0.15s; flex: 1; text-align: center; }
+        .btn-generate { background: #6b4830; color: #f0d878; }
+        .btn-generate:hover { background: #8a5a3a; }
+        .btn-generate:disabled { background: #a09080; color: #c0b090; cursor: not-allowed; }
+        .btn-prompt { background: #d8c8a0; color: #5c3d2e; }
+        .btn-prompt:hover { background: #e8d8b0; }
+        .btn-publish { background: #4a8848; color: #fff; }
+        .btn-publish:hover { background: #5a9a58; }
+        .btn-unpublish { background: #a08060; color: #fff; }
+        .btn-unpublish:hover { background: #b09070; }
+        .controls { padding: 12px 30px; background: #d4c4a0; border-bottom: 2px solid #b89a6a; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .controls input[type="text"], .controls select { background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 7px 14px; border-radius: 8px; font-family: inherit; font-size: 15px; }
+        .controls input[type="text"] { width: 280px; }
+        .controls button, .controls label.ctrl-btn { background: #6b4830; color: #f0d878; border: 2px solid #2a1a0e; padding: 7px 18px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: bold; }
+        .controls button:hover, .controls label.ctrl-btn:hover { background: #8a5a3a; }
+        .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 25px 30px; }
+        .feed-card { background: #efe0c0; border-radius: 12px; border: 3px solid #6b4830; overflow: hidden; box-shadow: 3px 3px 0 #8a6e48; transition: transform 0.15s, box-shadow 0.15s; }
+        .feed-card:hover { transform: translateY(-3px); box-shadow: 5px 7px 0 #8a6e48; }
+        .feed-card img { width: 100%; aspect-ratio: 1; object-fit: cover; cursor: pointer; display: block; }
+        .feed-card-info { padding: 10px 14px; }
+        .feed-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .feed-cat-name { font-family: 'Caveat', cursive; font-size: 24px; font-weight: 700; color: #2a1a0e; }
+        .feed-owner { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8a7050; }
+        .feed-owner img { width: 18px; height: 18px; border-radius: 50%; }
+        .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; padding: 25px 30px; }
+        .cat-card { background: #efe0c0; border-radius: 10px; border: 3px solid #6b4830; overflow: hidden; box-shadow: 3px 3px 0 #8a6e48; transition: transform 0.15s, box-shadow 0.15s; }
+        .cat-card:hover { transform: translateY(-3px); box-shadow: 5px 7px 0 #8a6e48; }
+        .cat-card-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #b89a6a; }
+        .cat-name { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: #2a1a0e; }
+        .cat-class { font-size: 13px; padding: 3px 12px; border-radius: 14px; font-weight: bold; text-transform: uppercase; border: 2px solid rgba(0,0,0,0.3); letter-spacing: 0.5px; }
+        .class-Fighter { background: #d44; color: #fff; } .class-Tank { background: #e88030; color: #fff; }
+        .class-Hunter { background: #4a8; color: #fff; } .class-Mage { background: #a67ad8; color: #fff; }
+        .class-Medic { background: #e8e0d0; color: #4a3820; border-color: #8a6e48; }
+        .class-Necromancer { background: #2a2a2a; color: #8f8; } .class-Druid { background: #5a7a3a; color: #dfd; }
+        .class-Thief { background: #d8c878; color: #4a3820; border-color: #8a6e48; }
+        .class-Tinkerer { background: #78c848; color: #fff; } .class-Colorless { background: #a09080; color: #fff; }
+        .class-Monk { background: #c8a838; color: #fff; } .class-Psychic { background: #a848c8; color: #fff; }
+        .class-Jester { background: linear-gradient(90deg, #d44, #48a, #4a8); color: #fff; }
+        .class-Butcher { background: #8a2020; color: #fff; }
+        .cat-card-body { padding: 10px 16px 6px; }
+        .cat-info-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 14px; align-items: flex-start; }
+        .cat-info-label { color: #7a6040; min-width: 70px; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 8px 0; text-align: center; }
+        .stat-cell { background: #d8c8a0; border: 2px solid #8a6e48; border-radius: 6px; padding: 4px 2px; font-size: 12px; }
+        .stat-label { font-size: 10px; font-weight: bold; color: #6a5030; display: block; }
+        .stat-value { font-size: 18px; font-weight: bold; color: #2a1a0e; font-family: 'Caveat', cursive; }
+        .stat-value.injured { color: #c03030; } .stat-value.buffed { color: #2a8a2a; }
+        .stat-detail { font-size: 9px; color: #8a7050; }
+        .status-badge { font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: bold; margin-left: 8px; }
+        .status-OK { background: #7ab85a; color: #fff; } .status-Injured { background: #d87030; color: #fff; } .status-Dead { background: #8a2020; color: #fff; }
+        .cat-tags, .feed-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+        .tag { font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.2); }
+        .tag.ability { background: #d44; color: #fff; } .tag.passive { background: #4a8; color: #fff; }
+        .tag.item { background: #c8a030; color: #2a1a0e; } .tag.mutation { background: #8a48a8; color: #fff; }
+        .tag.defect { background: #6a1a1a; color: #fcc; }
+        .cat-image-area { padding: 0 16px 10px; }
+        .cat-image-area img { width: 100%; border-radius: 8px; border: 3px solid #6b4830; max-height: 320px; object-fit: cover; }
+        .cat-card-actions { padding: 8px 16px 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .error-msg { color: #b03020; font-size: 13px; padding: 5px 16px 8px; font-weight: bold; }
+        .gender-icon { font-size: 16px; margin-right: 2px; }
+        .published-badge { font-size: 11px; padding: 1px 8px; border-radius: 10px; background: #4a8848; color: #fff; font-weight: bold; margin-left: 6px; }
+        .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 5px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .page-center { text-align: center; padding: 80px 30px; }
+        .page-center h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 38px; margin-bottom: 15px; }
+        .page-center p { color: #6a5030; font-size: 17px; margin-bottom: 10px; }
+        .btn-google { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #3a2e1e; border: 2px solid #8a6e48; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: bold; text-decoration: none; box-shadow: 3px 3px 0 #8a6e48; transition: all 0.2s; }
+        .btn-google:hover { transform: translateY(-2px); box-shadow: 4px 5px 0 #8a6e48; }
+        .btn-google svg { width: 22px; height: 22px; }
+        .upload-box { max-width: 500px; margin: 0 auto; background: #efe0c0; border: 3px dashed #8a6e48; border-radius: 16px; padding: 40px; cursor: pointer; transition: all 0.2s; }
         .upload-box:hover { border-color: #6b4830; background: #f0e8d0; }
         .upload-box.dragover { border-color: #f0d878; background: #f8f0d8; }
-
-        .upload-box h2 {
-            font-family: 'Caveat', cursive;
-            color: #5c3d2e;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
+        .upload-box h2 { font-family: 'Caveat', cursive; color: #5c3d2e; font-size: 28px; margin-bottom: 10px; }
         .upload-box p { margin: 8px 0; font-size: 15px; }
-
-        .upload-box .hint {
-            font-size: 12px;
-            color: #a08060;
-            margin-top: 15px;
-        }
-
-        .upload-progress {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .upload-progress .bar {
-            background: #d8c8a0;
-            border-radius: 8px;
-            overflow: hidden;
-            height: 8px;
-        }
-
-        .upload-progress .fill {
-            background: #6b4830;
-            height: 100%;
-            width: 0;
-            transition: width 0.3s;
-        }
-
-        /* Login page */
-        .login-page {
-            text-align: center;
-            padding: 100px 30px;
-        }
-
-        .login-page h2 {
-            font-family: 'Caveat', cursive;
-            color: #5c3d2e;
-            font-size: 42px;
-            margin-bottom: 20px;
-        }
-
-        .login-page p {
-            color: #6a5030;
-            font-size: 18px;
-            margin-bottom: 30px;
-        }
-
-        .btn-google {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff;
-            color: #3a2e1e;
-            border: 2px solid #8a6e48;
-            padding: 12px 28px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 18px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: all 0.2s;
-            box-shadow: 3px 3px 0 #8a6e48;
-        }
-        .btn-google:hover { transform: translateY(-2px); box-shadow: 4px 5px 0 #8a6e48; }
-
-        .btn-google svg { width: 22px; height: 22px; }
-
-        .cat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 20px;
-            padding: 25px 30px;
-        }
-
-        .cat-card {
-            background: #efe0c0;
-            border-radius: 10px;
-            border: 3px solid #6b4830;
-            overflow: hidden;
-            transition: transform 0.15s, box-shadow 0.15s;
-            box-shadow: 3px 3px 0 #8a6e48;
-            position: relative;
-        }
-        .cat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 5px 7px 0 #8a6e48;
-        }
-
-        .cat-card-header {
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px dashed #b89a6a;
-        }
-
-        .cat-name {
-            font-family: 'Caveat', cursive;
-            font-size: 26px;
-            font-weight: 700;
-            color: #2a1a0e;
-        }
-
-        .cat-class {
-            font-size: 13px;
-            padding: 3px 12px;
-            border-radius: 14px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border: 2px solid rgba(0,0,0,0.3);
-            letter-spacing: 0.5px;
-        }
-
-        .class-Fighter { background: #d44; color: #fff; }
-        .class-Tank { background: #e88030; color: #fff; }
-        .class-Hunter { background: #4a8; color: #fff; }
-        .class-Mage { background: #a67ad8; color: #fff; }
-        .class-Medic { background: #e8e0d0; color: #4a3820; border-color: #8a6e48; }
-        .class-Necromancer { background: #2a2a2a; color: #8f8; }
-        .class-Druid { background: #5a7a3a; color: #dfd; }
-        .class-Thief { background: #d8c878; color: #4a3820; border-color: #8a6e48; }
-        .class-Tinkerer { background: #78c848; color: #fff; }
-        .class-Colorless { background: #a09080; color: #fff; }
-        .class-Monk { background: #c8a838; color: #fff; }
-        .class-Jester { background: linear-gradient(90deg, #d44, #48a, #4a8); color: #fff; }
-        .class-Psychic { background: #a848c8; color: #fff; }
-        .class-Butcher { background: #8a2020; color: #fff; }
-
-        .cat-card-body { padding: 10px 16px 6px; }
-
-        .cat-info-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 6px;
-            font-size: 14px;
-            align-items: flex-start;
-        }
-
-        .cat-info-label {
-            color: #7a6040;
-            min-width: 70px;
-            font-weight: bold;
-        }
-
-        .cat-info-value { color: #3a2e1e; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            margin: 8px 0;
-            text-align: center;
-        }
-
-        .stat-cell {
-            background: #d8c8a0;
-            border: 2px solid #8a6e48;
-            border-radius: 6px;
-            padding: 4px 2px;
-            font-size: 12px;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            font-weight: bold;
-            color: #6a5030;
-            display: block;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2a1a0e;
-            font-family: 'Caveat', cursive;
-        }
-
-        .stat-value.injured { color: #c03030; }
-        .stat-value.buffed { color: #2a8a2a; }
-
-        .stat-detail {
-            font-size: 9px;
-            color: #8a7050;
-        }
-
-        .status-badge {
-            font-size: 11px;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-        .status-OK { background: #7ab85a; color: #fff; }
-        .status-Injured { background: #d87030; color: #fff; }
-        .status-Dead { background: #8a2020; color: #fff; }
-
-        .cat-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 3px;
-        }
-
-        .tag {
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: #d44;
-            color: #fff;
-            border: 1px solid rgba(0,0,0,0.2);
-        }
-        .tag.passive { background: #4a8; color: #fff; }
-        .tag.item { background: #c8a030; color: #2a1a0e; }
-        .tag.mutation { background: #8a48a8; color: #fff; }
-        .tag.defect { background: #6a1a1a; color: #fcc; }
-
-        .cat-image-area { padding: 0 16px 10px; }
-
-        .cat-image-area img {
-            width: 100%;
-            border-radius: 8px;
-            border: 3px solid #6b4830;
-            max-height: 320px;
-            object-fit: cover;
-        }
-
-        .cat-card-actions {
-            padding: 8px 16px 14px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 7px 14px;
-            border: 2px solid #2a1a0e;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.15s;
-            flex: 1;
-            text-align: center;
-        }
-
-        .btn-generate {
-            background: #6b4830;
-            color: #f0d878;
-        }
-        .btn-generate:hover { background: #8a5a3a; }
-        .btn-generate:disabled {
-            background: #a09080;
-            color: #c0b090;
-            cursor: not-allowed;
-        }
-
-        .btn-prompt {
-            background: #d8c8a0;
-            color: #5c3d2e;
-        }
-        .btn-prompt:hover { background: #e8d8b0; }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(240,216,120,0.3);
-            border-radius: 50%;
-            border-top-color: #f0d878;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(42,26,14,0.85);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+        .upload-box .hint { font-size: 12px; color: #a08060; margin-top: 15px; }
+        .empty-feed { text-align: center; padding: 60px; color: #8a7050; font-size: 18px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(42,26,14,0.85); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-
-        .modal {
-            background: #efe0c0;
-            border-radius: 12px;
-            padding: 25px;
-            max-width: 700px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 3px solid #6b4830;
-            box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
-        }
-
-        .modal h2 {
-            font-family: 'Caveat', cursive;
-            color: #5c3d2e;
-            margin-bottom: 15px;
-            font-size: 28px;
-        }
-
-        .modal textarea {
-            width: 100%;
-            min-height: 120px;
-            background: #e8dcc0;
-            border: 2px solid #8a6e48;
-            color: #3a2e1e;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            margin-bottom: 15px;
-        }
-
-        .modal .btn-row {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .modal .btn-close {
-            background: #b89a6a;
-            color: #3a2e1e;
-            padding: 8px 20px;
-            border: 2px solid #8a6e48;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .image-fullscreen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.92);
-            z-index: 2000;
-            cursor: pointer;
-            justify-content: center;
-            align-items: center;
-        }
+        .modal { background: #efe0c0; border-radius: 12px; padding: 25px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; border: 3px solid #6b4830; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
+        .modal h2 { font-family: 'Caveat', cursive; color: #5c3d2e; margin-bottom: 15px; font-size: 28px; }
+        .modal textarea { width: 100%; min-height: 120px; background: #e8dcc0; border: 2px solid #8a6e48; color: #3a2e1e; padding: 12px; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; margin-bottom: 15px; }
+        .modal .btn-row { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal .btn-close { background: #b89a6a; color: #3a2e1e; padding: 8px 20px; border: 2px solid #8a6e48; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; }
+        .image-fullscreen { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 2000; cursor: pointer; justify-content: center; align-items: center; }
         .image-fullscreen.active { display: flex; }
-        .image-fullscreen img {
-            max-width: 95%;
-            max-height: 95%;
-            object-fit: contain;
-            border-radius: 8px;
-            border: 3px solid #6b4830;
-        }
-
-        .error-msg {
-            color: #b03020;
-            font-size: 13px;
-            padding: 5px 16px 8px;
-            font-weight: bold;
-        }
-
-        .gender-icon { font-size: 16px; margin-right: 2px; }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #5c3d2e;
-            color: #f0d878;
-            padding: 12px 24px;
-            border-radius: 10px;
-            border: 2px solid #f0d878;
-            font-family: inherit;
-            font-size: 15px;
-            z-index: 3000;
-            display: none;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-        }
+        .image-fullscreen img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 8px; border: 3px solid #6b4830; }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #5c3d2e; color: #f0d878; padding: 12px 24px; border-radius: 10px; border: 2px solid #f0d878; font-family: inherit; font-size: 15px; z-index: 3000; display: none; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
         .toast.show { display: block; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>MEWGENICS Cat Viewer</h1>
-        <div class="header-right">
-            <div class="stats" id="save-stats"></div>
-            <div id="auth-area"></div>
-        </div>
+        <h1>MEWGENICS</h1>
+        <div class="header-right"><div id="auth-area"></div></div>
     </div>
-
+    <div class="nav" id="nav-bar"></div>
     <div id="main-content"></div>
 
-    <!-- Prompt modal -->
     <div class="modal-overlay" id="prompt-modal">
         <div class="modal">
-            <h2 id="modal-cat-name">Промпт для генерации</h2>
+            <h2 id="modal-cat-name">Промпт</h2>
             <textarea id="prompt-text"></textarea>
             <div class="btn-row">
                 <button class="btn-close" onclick="closeModal()">Отмена</button>
@@ -570,278 +144,190 @@
             </div>
         </div>
     </div>
-
-    <!-- Fullscreen image viewer -->
     <div class="image-fullscreen" id="fullscreen-viewer" onclick="this.classList.remove('active')">
         <img id="fullscreen-img" src="">
     </div>
-
-    <!-- Toast notifications -->
     <div class="toast" id="toast"></div>
 
     <script>
-        let currentUser = null;
-        let allCats = [];
-        let currentModalCatId = null;
-
+        const PAGE = "{{ page }}";
+        let currentUser = null, allCats = [], feedCats = [], currentModalCatId = null;
         const GOOGLE_SVG = `<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
 
-        // === Init ===
         async function init() {
-            const res = await fetch('/auth/me');
-            const data = await res.json();
-            if (data.authenticated) {
-                currentUser = data.user;
-                renderAuthArea();
-                await loadSaveInfo();
-                await loadCats();
+            try {
+                const r = await fetch('/auth/me');
+                const d = await r.json();
+                if (d.authenticated) currentUser = d.user;
+            } catch(e) {}
+            renderAuthArea();
+            renderNav();
+            if (PAGE === 'cabinet') {
+                if (!currentUser) renderLoginPage();
+                else await initCabinet();
             } else {
-                renderLoginPage();
+                await loadFeed();
             }
         }
 
         function renderAuthArea() {
-            const area = document.getElementById('auth-area');
-            area.innerHTML = `
-                <div class="user-info">
-                    ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="">` : ''}
-                    <span>${escHtml(currentUser.name)}</span>
+            const a = document.getElementById('auth-area');
+            if (currentUser) {
+                a.innerHTML = `<div class="user-info">
+                    ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}">` : ''}
+                    <span>${esc(currentUser.name)}</span>
+                    <span class="gen-counter">${currentUser.generations_count}/${currentUser.max_generations} генераций</span>
                     <a href="/auth/logout" class="btn-logout">Выйти</a>
-                </div>
-            `;
-        }
-
-        function renderLoginPage() {
-            document.getElementById('auth-area').innerHTML = '';
-            document.getElementById('save-stats').innerHTML = '';
-            document.getElementById('main-content').innerHTML = `
-                <div class="login-page">
-                    <h2>Добро пожаловать в Mewgenics Cat Viewer!</h2>
-                    <p>Загрузите своё сохранение и генерируйте уникальные арты котов</p>
-                    <a href="/auth/google" class="btn-google">
-                        ${GOOGLE_SVG}
-                        Войти через Google
-                    </a>
-                    <div style="margin-top: 30px; font-size: 14px; color: #8a7050;">
-                        <p>Файл сохранения находится по пути:</p>
-                        <code style="font-size: 12px; background: #e8dcc0; padding: 4px 8px; border-radius: 4px;">
-                            %APPDATA%\\Glaiel Games\\Mewgenics\\{steamid}\\saves\\steamcampaign01.sav
-                        </code>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function loadSaveInfo() {
-            const res = await fetch('/api/save-info');
-            const info = await res.json();
-            const statsDiv = document.getElementById('save-stats');
-
-            if (info.save_id) {
-                statsDiv.innerHTML = `
-                    <div>День: <span>${info.current_day || '?'}</span></div>
-                    <div>Золото: <span>${info.house_gold || '?'}</span></div>
-                    <div>Еда: <span>${info.house_food || '?'}</span></div>
-                    <div>Котов: <span id="cat-count">${info.total_cats || '?'}</span></div>
-                `;
-                renderMainUI();
+                </div>`;
             } else {
-                renderUploadPage();
+                a.innerHTML = `<a href="/auth/google" class="btn-auth">Войти</a>`;
             }
         }
 
-        function renderUploadPage() {
-            document.getElementById('main-content').innerHTML = `
-                <div class="upload-area">
-                    <div class="upload-box" id="upload-box" onclick="document.getElementById('file-input').click()">
-                        <h2>Загрузите сохранение</h2>
-                        <p>Перетащите файл <strong>steamcampaign01.sav</strong> сюда</p>
-                        <p>или нажмите для выбора</p>
-                        <input type="file" id="file-input" accept=".sav" style="display:none"
-                               onchange="uploadFile(this.files[0])">
-                        <div class="hint">
-                            Путь к файлу на Windows:<br>
-                            <code>%APPDATA%\\Glaiel Games\\Mewgenics\\{steamid}\\saves\\steamcampaign01.sav</code>
+        function renderNav() {
+            document.getElementById('nav-bar').innerHTML = `
+                <a href="/" class="${PAGE==='feed'?'active':''}">Лента</a>
+                <a href="/cabinet" class="${PAGE==='cabinet'?'active':''}">Мои коты</a>`;
+        }
+
+        // FEED
+        async function loadFeed() {
+            try {
+                const r = await fetch('/api/feed');
+                const d = await r.json();
+                feedCats = d.cats;
+            } catch(e) { feedCats = []; }
+            renderFeed();
+        }
+
+        function renderFeed() {
+            const m = document.getElementById('main-content');
+            if (!feedCats.length) {
+                m.innerHTML = `<div class="empty-feed"><p style="font-size:40px">&#128049;</p><p>Пока никто не опубликовал котов</p><p style="font-size:14px">Войдите, загрузите сохранение и опубликуйте!</p></div>`;
+                return;
+            }
+            m.innerHTML = `<div class="feed-grid">${feedCats.map(c => `
+                <div class="feed-card">
+                    <img src="${c.image_url}" alt="${esc(c.name)}" onclick="showFullscreen('${c.image_url}')">
+                    <div class="feed-card-info">
+                        <div class="feed-card-top">
+                            <span class="feed-cat-name">${esc(c.name)}</span>
+                            <span class="cat-class class-${c.class_en}">${esc(c['class'])}</span>
                         </div>
-                        <div class="upload-progress" id="upload-progress">
-                            <div class="bar"><div class="fill" id="upload-fill"></div></div>
-                            <p style="margin-top:8px; font-size:13px;">Загрузка и парсинг...</p>
+                        <div class="feed-owner">${c.owner_avatar?`<img src="${c.owner_avatar}">`:''}${esc(c.owner_name)}</div>
+                        <div class="feed-tags">
+                            ${(c.abilities||[]).map(a=>`<span class="tag ability">${esc(a)}</span>`).join('')}
+                            ${(c.passives||[]).map(p=>`<span class="tag passive">${esc(p)}</span>`).join('')}
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`).join('')}</div>`;
+        }
 
-            // Drag and drop
-            const box = document.getElementById('upload-box');
-            box.addEventListener('dragover', (e) => { e.preventDefault(); box.classList.add('dragover'); });
-            box.addEventListener('dragleave', () => box.classList.remove('dragover'));
-            box.addEventListener('drop', (e) => {
-                e.preventDefault();
-                box.classList.remove('dragover');
-                if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
-            });
+        // CABINET
+        async function initCabinet() {
+            try {
+                const r = await fetch('/api/save-info');
+                const info = await r.json();
+                if (info.save_id) { renderCabinetUI(info); await loadCats(); }
+                else renderUploadPage();
+            } catch(e) { renderUploadPage(); }
+        }
+
+        function renderLoginPage() {
+            document.getElementById('main-content').innerHTML = `<div class="page-center">
+                <h2>Войдите чтобы управлять котами</h2>
+                <p>Загружайте сохранения и генерируйте уникальные арты</p>
+                <a href="/auth/google" class="btn-google">${GOOGLE_SVG} Войти через Google</a></div>`;
+        }
+
+        function renderUploadPage() {
+            document.getElementById('main-content').innerHTML = `<div class="page-center">
+                <div class="upload-box" id="upload-box" onclick="document.getElementById('file-input').click()">
+                    <h2>Загрузите сохранение</h2>
+                    <p>Перетащите <strong>steamcampaign01.sav</strong> сюда или нажмите</p>
+                    <input type="file" id="file-input" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])">
+                    <div class="hint">Windows: <code>%APPDATA%\\Glaiel Games\\Mewgenics\\{steamid}\\saves\\</code></div>
+                </div></div>`;
+            const b = document.getElementById('upload-box');
+            b.addEventListener('dragover', e=>{e.preventDefault();b.classList.add('dragover')});
+            b.addEventListener('dragleave', ()=>b.classList.remove('dragover'));
+            b.addEventListener('drop', e=>{e.preventDefault();b.classList.remove('dragover');if(e.dataTransfer.files.length)uploadFile(e.dataTransfer.files[0])});
         }
 
         async function uploadFile(file) {
             if (!file) return;
-
-            const progress = document.getElementById('upload-progress');
-            const fill = document.getElementById('upload-fill');
-            progress.style.display = 'block';
-            fill.style.width = '30%';
-
-            const form = new FormData();
-            form.append('save_file', file);
-
+            showToast('Загрузка...');
+            const f = new FormData(); f.append('save_file', file);
             try {
-                fill.style.width = '60%';
-                const res = await fetch('/api/upload', { method: 'POST', body: form });
-                fill.style.width = '90%';
-                const data = await res.json();
-
-                if (data.success) {
-                    fill.style.width = '100%';
-                    showToast(`Загружено! ${data.cat_count} котов найдено`);
-                    await loadSaveInfo();
-                    await loadCats();
-                } else {
-                    showToast(data.error || 'Ошибка загрузки');
-                    progress.style.display = 'none';
-                }
-            } catch (e) {
-                showToast('Ошибка сети: ' + e.message);
-                progress.style.display = 'none';
-            }
+                const r = await fetch('/api/upload', {method:'POST', body:f});
+                const d = await r.json();
+                if (d.success) { showToast(`${d.cat_count} котов!`); await initCabinet(); }
+                else showToast(d.error||'Ошибка');
+            } catch(e) { showToast('Ошибка сети'); }
         }
 
-        function renderMainUI() {
+        function renderCabinetUI(info) {
             document.getElementById('main-content').innerHTML = `
                 <div class="controls">
                     <input type="text" id="search" placeholder="Поиск по имени...">
-                    <select id="class-filter">
-                        <option value="">Все классы</option>
-                        <option value="Fighter">Боец</option>
-                        <option value="Tank">Танк</option>
-                        <option value="Hunter">Охотник</option>
-                        <option value="Mage">Маг</option>
-                        <option value="Medic">Медик</option>
-                        <option value="Necromancer">Некромант</option>
-                        <option value="Druid">Друид</option>
-                        <option value="Thief">Вор</option>
-                        <option value="Tinkerer">Механик</option>
-                        <option value="Colorless">Бесцветный</option>
-                    </select>
-                    <select id="status-filter">
-                        <option value="">Все статусы</option>
-                        <option value="OK">Здоровые</option>
-                        <option value="Injured">Раненые</option>
-                        <option value="Dead">Мертвые</option>
-                    </select>
-                    <label class="btn" style="cursor:pointer;" onclick="document.getElementById('reupload-input').click()">
-                        Загрузить новый сейв
-                        <input type="file" id="reupload-input" accept=".sav" style="display:none"
-                               onchange="uploadFile(this.files[0])">
-                    </label>
+                    <select id="class-filter"><option value="">Все классы</option>
+                        <option value="Fighter">Боец</option><option value="Tank">Танк</option><option value="Hunter">Охотник</option>
+                        <option value="Mage">Маг</option><option value="Medic">Медик</option><option value="Necromancer">Некромант</option>
+                        <option value="Druid">Друид</option><option value="Thief">Вор</option><option value="Tinkerer">Механик</option>
+                        <option value="Colorless">Бесцветный</option></select>
+                    <select id="status-filter"><option value="">Все</option><option value="OK">Здоровые</option><option value="Injured">Раненые</option></select>
+                    <label class="ctrl-btn" style="cursor:pointer">Новый сейв<input type="file" accept=".sav" style="display:none" onchange="uploadFile(this.files[0])"></label>
+                    <span style="font-size:13px;color:#7a6040">День ${info.current_day||'?'} | Золото: ${info.house_gold||'?'} | Котов: ${info.total_cats||'?'}</span>
                 </div>
-                <div class="cat-grid" id="cat-grid"></div>
-            `;
-
+                <div class="cat-grid" id="cat-grid"></div>`;
             document.getElementById('search').addEventListener('input', renderCats);
             document.getElementById('class-filter').addEventListener('change', renderCats);
             document.getElementById('status-filter').addEventListener('change', renderCats);
-            renderCats();
         }
 
-        // === Cats ===
-
         async function loadCats() {
-            try {
-                const res = await fetch('/api/cats');
-                allCats = await res.json();
-                renderCats();
-            } catch (e) { console.error(e); }
+            try { const r = await fetch('/api/cats'); allCats = await r.json(); renderCats(); } catch(e){}
         }
 
         function renderCats() {
-            const grid = document.getElementById('cat-grid');
-            if (!grid) return;
-
-            const search = document.getElementById('search')?.value.toLowerCase() || '';
-            const classFilter = document.getElementById('class-filter')?.value || '';
-            const statusFilter = document.getElementById('status-filter')?.value || '';
-
-            let filtered = allCats.filter(cat => {
-                if (search && !cat.name.toLowerCase().includes(search)) return false;
-                if (classFilter && cat.class_en !== classFilter) return false;
-                if (statusFilter && cat.status !== statusFilter) return false;
+            const g = document.getElementById('cat-grid'); if (!g) return;
+            const s = (document.getElementById('search')?.value||'').toLowerCase();
+            const cf = document.getElementById('class-filter')?.value||'';
+            const sf = document.getElementById('status-filter')?.value||'';
+            const fl = allCats.filter(c => {
+                if (s && !c.name.toLowerCase().includes(s)) return false;
+                if (cf && c.class_en !== cf) return false;
+                if (sf && c.status !== sf) return false;
                 return true;
             });
-
-            grid.innerHTML = filtered.map(cat => {
-                const genderIcon = cat.gender === 'кот' ? '&#9794;' : cat.gender === 'кошка' ? '&#9792;' : '?';
-                const statsHtml = renderStats(cat.stats);
-                const catId = cat.db_id;
-
-                return `
-                <div class="cat-card" data-id="${catId}">
+            const canGen = currentUser && currentUser.generations_count < currentUser.max_generations;
+            g.innerHTML = fl.map(cat => {
+                const gi = cat.gender==='кот'?'&#9794;':cat.gender==='кошка'?'&#9792;':'?';
+                const id = cat.db_id;
+                return `<div class="cat-card">
                     <div class="cat-card-header">
-                        <div>
-                            <span class="cat-name">${escHtml(cat.name)}</span>
-                            <span class="gender-icon">${genderIcon}</span>
-                            ${cat.status !== 'OK' ? `<span class="status-badge status-${cat.status}">${cat.status === 'Injured' ? 'Ранен' : 'Мёртв'}</span>` : ''}
+                        <div><span class="cat-name">${esc(cat.name)}</span><span class="gender-icon">${gi}</span>
+                            ${cat.status!=='OK'?`<span class="status-badge status-${cat.status}">${cat.status==='Injured'?'Ранен':'Мёртв'}</span>`:''}
+                            ${cat.published?'<span class="published-badge">В ленте</span>':''}
                         </div>
-                        <div class="cat-class class-${cat.class_en}">${escHtml(cat['class'])}</div>
+                        <div class="cat-class class-${cat.class_en}">${esc(cat['class'])}</div>
                     </div>
                     <div class="cat-card-body">
-                        ${statsHtml}
-                        <div class="cat-info-row">
-                            <span class="cat-info-label">Фокус:</span>
-                            <span class="cat-info-value">${escHtml(cat.stat_focus)}</span>
-                        </div>
-                        ${cat.abilities.length ? `
-                        <div class="cat-info-row">
-                            <span class="cat-info-label">Скиллы:</span>
-                            <div class="cat-tags">
-                                ${cat.abilities.map(a => `<span class="tag">${escHtml(a)}</span>`).join('')}
-                            </div>
-                        </div>` : ''}
-                        ${cat.passives.length ? `
-                        <div class="cat-info-row">
-                            <span class="cat-info-label">Пассивки:</span>
-                            <div class="cat-tags">
-                                ${cat.passives.map(p => `<span class="tag passive">${escHtml(p)}</span>`).join('')}
-                            </div>
-                        </div>` : ''}
-                        ${cat.items.length ? `
-                        <div class="cat-info-row">
-                            <span class="cat-info-label">Предметы:</span>
-                            <div class="cat-tags">
-                                ${cat.items.map(i => `<span class="tag item">${escHtml(i)}</span>`).join('')}
-                            </div>
-                        </div>` : ''}
-                        ${cat.mutations && cat.mutations.length ? `
-                        <div class="cat-info-row">
-                            <span class="cat-info-label">Мутации:</span>
-                            <div class="cat-tags">
-                                ${cat.mutations.map(m => `<span class="tag ${m.is_defect ? 'defect' : 'mutation'}" title="${escHtml(m.desc)}">${escHtml(m.part_ru)}${m.desc ? ' (' + escHtml(m.desc.substring(0, 40)) + (m.desc.length > 40 ? '...' : '') + ')' : ''}</span>`).join('')}
-                            </div>
-                        </div>` : ''}
+                        ${renderStats(cat.stats)}
+                        <div class="cat-info-row"><span class="cat-info-label">Фокус:</span><span>${esc(cat.stat_focus)}</span></div>
+                        ${cat.abilities.length?`<div class="cat-info-row"><span class="cat-info-label">Скиллы:</span><div class="cat-tags">${cat.abilities.map(a=>`<span class="tag ability">${esc(a)}</span>`).join('')}</div></div>`:''}
+                        ${cat.passives.length?`<div class="cat-info-row"><span class="cat-info-label">Пассивки:</span><div class="cat-tags">${cat.passives.map(p=>`<span class="tag passive">${esc(p)}</span>`).join('')}</div></div>`:''}
+                        ${cat.items.length?`<div class="cat-info-row"><span class="cat-info-label">Предметы:</span><div class="cat-tags">${cat.items.map(i=>`<span class="tag item">${esc(i)}</span>`).join('')}</div></div>`:''}
+                        ${cat.mutations&&cat.mutations.length?`<div class="cat-info-row"><span class="cat-info-label">Мутации:</span><div class="cat-tags">${cat.mutations.map(m=>`<span class="tag ${m.is_defect?'defect':'mutation'}" title="${esc(m.desc)}">${esc(m.part_ru)}${m.desc?' ('+esc(m.desc.substring(0,35))+(m.desc.length>35?'...':'')+')':''}</span>`).join('')}</div></div>`:''}
                     </div>
-                    ${cat.has_image ? `
-                    <div class="cat-image-area">
-                        <img src="${cat.image_url}" alt="${escHtml(cat.name)}"
-                             onclick="showFullscreen('${cat.image_url}')"
-                             style="cursor: pointer;">
-                    </div>` : ''}
-                    <div id="error-${catId}" class="error-msg" style="display:none;"></div>
+                    ${cat.has_image?`<div class="cat-image-area"><img src="${cat.image_url}" onclick="showFullscreen('${cat.image_url}')" style="cursor:pointer"></div>`:''}
+                    <div id="error-${id}" class="error-msg" style="display:none"></div>
                     <div class="cat-card-actions">
-                        <button class="btn btn-generate" id="gen-btn-${catId}"
-                                onclick="generateImage(${catId})">
-                            ${cat.has_image ? 'Перегенерировать' : 'Сгенерировать'}
-                        </button>
-                        <button class="btn btn-prompt" onclick="showPrompt(${catId})">
-                            Промпт
-                        </button>
+                        <button class="btn btn-generate" id="gen-btn-${id}" onclick="generateImage(${id})" ${!canGen?'disabled':''}>${cat.has_image?'Перегенерировать':'Сгенерировать'}</button>
+                        <button class="btn btn-prompt" onclick="showPrompt(${id})">Промпт</button>
+                        ${cat.has_image?(cat.published
+                            ?`<button class="btn btn-unpublish" onclick="togglePublish(${id},false)">Убрать</button>`
+                            :`<button class="btn btn-publish" onclick="togglePublish(${id},true)">В ленту</button>`):''}
                     </div>
                 </div>`;
             }).join('');
@@ -849,148 +335,69 @@
 
         function renderStats(stats) {
             if (!stats) return '';
-            const order = ['STR', 'DEX', 'CON', 'INT', 'SPD', 'CHA', 'LCK'];
-            let html = '<div class="stats-grid">';
-            for (const key of order) {
-                const s = stats[key];
-                if (!s) continue;
-                const eff = s.effective;
-                const cls = s.extra < 0 ? 'injured' : (s.bonus > 0 || s.extra > 0) ? 'buffed' : '';
-                const detail = [];
-                if (s.bonus !== 0) detail.push((s.bonus > 0 ? '+' : '') + s.bonus);
-                if (s.extra !== 0) detail.push((s.extra > 0 ? '+' : '') + s.extra);
-                html += `<div class="stat-cell">
-                    <span class="stat-label">${s.label_ru}</span>
-                    <span class="stat-value ${cls}">${eff}</span>
-                    ${detail.length ? `<span class="stat-detail">${s.base}${detail.join('')}</span>` : ''}
-                </div>`;
-            }
-            html += '</div>';
-            return html;
+            const ks = ['STR','DEX','CON','INT','SPD','CHA','LCK'];
+            let h = '<div class="stats-grid">';
+            for (const k of ks) { const s=stats[k]; if(!s)continue;
+                const c=s.extra<0?'injured':(s.bonus>0||s.extra>0)?'buffed':'';
+                const d=[]; if(s.bonus)d.push((s.bonus>0?'+':'')+s.bonus); if(s.extra)d.push((s.extra>0?'+':'')+s.extra);
+                h+=`<div class="stat-cell"><span class="stat-label">${s.label_ru}</span><span class="stat-value ${c}">${s.effective}</span>${d.length?`<span class="stat-detail">${s.base}${d.join('')}</span>`:''}</div>`;
+            } return h+'</div>';
         }
-
-        function escHtml(s) {
-            if (!s) return '';
-            const div = document.createElement('div');
-            div.textContent = s;
-            return div.innerHTML;
-        }
-
-        // === Generation ===
 
         async function generateImage(catId) {
-            const btn = document.getElementById(`gen-btn-${catId}`);
-            const errDiv = document.getElementById(`error-${catId}`);
-            if (!btn) return;
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span>Генерация...';
-            if (errDiv) errDiv.style.display = 'none';
-
+            const btn=document.getElementById(`gen-btn-${catId}`), err=document.getElementById(`error-${catId}`);
+            if(!btn)return; btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span>Генерация...';
+            if(err)err.style.display='none';
             try {
-                const res = await fetch(`/api/cat/${catId}/generate`, { method: 'POST' });
-                const data = await res.json();
-
-                if (data.success) {
-                    const cat = allCats.find(c => c.db_id === catId);
-                    if (cat) {
-                        cat.has_image = true;
-                        cat.image_url = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 't=' + Date.now();
-                    }
+                const r = await fetch(`/api/cat/${catId}/generate`,{method:'POST'});
+                const d = await r.json();
+                if(d.success){ currentUser.generations_count++; renderAuthArea();
+                    const c=allCats.find(x=>x.db_id===catId); if(c){c.has_image=true;c.image_url=d.image_url+'?t='+Date.now();}
                     renderCats();
-                } else {
-                    errDiv.textContent = data.error || 'Ошибка';
-                    errDiv.style.display = 'block';
-                    btn.disabled = false;
-                    btn.textContent = 'Сгенерировать';
-                }
-            } catch (e) {
-                errDiv.textContent = 'Ошибка сети: ' + e.message;
-                errDiv.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Сгенерировать';
-            }
+                } else { err.textContent=d.error;err.style.display='block';btn.disabled=false;btn.textContent='Сгенерировать'; }
+            } catch(e){ err.textContent='Ошибка сети';err.style.display='block';btn.disabled=false;btn.textContent='Сгенерировать'; }
+        }
+
+        async function togglePublish(catId, pub) {
+            try {
+                const r = await fetch(`/api/cat/${catId}/${pub?'publish':'unpublish'}`,{method:'POST'});
+                const d = await r.json();
+                if(d.success){ const c=allCats.find(x=>x.db_id===catId);if(c)c.published=d.published; renderCats(); showToast(pub?'Опубликовано!':'Убрано из ленты'); }
+                else showToast(d.error);
+            } catch(e){ showToast('Ошибка'); }
         }
 
         async function showPrompt(catId) {
-            try {
-                const res = await fetch(`/api/cat/${catId}/prompt`);
-                const data = await res.json();
-                currentModalCatId = catId;
-                document.getElementById('modal-cat-name').textContent = `Промпт: ${data.cat.name}`;
-                document.getElementById('prompt-text').value = data.prompt;
-                document.getElementById('prompt-modal').classList.add('active');
-            } catch (e) { console.error(e); }
+            const r = await fetch(`/api/cat/${catId}/prompt`); const d = await r.json();
+            currentModalCatId=catId;
+            document.getElementById('modal-cat-name').textContent=`Промпт: ${d.cat.name}`;
+            document.getElementById('prompt-text').value=d.prompt;
+            document.getElementById('prompt-modal').classList.add('active');
         }
 
         async function generateFromModal() {
-            if (!currentModalCatId) return;
-            const prompt = document.getElementById('prompt-text').value;
-            closeModal();
-
-            const btn = document.getElementById(`gen-btn-${currentModalCatId}`);
-            const errDiv = document.getElementById(`error-${currentModalCatId}`);
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading-spinner"></span>Генерация...';
-            }
-            if (errDiv) errDiv.style.display = 'none';
-
+            if(!currentModalCatId)return;
+            const p=document.getElementById('prompt-text').value; closeModal();
+            const btn=document.getElementById(`gen-btn-${currentModalCatId}`), err=document.getElementById(`error-${currentModalCatId}`);
+            if(btn){btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>Генерация...';}
+            if(err)err.style.display='none';
             try {
-                const res = await fetch(`/api/cat/${currentModalCatId}/generate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ custom_prompt: prompt }),
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    const cat = allCats.find(c => c.db_id === currentModalCatId);
-                    if (cat) {
-                        cat.has_image = true;
-                        cat.image_url = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 't=' + Date.now();
-                    }
+                const r = await fetch(`/api/cat/${currentModalCatId}/generate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({custom_prompt:p})});
+                const d = await r.json();
+                if(d.success){ currentUser.generations_count++;renderAuthArea();
+                    const c=allCats.find(x=>x.db_id===currentModalCatId);if(c){c.has_image=true;c.image_url=d.image_url+'?t='+Date.now();}
                     renderCats();
-                } else {
-                    if (errDiv) { errDiv.textContent = data.error; errDiv.style.display = 'block'; }
-                    if (btn) { btn.disabled = false; btn.textContent = 'Сгенерировать'; }
-                }
-            } catch (e) {
-                if (errDiv) { errDiv.textContent = 'Ошибка: ' + e.message; errDiv.style.display = 'block'; }
-                if (btn) { btn.disabled = false; btn.textContent = 'Сгенерировать'; }
-            }
+                } else { if(err){err.textContent=d.error;err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Сгенерировать';} }
+            } catch(e){ if(err){err.textContent='Ошибка';err.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Сгенерировать';} }
         }
 
-        function closeModal() {
-            document.getElementById('prompt-modal').classList.remove('active');
-        }
+        function closeModal(){document.getElementById('prompt-modal').classList.remove('active')}
+        function showFullscreen(u){document.getElementById('fullscreen-img').src=u;document.getElementById('fullscreen-viewer').classList.add('active')}
+        function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+        function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
-        function showFullscreen(url) {
-            document.getElementById('fullscreen-img').src = url;
-            document.getElementById('fullscreen-viewer').classList.add('active');
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        // === Events ===
-
-        document.getElementById('prompt-modal')?.addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeModal();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModal();
-                document.getElementById('fullscreen-viewer')?.classList.remove('active');
-            }
-        });
-
-        // Boot
+        document.getElementById('prompt-modal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+        document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();document.getElementById('fullscreen-viewer')?.classList.remove('active')}});
         init();
     </script>
 </body>

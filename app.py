@@ -21,19 +21,17 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 # === Helpers ===
 
 def require_auth():
-    """Check auth, return user payload or None."""
     return get_current_user(request)
 
 
 def _cat_data_from_row(row):
-    """Reconstruct CatData from DB row for prompt building."""
     d = row["data"] if isinstance(row["data"], dict) else json.loads(row["data"])
     stats = CatStats(
         base=d.get("stats_base", [0]*7),
         bonus=d.get("stats_bonus", [0]*7),
         extra=d.get("stats_extra", [0]*7),
     )
-    cat = CatData(
+    return CatData(
         id=row["cat_key"],
         name=d.get("name", ""),
         voice=d.get("voice", ""),
@@ -48,11 +46,9 @@ def _cat_data_from_row(row):
         stats=stats,
         status=d.get("status", "OK"),
     )
-    return cat
 
 
 def _cat_to_db_data(cat):
-    """Convert CatData to JSON-serializable dict for DB storage."""
     return {
         "name": cat.name,
         "voice": cat.voice,
@@ -88,15 +84,15 @@ def auth_callback():
     if not user_info:
         return redirect("/?error=auth_failed")
 
-    google_id = user_info.get("id", "")
-    email = user_info.get("email", "")
-    name = user_info.get("name", "")
-    avatar = user_info.get("picture", "")
+    user = db.upsert_user(
+        user_info.get("id", ""),
+        user_info.get("email", ""),
+        user_info.get("name", ""),
+        user_info.get("picture", ""),
+    )
+    token = create_jwt(user["id"], user_info.get("email", ""), user_info.get("name", ""))
 
-    user = db.upsert_user(google_id, email, name, avatar)
-    token = create_jwt(user["id"], email, name)
-
-    resp = make_response(redirect("/"))
+    resp = make_response(redirect("/cabinet"))
     resp.set_cookie("auth_token", token, httponly=True, secure=True,
                      samesite="Lax", max_age=60*60*24*30)
     return resp
@@ -125,6 +121,7 @@ def auth_me():
             "email": db_user["email"],
             "avatar_url": db_user["avatar_url"],
             "generations_count": db_user["generations_count"],
+            "max_generations": db.MAX_GENERATIONS,
         }
     })
 
@@ -133,8 +130,37 @@ def auth_me():
 
 @app.route("/")
 def index():
-    user = require_auth()
-    return render_template("index.html", user=user)
+    return render_template("index.html", page="feed")
+
+
+@app.route("/cabinet")
+def cabinet():
+    return render_template("index.html", page="cabinet")
+
+
+# === Public feed API ===
+
+@app.route("/api/feed")
+def api_feed():
+    offset = request.args.get("offset", 0, type=int)
+    limit = request.args.get("limit", 50, type=int)
+    limit = min(limit, 100)
+
+    rows = db.get_published_cats(limit=limit, offset=offset)
+    total = db.get_published_count()
+
+    result = []
+    for row in rows:
+        cat = _cat_data_from_row(row)
+        summary = build_cat_summary_ru(cat)
+        summary["db_id"] = row["id"]
+        summary["image_url"] = row.get("image_url")
+        summary["owner_name"] = row.get("owner_name", "")
+        summary["owner_avatar"] = row.get("owner_avatar", "")
+        summary["published_at"] = row["published_at"].isoformat() if row.get("published_at") else None
+        result.append(summary)
+
+    return jsonify({"cats": result, "total": total})
 
 
 # === Save upload ===
@@ -149,7 +175,6 @@ def api_upload():
     if not file or not file.filename:
         return jsonify({"error": "Файл не выбран"}), 400
 
-    # Save to temp, parse, store in DB
     with tempfile.NamedTemporaryFile(suffix=".sav", delete=False) as tmp:
         file.save(tmp.name)
         tmp_path = tmp.name
@@ -164,20 +189,17 @@ def api_upload():
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)
 
-    # Delete old saves for this user (keep only latest)
+    # Delete old saves
     old_saves = db.get_user_saves(user["user_id"])
     for old in old_saves:
-        # Delete old cat images from blob
         old_cats = db.get_cats_for_save(old["id"])
         for oc in old_cats:
             if oc.get("image_url"):
                 storage.delete_blob(oc["image_url"])
         db.delete_save(old["id"])
 
-    # Create new save
     save = db.create_save(user["user_id"], file.filename, save_info)
 
-    # Insert cats
     cats_data = []
     for cat in cats:
         cats_data.append((cat.id, cat.name, _cat_to_db_data(cat)))
@@ -191,7 +213,7 @@ def api_upload():
     })
 
 
-# === Cat API ===
+# === Cat API (private — user's own cats) ===
 
 @app.route("/api/cats")
 def api_cats():
@@ -203,16 +225,16 @@ def api_cats():
     if not saves:
         return jsonify([])
 
-    save = saves[0]  # Latest save
-    rows = db.get_cats_for_save(save["id"])
+    rows = db.get_cats_for_save(saves[0]["id"])
 
     result = []
     for row in rows:
         cat = _cat_data_from_row(row)
         summary = build_cat_summary_ru(cat)
-        summary["db_id"] = row["id"]  # DB primary key for generation
+        summary["db_id"] = row["id"]
         summary["has_image"] = bool(row.get("image_url"))
         summary["image_url"] = row.get("image_url")
+        summary["published"] = bool(row.get("published"))
         result.append(summary)
 
     return jsonify(result)
@@ -246,8 +268,7 @@ def api_cat_prompt(db_cat_id):
         return jsonify({"error": "Кот не найден"}), 404
 
     cat = _cat_data_from_row(row)
-    prompt = build_prompt(cat)
-    return jsonify({"prompt": prompt, "cat": build_cat_summary_ru(cat)})
+    return jsonify({"prompt": build_prompt(cat), "cat": build_cat_summary_ru(cat)})
 
 
 @app.route("/api/cat/<int:db_cat_id>/generate", methods=["POST"])
@@ -255,6 +276,14 @@ def api_generate(db_cat_id):
     user = require_auth()
     if not user:
         return jsonify({"error": "Требуется авторизация"}), 401
+
+    if not db.can_generate(user["user_id"]):
+        return jsonify({"error": f"Лимит генераций исчерпан ({db.MAX_GENERATIONS}/{db.MAX_GENERATIONS})"}), 403
+
+    # Verify ownership
+    owner_id = db.get_cat_owner_id(db_cat_id)
+    if owner_id != user["user_id"]:
+        return jsonify({"error": "Это не ваш кот"}), 403
 
     row = db.get_cat(db_cat_id)
     if not row:
@@ -292,15 +321,12 @@ def api_generate(db_cat_id):
 
                 filename = f"cat_{db_cat_id}_{cat.name[:20]}.{ext}"
 
-                # Delete old image if exists
                 if row.get("image_url"):
                     storage.delete_blob(row["image_url"])
 
-                # Upload to Vercel Blob
                 blob_url = storage.upload_blob(filename, image_data, mime_type)
 
                 if not blob_url:
-                    # Fallback: local storage for dev
                     gen_dir = os.path.join(os.path.dirname(__file__), "static", "generated")
                     os.makedirs(gen_dir, exist_ok=True)
                     local_path = os.path.join(gen_dir, f"cat_{db_cat_id}.{ext}")
@@ -308,31 +334,60 @@ def api_generate(db_cat_id):
                         f.write(image_data)
                     blob_url = f"/static/generated/cat_{db_cat_id}.{ext}"
 
-                # Save URL to DB
                 db.set_cat_image(db_cat_id, blob_url)
                 db.increment_generations(user["user_id"])
 
-                return jsonify({
-                    "success": True,
-                    "image_url": blob_url,
-                })
+                return jsonify({"success": True, "image_url": blob_url})
 
-        return jsonify({"error": "Нет изображения в ответе", "text": response.text}), 500
+        return jsonify({"error": "Нет изображения в ответе"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-# === DB init on startup ===
+# === Publish/unpublish ===
+
+@app.route("/api/cat/<int:db_cat_id>/publish", methods=["POST"])
+def api_publish(db_cat_id):
+    user = require_auth()
+    if not user:
+        return jsonify({"error": "Требуется авторизация"}), 401
+
+    owner_id = db.get_cat_owner_id(db_cat_id)
+    if owner_id != user["user_id"]:
+        return jsonify({"error": "Это не ваш кот"}), 403
+
+    row = db.get_cat(db_cat_id)
+    if not row or not row.get("image_url"):
+        return jsonify({"error": "Сначала сгенерируйте изображение"}), 400
+
+    db.publish_cat(db_cat_id)
+    return jsonify({"success": True, "published": True})
+
+
+@app.route("/api/cat/<int:db_cat_id>/unpublish", methods=["POST"])
+def api_unpublish(db_cat_id):
+    user = require_auth()
+    if not user:
+        return jsonify({"error": "Требуется авторизация"}), 401
+
+    owner_id = db.get_cat_owner_id(db_cat_id)
+    if owner_id != user["user_id"]:
+        return jsonify({"error": "Это не ваш кот"}), 403
+
+    db.unpublish_cat(db_cat_id)
+    return jsonify({"success": True, "published": False})
+
+
+# === DB init ===
 
 try:
     db.init_db()
 except Exception:
-    pass  # DB might not be available (e.g., no POSTGRES_URL set yet)
+    pass
 
 
 if __name__ == "__main__":
-    # Local dev mode
     from dotenv import load_dotenv
     load_dotenv()
 
@@ -340,7 +395,7 @@ if __name__ == "__main__":
         db.init_db()
         print("Database initialized")
     except Exception as e:
-        print(f"DB init failed (ok for local dev without Postgres): {e}")
+        print(f"DB init failed: {e}")
 
     os.makedirs(os.path.join(os.path.dirname(__file__), "static", "generated"), exist_ok=True)
     app.run(debug=True, port=5000)

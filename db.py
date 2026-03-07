@@ -7,13 +7,14 @@ from psycopg2.extras import RealDictCursor
 
 _pool = None
 
+MAX_GENERATIONS = 5
+
 
 def get_conn():
     global _pool
     url = os.environ.get("POSTGRES_URL")
     if not url:
         raise RuntimeError("POSTGRES_URL not set")
-    # Vercel gives postgres:// but psycopg2 needs postgresql://
     if url.startswith("postgres://"):
         url = "postgresql://" + url[len("postgres://"):]
     if _pool is None:
@@ -89,21 +90,27 @@ def init_db():
             name TEXT NOT NULL,
             data JSONB NOT NULL,
             image_url TEXT,
+            published BOOLEAN DEFAULT FALSE,
+            published_at TIMESTAMP,
             created_at TIMESTAMP DEFAULT NOW()
         )
     """)
+    execute("CREATE INDEX IF NOT EXISTS idx_cats_save_id ON cats(save_id)")
+    execute("CREATE INDEX IF NOT EXISTS idx_saves_user_id ON saves(user_id)")
+    execute("CREATE INDEX IF NOT EXISTS idx_cats_published ON cats(published) WHERE published = TRUE")
+    # Migration: add published columns if they don't exist
     execute("""
-        CREATE INDEX IF NOT EXISTS idx_cats_save_id ON cats(save_id)
-    """)
-    execute("""
-        CREATE INDEX IF NOT EXISTS idx_saves_user_id ON saves(user_id)
+        DO $$ BEGIN
+            ALTER TABLE cats ADD COLUMN IF NOT EXISTS published BOOLEAN DEFAULT FALSE;
+            ALTER TABLE cats ADD COLUMN IF NOT EXISTS published_at TIMESTAMP;
+        EXCEPTION WHEN OTHERS THEN NULL;
+        END $$
     """)
 
 
 # === User operations ===
 
 def upsert_user(google_id, email, name, avatar_url):
-    """Create or update a user from Google OAuth. Returns user dict."""
     row = query_one("""
         INSERT INTO users (google_id, email, name, avatar_url)
         VALUES (%s, %s, %s, %s)
@@ -122,6 +129,13 @@ def get_user(user_id):
 
 def increment_generations(user_id):
     execute("UPDATE users SET generations_count = generations_count + 1 WHERE id = %s", (user_id,))
+
+
+def can_generate(user_id):
+    user = get_user(user_id)
+    if not user:
+        return False
+    return user["generations_count"] < MAX_GENERATIONS
 
 
 # === Save operations ===
@@ -150,7 +164,6 @@ def delete_save(save_id):
 # === Cat operations ===
 
 def insert_cats(save_id, cats_data):
-    """Bulk insert parsed cats. cats_data is a list of (cat_key, name, data_dict)."""
     conn = get_conn()
     with conn.cursor() as cur:
         for cat_key, name, data in cats_data:
@@ -170,3 +183,39 @@ def get_cat(cat_id):
 
 def set_cat_image(cat_id, image_url):
     execute("UPDATE cats SET image_url = %s WHERE id = %s", (image_url, cat_id))
+
+
+def publish_cat(cat_id):
+    execute("UPDATE cats SET published = TRUE, published_at = NOW() WHERE id = %s", (cat_id,))
+
+
+def unpublish_cat(cat_id):
+    execute("UPDATE cats SET published = FALSE, published_at = NULL WHERE id = %s", (cat_id,))
+
+
+def get_published_cats(limit=50, offset=0):
+    """Get published cats with owner info for the public feed."""
+    return query("""
+        SELECT c.*, u.name as owner_name, u.avatar_url as owner_avatar
+        FROM cats c
+        JOIN saves s ON c.save_id = s.id
+        JOIN users u ON s.user_id = u.id
+        WHERE c.published = TRUE AND c.image_url IS NOT NULL
+        ORDER BY c.published_at DESC
+        LIMIT %s OFFSET %s
+    """, (limit, offset))
+
+
+def get_published_count():
+    row = query_one("SELECT COUNT(*) as cnt FROM cats WHERE published = TRUE AND image_url IS NOT NULL")
+    return row["cnt"] if row else 0
+
+
+def get_cat_owner_id(cat_id):
+    """Get the user_id who owns a cat."""
+    row = query_one("""
+        SELECT s.user_id FROM cats c
+        JOIN saves s ON c.save_id = s.id
+        WHERE c.id = %s
+    """, (cat_id,))
+    return row["user_id"] if row else None
