@@ -294,6 +294,12 @@
         .like-btn:hover { transform: scale(1.15); }
         .like-btn.liked { color: #c03030; }
         .like-btn .like-count { font-size: 18px; font-weight: bold; }
+        .share-btn {
+            background: none; border: 1px solid #a89870; color: #8a7050;
+            cursor: pointer; font-family: inherit; font-size: 14px;
+            padding: 4px 12px; border-radius: 6px; transition: all 0.15s;
+        }
+        .share-btn:hover { background: #d8c8a0; color: #5c3d2e; }
 
         /* === UTILITY === */
         .loading-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(240,216,120,0.3); border-radius: 50%; border-top-color: #f0d878; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 4px; }
@@ -649,6 +655,7 @@
                     <button class="like-btn ${c.liked?'liked':''}" onclick="toggleLike(${c.db_id},${i})">
                         ${c.liked?'&#10084;':'&#9825;'} <span class="like-count">${c.like_count||0}</span>
                     </button>
+                    <button class="share-btn" onclick="shareCat(${c.db_id},'${esc(c.name)}')">&#128279; Поделиться</button>
                 </div>
             </div>`;
         }
@@ -1101,6 +1108,17 @@
         function showFullscreen(u){document.getElementById('fullscreen-img').src=u;document.getElementById('fullscreen-viewer').classList.add('active')}
         function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
         function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+        function shareCat(catId, catName) {
+            const url = window.location.origin + '/cat/' + catId;
+            if (navigator.share) {
+                navigator.share({ title: catName + ' — Mewgenics', url: url }).catch(()=>{});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => showToast('Ссылка скопирована!'));
+            } else {
+                prompt('Скопируйте ссылку:', url);
+            }
+        }
 
         function openFeedback() {
             const m = document.getElementById('feedback-modal');

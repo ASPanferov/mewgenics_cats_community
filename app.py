@@ -167,6 +167,27 @@ def cabinet():
     return render_template("index.html", page="cabinet")
 
 
+@app.route("/cat/<int:cat_id>")
+def cat_page(cat_id):
+    """Dedicated cat page with OG tags for social sharing."""
+    row = db.get_cat(cat_id)
+    if not row or not row.get("published") or not row.get("image_url"):
+        return redirect("/")
+    data = row["data"] if isinstance(row["data"], dict) else json.loads(row["data"])
+    name = data.get("name", "Cat")
+    cat_class = data.get("cat_class", "")
+    image_url = row["image_url"]
+    # Get owner
+    owner_id = db.get_cat_owner_id(cat_id)
+    owner = db.get_user(owner_id) if owner_id else None
+    owner_name = owner["name"] if owner else ""
+    likes = db.get_likes_count(cat_id)
+    return render_template("cat_share.html",
+                           cat_id=cat_id, name=name, cat_class=cat_class,
+                           image_url=image_url, owner_name=owner_name,
+                           likes=likes)
+
+
 # === Public feed API ===
 
 @app.route("/api/feed")
