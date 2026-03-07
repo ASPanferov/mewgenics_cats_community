@@ -179,66 +179,188 @@ def _scan_ascii_strings(data: bytes, start: int) -> list[tuple[int, str]]:
     return strings
 
 
-def _parse_stats(raw: bytes, strings: list[tuple[int, str]]) -> tuple[CatStats, str]:
-    """Find the 92-byte stat block and stat_type from string fields."""
+def _find_voice_idx(strings: list[tuple[int, str]]) -> int | None:
+    """Find index of voice string (male5, female33, spidercat1 etc)."""
+    for idx, (off, s) in enumerate(strings):
+        if re.match(r'^(male|female|spidercat)\d', s):
+            return idx
+    return None
+
+
+def _find_dm_idx(strings: list[tuple[int, str]]) -> int | None:
+    """Find index of DefaultMove string."""
+    for idx, (off, s) in enumerate(strings):
+        if s == "DefaultMove":
+            return idx
+    return None
+
+
+def _parse_stats_anchored(raw: bytes, strings: list[tuple[int, str]], voice_idx: int) -> tuple[CatStats, str]:
+    """Find the 92-byte stat block using voice string as anchor.
+
+    Layout: voice_string -> 92-byte stat block -> stat_type_string
+    The stat_type is the string right AFTER voice.
+    """
     stats = CatStats()
     stat_type = "none"
 
-    # Find stat_type string (it's right after the stat block)
-    for idx, (off, s) in enumerate(strings):
-        if s in STAT_TYPES:
-            stat_type = s
-            stat_block_start = off - _STAT_BLOCK_SIZE
-            if stat_block_start >= 0:
-                block = raw[stat_block_start:off]
-                stats.base = [struct.unpack_from('<i', block, _STAT_BASE_OFFSET + j*4)[0]
-                              for j in range(_STAT_COUNT)]
-                stats.bonus = [struct.unpack_from('<i', block, _STAT_BONUS_OFFSET + j*4)[0]
-                               for j in range(_STAT_COUNT)]
-                stats.extra = [struct.unpack_from('<i', block, _STAT_EXTRA_OFFSET + j*4)[0]
-                               for j in range(_STAT_COUNT)]
-            break
+    if voice_idx is None or voice_idx + 1 >= len(strings):
+        return stats, stat_type
+
+    # stat_type is the next string after voice
+    st_off, st_str = strings[voice_idx + 1]
+    if st_str in STAT_TYPES:
+        stat_type = st_str
+    else:
+        # Fallback: sometimes there's an extra string between voice and stat_type
+        # Try the one after
+        if voice_idx + 2 < len(strings):
+            st_off2, st_str2 = strings[voice_idx + 2]
+            if st_str2 in STAT_TYPES:
+                stat_type = st_str2
+                st_off = st_off2
+
+    # Stat block is the 92 bytes immediately before stat_type string
+    stat_block_start = st_off - _STAT_BLOCK_SIZE
+    if stat_block_start >= 0:
+        block = raw[stat_block_start:st_off]
+        if len(block) == _STAT_BLOCK_SIZE:
+            stats.base = [struct.unpack_from('<i', block, _STAT_BASE_OFFSET + j*4)[0]
+                          for j in range(_STAT_COUNT)]
+            stats.bonus = [struct.unpack_from('<i', block, _STAT_BONUS_OFFSET + j*4)[0]
+                           for j in range(_STAT_COUNT)]
+            stats.extra = [struct.unpack_from('<i', block, _STAT_EXTRA_OFFSET + j*4)[0]
+                           for j in range(_STAT_COUNT)]
+
+            # Sanity check: if values look like garbage, reset
+            all_vals = stats.base + stats.bonus + stats.extra
+            if any(abs(v) > 1000 for v in all_vals):
+                stats = CatStats()
 
     return stats, stat_type
 
 
-def _parse_mutations(raw: bytes, all_strings: list[tuple[int, str]]) -> dict[str, int]:
-    """Parse 368-byte equipment block between breed and voice strings to find mutations.
+def _parse_mutations(raw: bytes, all_strings: list[tuple[int, str]], voice_idx: int) -> dict[str, int]:
+    """Parse equipment block between breed and voice strings to find mutations.
 
     Returns dict of part_name -> frame_number for mutated parts (frame >= 300).
     """
-    # Find voice string offset (it's right after equipment block)
-    voice_off = None
-    breed_end = None
-    for idx, (off, s) in enumerate(all_strings):
-        if re.match(r'^(male|female|spidercat)\d', s):
-            voice_off = off
-            # Breed is the string(s) before voice; equipment block sits between
-            # breed end and voice start
-            if idx > 0:
-                prev_off, prev_s = all_strings[idx - 1]
-                breed_end = prev_off + 8 + len(prev_s)
-            break
-
-    if voice_off is None or breed_end is None:
+    if voice_idx is None or voice_idx < 1:
         return {}
 
-    equip_block_start = breed_end
-    equip_block_end = voice_off
-    block_size = equip_block_end - equip_block_start
+    voice_off = all_strings[voice_idx][0]
 
-    if block_size != _EQUIP_BLOCK_SIZE:
-        return {}
+    # Breed is the string before voice. There might be 1 or 2 breed strings.
+    # Equipment block sits between last breed string end and voice start.
+    # Try with immediate predecessor first.
+    for back in range(1, min(4, voice_idx + 1)):
+        prev_off, prev_s = all_strings[voice_idx - back]
+        breed_end = prev_off + 8 + len(prev_s)
+        block_size = voice_off - breed_end
 
-    block = raw[equip_block_start:equip_block_end]
-    mutations = {}
-    for offset, part_name in _EQUIP_BLOCK_PART_OFFSETS:
-        if offset + 4 <= len(block):
-            frame = struct.unpack_from('<I', block, offset)[0]
-            if _MUTATION_FRAME_THRESHOLD <= frame <= 10000:
-                mutations[part_name] = frame
+        if _EQUIP_BLOCK_SIZE - 8 <= block_size <= _EQUIP_BLOCK_SIZE + 8:
+            # Close enough to expected size
+            block = raw[breed_end:voice_off]
+            mutations = {}
+            for offset, part_name in _EQUIP_BLOCK_PART_OFFSETS:
+                if offset + 4 <= len(block):
+                    frame = struct.unpack_from('<I', block, offset)[0]
+                    if _MUTATION_FRAME_THRESHOLD <= frame <= 10000:
+                        mutations[part_name] = frame
+            return mutations
 
-    return mutations
+    return {}
+
+
+def _classify_strings(cat: CatData, all_strings: list[tuple[int, str]],
+                       voice_idx: int | None, dm_idx: int | None):
+    """Classify strings into abilities, passives, items using anchor positions.
+
+    Anchors: voice_idx, dm_idx (DefaultMove), and class at end.
+
+    Layout from DefaultMove forward:
+      dm_idx:   DefaultMove
+      dm_idx+1: basic_attack
+      dm_idx+2..dm_idx+N: abilities (3 slots)
+      next 3: passive dups (copies of passives)
+      next 3: passives
+      next 3: items
+      last:   class
+
+    Layout from end:
+      -1:      class
+      -2..-4:  items
+      -5..-7:  passives
+      -8..-10: passive dups
+      -11+:    abilities (up to basic_attack)
+    """
+    n = len(all_strings)
+
+    # Class is always last string
+    if n >= 1:
+        class_str = all_strings[-1][1]
+        if class_str in CLASS_RU:
+            cat.cat_class = class_str
+
+    # Voice
+    if voice_idx is not None:
+        cat.voice = all_strings[voice_idx][1]
+        for prefix, gender in VOICE_GENDER.items():
+            if cat.voice.startswith(prefix):
+                cat.gender = gender
+                break
+
+    # Basic attack (right after DefaultMove)
+    if dm_idx is not None and dm_idx + 1 < n:
+        attack_str = all_strings[dm_idx + 1][1]
+        cat.basic_attack = attack_str
+        for attack_prefix, cls in ATTACK_TO_CLASS.items():
+            if attack_str.startswith(attack_prefix.replace("_", "")):
+                if cat.cat_class == "Colorless" and cls != "Colorless":
+                    cat.cat_class = cls
+                break
+
+    # Parse from the END — most reliable since class is always last
+    # -1: class
+    # -2, -3, -4: items
+    # -5, -6, -7: passives
+    # -8, -9, -10: passive dups
+    # -11+: abilities until basic_attack
+
+    if n < 10:
+        # Not enough strings to parse
+        return
+
+    # Items: 3 slots from end (n-4, n-3, n-2), before class (n-1)
+    for idx in range(max(n - 4, 0), n - 1):
+        s = all_strings[idx][1]
+        if s != "None" and s not in CLASS_RU and s not in STAT_TYPES:
+            cat.items.append(s)
+
+    # Passives: 3 slots before items (n-7, n-6, n-5)
+    for idx in range(max(n - 7, 0), max(n - 4, 0)):
+        s = all_strings[idx][1]
+        if s != "None" and s not in CLASS_RU:
+            cat.passives.append(s)
+
+    # Abilities: from basic_attack+1 to passive_dups start (n-10)
+    # Passive dups are at n-10, n-9, n-8
+    abilities_end = max(n - 10, 0)
+
+    if dm_idx is not None and dm_idx + 2 <= abilities_end:
+        abilities_start = dm_idx + 2
+    else:
+        # Fallback: abilities are right after basic_attack
+        # basic_attack is at n-14 for standard 18-string cats
+        # But we can also guess: anything between dm+2 and n-10
+        abilities_start = abilities_end  # no abilities
+
+    seen = set()
+    for idx in range(abilities_start, abilities_end):
+        s = all_strings[idx][1]
+        if s != "None" and s not in seen:
+            cat.abilities.append(s)
+            seen.add(s)
 
 
 def parse_cat_blob(cat_id: int, blob: bytes) -> CatData:
@@ -251,6 +373,7 @@ def parse_cat_blob(cat_id: int, blob: bytes) -> CatData:
     raw = _decompress_blob(blob)
 
     # Extract name
+    name_len = 0
     if len(raw) >= _NAME_START:
         name_len = struct.unpack_from('<I', raw, _NAME_LEN_OFFSET)[0]
         name_end = _NAME_START + name_len * 2
@@ -264,114 +387,26 @@ def parse_cat_blob(cat_id: int, blob: bytes) -> CatData:
         cat.name = f"Кот #{cat_id}"
 
     # Scan all ASCII strings
-    name_byte_end = _NAME_START + (name_len * 2 if 'name_len' in dir() else 0)
+    name_byte_end = _NAME_START + name_len * 2
     all_strings = _scan_ascii_strings(raw, name_byte_end)
     cat.raw_strings = [s for _, s in all_strings]
 
-    # Parse stats
-    cat.stats, stat_type_str = _parse_stats(raw, all_strings)
+    # Find anchor strings
+    voice_idx = _find_voice_idx(all_strings)
+    dm_idx = _find_dm_idx(all_strings)
+
+    # Parse stats using voice anchor
+    cat.stats, stat_type_str = _parse_stats_anchored(raw, all_strings, voice_idx)
     cat.stat_focus = STAT_FOCUS_RU.get(stat_type_str, stat_type_str)
 
     # Parse mutations from equipment block
-    cat.mutations = _parse_mutations(raw, all_strings)
+    cat.mutations = _parse_mutations(raw, all_strings, voice_idx)
 
-    # Check for injuries (negative extra stats)
-    has_negative_extra = any(e < 0 for e in cat.stats.extra)
+    # Classify strings into abilities, passives, items, class
+    _classify_strings(cat, all_strings, voice_idx, dm_idx)
 
-    # Classify strings using end-relative indexing
-    n = len(all_strings)
-    if n >= 2:
-        # Class is always last string
-        class_str = all_strings[-1][1]
-        if class_str in CLASS_RU:
-            cat.cat_class = class_str
-
-        # Voice is at a known position from end
-        # Find voice string (matches pattern like male5, female33, spidercat1)
-        for idx, (off, s) in enumerate(all_strings):
-            if re.match(r'^(male|female|spidercat)\d', s):
-                cat.voice = s
-                for prefix, gender in VOICE_GENDER.items():
-                    if s.startswith(prefix):
-                        cat.gender = gender
-                        break
-                break
-
-        # Basic attack is at end-14 (for 18 strings) or generally the string after DefaultMove
-        for idx, (off, s) in enumerate(all_strings):
-            if s == "DefaultMove" and idx + 1 < n:
-                attack_str = all_strings[idx + 1][1]
-                cat.basic_attack = attack_str
-                # Determine class from basic attack if not already set
-                for attack_prefix, cls in ATTACK_TO_CLASS.items():
-                    if attack_str.startswith(attack_prefix.replace("_", "")):
-                        if cat.cat_class == "Colorless" and cls != "Colorless":
-                            cat.cat_class = cls
-                        break
-                break
-
-        # String layout from end:
-        # -1: class
-        # -2, -3, -4: items (can be "None")
-        # -5, -6, -7: passives (can be "None")
-        # -8, -9, -10: passive ability duplicates
-        # -11, -12, -13: active abilities
-        # -14: basic attack
-        # -15: DefaultMove
-        # -16: stat_type
-        # -17: voice
-        # -18+: breed
-
-        # Active abilities: between DefaultMove+basic_attack and the passive dup section
-        # Find DefaultMove index
-        dm_idx = None
-        for idx, (off, s) in enumerate(all_strings):
-            if s == "DefaultMove":
-                dm_idx = idx
-                break
-
-        if dm_idx is not None and n >= 18:
-            # Active abilities: dm_idx+2 to dm_idx+2+ability_count
-            # The number of ability slots varies. Basic pattern:
-            # After basic_attack, abilities go until we hit the passive dup section
-
-            # Items: from end-2 backwards, up to 3 slots (before class)
-            items_start = max(n - 4, 0)
-            items_end = n - 1  # exclusive (class is at n-1)
-            for idx in range(items_start, items_end):
-                s = all_strings[idx][1]
-                if s != "None":
-                    cat.items.append(s)
-
-            # Passives: 3 slots before items
-            passives_start = max(n - 7, 0)
-            passives_end = items_start
-            for idx in range(passives_start, passives_end):
-                s = all_strings[idx][1]
-                if s != "None":
-                    cat.passives.append(s)
-
-            # Active abilities: from basic_attack+1 up to passive dup area
-            # Standard 18-string cat: 3 ability slots (dm+2..dm+4)
-            # Extra strings = more abilities or items
-            # The passive dup section starts at n-10 for standard cats
-            extra = n - 18  # how many extra string slots beyond standard
-            abilities_start = dm_idx + 2
-            abilities_end = max(n - 10 - extra, abilities_start)
-            # Safer: count abilities as everything between basic_attack
-            # and the first repeated/dup section
-            # The dup section starts at n - 10
-            abilities_end = n - 10
-            seen_abilities = set()
-            for idx in range(abilities_start, max(abilities_end, abilities_start)):
-                s = all_strings[idx][1]
-                if s != "None" and s not in seen_abilities:
-                    cat.abilities.append(s)
-                    seen_abilities.add(s)
-
-    # Determine status
-    # Check death: look for pre-meta flags
-    if has_negative_extra:
+    # Determine status from injuries (negative extra stats)
+    if any(e < 0 for e in cat.stats.extra):
         cat.status = "Injured"
 
     return cat

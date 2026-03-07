@@ -266,6 +266,32 @@ def api_save_info():
     return jsonify(info)
 
 
+@app.route("/api/cat/<int:db_cat_id>/debug")
+def api_cat_debug(db_cat_id):
+    """Debug: show raw parsed data for a cat."""
+    row = db.get_cat(db_cat_id)
+    if not row:
+        return jsonify({"error": "not found"}), 404
+    cat = _cat_data_from_row(row)
+    d = row["data"] if isinstance(row["data"], dict) else json.loads(row["data"])
+    return jsonify({
+        "name": cat.name,
+        "class": cat.cat_class,
+        "voice": d.get("voice", ""),
+        "gender": d.get("gender", ""),
+        "stat_focus": d.get("stat_focus", ""),
+        "basic_attack": d.get("basic_attack", ""),
+        "abilities": d.get("abilities", []),
+        "passives": d.get("passives", []),
+        "items": d.get("items", []),
+        "mutations": d.get("mutations", {}),
+        "stats_base": d.get("stats_base", []),
+        "stats_bonus": d.get("stats_bonus", []),
+        "stats_extra": d.get("stats_extra", []),
+        "status": d.get("status", ""),
+    })
+
+
 @app.route("/api/cat/<int:db_cat_id>/prompt")
 def api_cat_prompt(db_cat_id):
     user = require_auth()
