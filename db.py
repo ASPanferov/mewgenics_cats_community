@@ -99,13 +99,14 @@ def init_db():
     execute("CREATE INDEX IF NOT EXISTS idx_saves_user_id ON saves(user_id)")
     execute("CREATE INDEX IF NOT EXISTS idx_cats_published ON cats(published) WHERE published = TRUE")
     # Migration: add published columns if they don't exist
-    execute("""
-        DO $$ BEGIN
-            ALTER TABLE cats ADD COLUMN IF NOT EXISTS published BOOLEAN DEFAULT FALSE;
-            ALTER TABLE cats ADD COLUMN IF NOT EXISTS published_at TIMESTAMP;
-        EXCEPTION WHEN OTHERS THEN NULL;
-        END $$
-    """)
+    try:
+        execute("ALTER TABLE cats ADD COLUMN IF NOT EXISTS published BOOLEAN DEFAULT FALSE")
+    except Exception:
+        pass
+    try:
+        execute("ALTER TABLE cats ADD COLUMN IF NOT EXISTS published_at TIMESTAMP")
+    except Exception:
+        pass
 
 
 # === User operations ===

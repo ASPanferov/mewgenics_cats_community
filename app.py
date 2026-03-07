@@ -361,7 +361,10 @@ def api_publish(db_cat_id):
     if not row or not row.get("image_url"):
         return jsonify({"error": "Сначала сгенерируйте изображение"}), 400
 
-    db.publish_cat(db_cat_id)
+    try:
+        db.publish_cat(db_cat_id)
+    except Exception as e:
+        return jsonify({"error": f"DB error: {e}"}), 500
     return jsonify({"success": True, "published": True})
 
 
@@ -375,7 +378,10 @@ def api_unpublish(db_cat_id):
     if owner_id != user["user_id"]:
         return jsonify({"error": "Это не ваш кот"}), 403
 
-    db.unpublish_cat(db_cat_id)
+    try:
+        db.unpublish_cat(db_cat_id)
+    except Exception as e:
+        return jsonify({"error": f"DB error: {e}"}), 500
     return jsonify({"success": True, "published": False})
 
 
