@@ -148,6 +148,12 @@ def auth_me():
     db_user = db.get_user(user["user_id"])
     if not db_user:
         return jsonify({"authenticated": False})
+    approved = bool(db_user.get("waitlist_approved", True))
+    wl_position = 0
+    wl_total = 0
+    if not approved:
+        wl_position = db.get_waitlist_position(db_user["id"])
+        wl_total = db.get_waitlist_count()
     return jsonify({
         "authenticated": True,
         "user": {
@@ -158,6 +164,9 @@ def auth_me():
             "generations_count": db_user["generations_count"],
             "max_generations": db.get_user_max_generations(db_user),
             "is_premium": bool(db_user.get("is_premium")),
+            "waitlist": not approved,
+            "waitlist_position": wl_position,
+            "waitlist_total": wl_total,
         }
     })
 
@@ -266,6 +275,9 @@ def api_upload():
     user = require_auth()
     if not user:
         return jsonify({"error": "Требуется авторизация"}), 401
+
+    if not db.is_user_approved(user["user_id"]):
+        return jsonify({"error": "You are on the waitlist. Please wait for approval."}), 403
 
     file = request.files.get("save_file")
     if not file or not file.filename:
@@ -419,6 +431,9 @@ def api_generate(db_cat_id):
     user = require_auth()
     if not user:
         return jsonify({"error": "Требуется авторизация"}), 401
+
+    if not db.is_user_approved(user["user_id"]):
+        return jsonify({"error": "You are on the waitlist. Please wait for approval."}), 403
 
     if not db.can_generate(user["user_id"]):
         return jsonify({"error": f"Лимит генераций исчерпан ({db.MAX_GENERATIONS}/{db.MAX_GENERATIONS})"}), 403
@@ -592,6 +607,43 @@ def api_admin_reset_generations(uid):
     return jsonify({"success": True})
 
 
+# === Waitlist Admin ===
+
+@app.route("/api/admin/waitlist")
+def api_admin_waitlist():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    waitlist = db.get_waitlist()
+    return jsonify({
+        "waitlist": [dict(r) for r in waitlist],
+        "count": db.get_waitlist_count(),
+        "active_users": db.get_active_user_count(),
+        "max_active": db.MAX_ACTIVE_USERS,
+        "batch_size": db.WAITLIST_BATCH_SIZE,
+    })
+
+
+@app.route("/api/admin/waitlist/approve-batch", methods=["POST"])
+def api_admin_approve_batch():
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    data = request.get_json(silent=True) or {}
+    count = data.get("count", db.WAITLIST_BATCH_SIZE)
+    approved = db.approve_waitlist_batch(count)
+    return jsonify({"success": True, "approved": approved, "remaining": db.get_waitlist_count()})
+
+
+@app.route("/api/admin/waitlist/approve/<int:uid>", methods=["POST"])
+def api_admin_approve_user(uid):
+    user = require_auth()
+    if not user or not db.is_admin(user["user_id"]):
+        return jsonify({"error": "Forbidden"}), 403
+    db.approve_user(uid)
+    return jsonify({"success": True})
+
+
 # === Likes ===
 
 @app.route("/api/cat/<int:db_cat_id>/like", methods=["POST"])
@@ -673,6 +725,9 @@ def api_admin_analytics():
     # Serialize top_users and recent_images
     stats["top_users"] = [dict(r) for r in stats["top_users"]]
     stats["recent_images"] = [dict(r) for r in stats["recent_images"]]
+    stats["waitlist_count"] = db.get_waitlist_count()
+    stats["active_users"] = db.get_active_user_count()
+    stats["max_active_users"] = db.MAX_ACTIVE_USERS
     return jsonify(stats)
 
 

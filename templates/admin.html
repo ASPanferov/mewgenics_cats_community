@@ -192,6 +192,7 @@
         <button onclick="switchTab('prompts',this)">Промпты</button>
         <button onclick="switchTab('analytics',this)">Аналитика</button>
         <button onclick="switchTab('feedback',this)">Фидбек <span id="fb-badge" style="background:#c03030;color:#fff;padding:1px 6px;border-radius:8px;font-size:11px;margin-left:4px;display:none">0</span></button>
+        <button onclick="switchTab('waitlist',this)">Waitlist <span id="wl-badge" style="background:#f0a040;color:#2a1a0e;padding:1px 6px;border-radius:8px;font-size:11px;margin-left:4px;display:none">0</span></button>
     </div>
 
     <!-- ========== PLAYGROUND TAB ========== -->
@@ -351,6 +352,19 @@
     <div class="tab-content" id="tab-feedback">
         <p style="color:#a09070;margin-bottom:16px">Сообщения от пользователей — баги и обратная связь</p>
         <div id="feedback-list"></div>
+    </div>
+
+    <div class="tab-content" id="tab-waitlist">
+        <div class="stats-grid" id="wl-stats"></div>
+        <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="tbtn tbtn-on" onclick="approveBatch(50)">Approve next 50</button>
+            <button class="tbtn tbtn-on" onclick="approveBatch(25)">Approve next 25</button>
+            <button class="tbtn tbtn-on" onclick="approveBatch(10)">Approve next 10</button>
+        </div>
+        <table id="wl-table">
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Registered</th><th>Action</th></tr></thead>
+            <tbody id="wl-body"></tbody>
+        </table>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -656,6 +670,8 @@
                     ['published_cats', 'В ленте'],
                     ['total_saves', 'Сейвов'],
                     ['total_likes', 'Лайков'],
+                    ['waitlist_count', 'В очереди'],
+                    ['active_users', 'Активных / ' + (d.max_active_users||100)],
                 ].map(([k, l]) => `<div class="stat-card"><span class="num">${d[k]||0}</span><span class="label">${l}</span></div>`).join('');
 
                 document.querySelector('#users-table tbody').innerHTML = (d.top_users||[]).map(u => `
@@ -754,8 +770,60 @@
 
         function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
+        // === Waitlist ===
+        async function loadWaitlist() {
+            try {
+                const r = await fetch('/api/admin/waitlist');
+                const d = await r.json();
+                const badge = document.getElementById('wl-badge');
+                if (d.count > 0) {
+                    badge.textContent = d.count;
+                    badge.style.display = 'inline';
+                }
+                document.getElementById('wl-stats').innerHTML = `
+                    <div class="stat-card"><span class="num">${d.active_users}</span><span class="label">Active / ${d.max_active} max</span></div>
+                    <div class="stat-card"><span class="num">${d.count}</span><span class="label">In Waitlist</span></div>
+                    <div class="stat-card"><span class="num">${d.batch_size}</span><span class="label">Batch Size</span></div>`;
+                const body = document.getElementById('wl-body');
+                if (!d.waitlist.length) {
+                    body.innerHTML = '<tr><td colspan="5" style="color:#706040;text-align:center;padding:20px">Waitlist is empty</td></tr>';
+                    return;
+                }
+                body.innerHTML = d.waitlist.map((u, i) => `<tr>
+                    <td>${i+1}</td>
+                    <td>${esc(u.name)}</td>
+                    <td style="font-size:12px">${esc(u.email)}</td>
+                    <td style="font-size:12px">${u.created_at ? new Date(u.created_at).toLocaleString('ru') : ''}</td>
+                    <td><button class="tbtn tbtn-on" style="font-size:11px;padding:2px 8px" onclick="approveOne(${u.id},this)">Approve</button></td>
+                </tr>`).join('');
+            } catch(e) { console.error(e); }
+        }
+
+        async function approveBatch(count) {
+            if (!confirm(`Approve next ${count} users from waitlist?`)) return;
+            try {
+                const r = await fetch('/api/admin/waitlist/approve-batch', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({count})});
+                const d = await r.json();
+                if (d.success) {
+                    showToast(`Approved ${d.approved} users. ${d.remaining} remaining.`);
+                    loadWaitlist();
+                    loadAnalytics();
+                }
+            } catch(e) { showToast('Error'); }
+        }
+
+        async function approveOne(uid, btn) {
+            btn.disabled = true; btn.textContent = '...';
+            try {
+                await fetch(`/api/admin/waitlist/approve/${uid}`, {method:'POST'});
+                btn.closest('tr').remove();
+                loadWaitlist();
+            } catch(e) { btn.disabled = false; btn.textContent = 'Approve'; }
+        }
+
         loadAnalytics();
         loadFeedback();
+        loadWaitlist();
     </script>
 </body>
 </html>

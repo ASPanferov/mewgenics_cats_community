@@ -9,6 +9,8 @@ _pool = None
 
 MAX_GENERATIONS = 5
 MAX_GENERATIONS_PREMIUM = 50
+MAX_ACTIVE_USERS = 100  # After this, new users go to waitlist
+WAITLIST_BATCH_SIZE = 50
 
 
 def get_conn():
@@ -134,6 +136,14 @@ def init_db():
     """)
     if not admin_cols:
         execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE")
+    # Migration: add waitlist_approved column to users
+    wl_cols = query("""
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'waitlist_approved'
+    """)
+    if not wl_cols:
+        execute("ALTER TABLE users ADD COLUMN waitlist_approved BOOLEAN DEFAULT TRUE")
+        # Existing users are approved by default; new ones after limit will be FALSE
     # Feedback table
     execute("""
         CREATE TABLE IF NOT EXISTS feedback (
@@ -154,16 +164,27 @@ def init_db():
 # === User operations ===
 
 def upsert_user(google_id, email, name, avatar_url):
-    row = query_one("""
-        INSERT INTO users (google_id, email, name, avatar_url)
-        VALUES (%s, %s, %s, %s)
-        ON CONFLICT (google_id) DO UPDATE SET
-            email = EXCLUDED.email,
-            name = EXCLUDED.name,
-            avatar_url = EXCLUDED.avatar_url
-        RETURNING *
-    """, (google_id, email, name, avatar_url))
-    return row
+    # Check if user already exists
+    existing = query_one("SELECT id FROM users WHERE google_id = %s", (google_id,))
+    if existing:
+        # Existing user — just update profile, keep waitlist status
+        row = query_one("""
+            UPDATE users SET email = %s, name = %s, avatar_url = %s
+            WHERE google_id = %s RETURNING *
+        """, (email, name, avatar_url, google_id))
+        return row
+    else:
+        # New user — check if should be waitlisted
+        approved = not should_waitlist_new_user()
+        # Admins/founders always approved
+        if email in ADMIN_EMAILS:
+            approved = True
+        row = query_one("""
+            INSERT INTO users (google_id, email, name, avatar_url, waitlist_approved)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING *
+        """, (google_id, email, name, avatar_url, approved))
+        return row
 
 
 def get_user(user_id):
@@ -324,6 +345,77 @@ def is_admin(user_id):
 
 def set_admin(user_id, is_admin_flag=True):
     execute("UPDATE users SET is_admin = %s WHERE id = %s", (is_admin_flag, user_id))
+
+
+# === Waitlist ===
+
+def get_active_user_count():
+    """Count users that are approved (not on waitlist)."""
+    row = query_one("SELECT COUNT(*) as cnt FROM users WHERE waitlist_approved = TRUE")
+    return row["cnt"] if row else 0
+
+
+def should_waitlist_new_user():
+    """Check if new users should be put on waitlist."""
+    return get_active_user_count() >= MAX_ACTIVE_USERS
+
+
+def is_user_approved(user_id):
+    """Check if user is approved (not on waitlist)."""
+    user = get_user(user_id)
+    if not user:
+        return False
+    return bool(user.get("waitlist_approved", True))
+
+
+def get_waitlist(limit=200):
+    """Get users on waitlist, ordered by registration date."""
+    return query("""
+        SELECT id, name, email, avatar_url, created_at
+        FROM users WHERE waitlist_approved = FALSE
+        ORDER BY created_at ASC LIMIT %s
+    """, (limit,))
+
+
+def get_waitlist_count():
+    row = query_one("SELECT COUNT(*) as cnt FROM users WHERE waitlist_approved = FALSE")
+    return row["cnt"] if row else 0
+
+
+def get_waitlist_position(user_id):
+    """Get user's position in waitlist (1-based), or 0 if approved."""
+    user = get_user(user_id)
+    if not user or user.get("waitlist_approved", True):
+        return 0
+    row = query_one("""
+        SELECT COUNT(*) as pos FROM users
+        WHERE waitlist_approved = FALSE AND created_at <= (
+            SELECT created_at FROM users WHERE id = %s
+        )
+    """, (user_id,))
+    return row["pos"] if row else 0
+
+
+def approve_waitlist_batch(count=None):
+    """Approve the next batch of waitlisted users. Returns count approved."""
+    if count is None:
+        count = WAITLIST_BATCH_SIZE
+    rows = query("""
+        UPDATE users SET waitlist_approved = TRUE
+        WHERE id IN (
+            SELECT id FROM users
+            WHERE waitlist_approved = FALSE
+            ORDER BY created_at ASC
+            LIMIT %s
+        )
+        RETURNING id
+    """, (count,))
+    return len(rows)
+
+
+def approve_user(user_id):
+    """Approve a single user from waitlist."""
+    execute("UPDATE users SET waitlist_approved = TRUE WHERE id = %s", (user_id,))
 
 
 # === Settings (key-value store for prompts etc.) ===

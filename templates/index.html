@@ -626,6 +626,11 @@
             win_full_path: {en: 'Full path:', ru: 'Полный путь:'},
             win_save_hint: {en: 'Inside, find the folder with your <b>Steam ID</b>, then <code>saves</code>. Files are named <b>steamcampaign01.sav</b>, <b>steamcampaign02.sav</b>, etc. — one per campaign (max 3).', ru: 'Внутри найдите папку с вашим <b>Steam ID</b>, затем <code>saves</code>. Файлы называются <b>steamcampaign01.sav</b>, <b>steamcampaign02.sav</b> и т.д. — по одному на каждый кампейн (максимум 3).'},
             hidden_folder_hint: {en: 'AppData is a hidden folder. If you don\'t see it, enable hidden files in Explorer, or just paste the %AppData% path into the address bar.', ru: 'AppData — скрытая папка. Если не видите её, включите показ скрытых файлов в проводнике, либо просто вставьте путь с %AppData% в адресную строку.'},
+            waitlist_title: {en: 'You\'re on the waitlist!', ru: 'Вы в очереди!'},
+            waitlist_desc: {en: 'We\'re gradually letting people in. Your position:', ru: 'Мы постепенно открываем доступ. Ваша позиция:'},
+            waitlist_of: {en: 'of', ru: 'из'},
+            waitlist_hint: {en: 'We\'ll notify you when access is granted. In the meantime, check out the public feed!', ru: 'Мы откроем вам доступ в ближайшее время. А пока — смотрите публичную ленту!'},
+            waitlist_badge: {en: 'Waitlist', ru: 'Очередь'},
         };
         function t(key) { return (T[key] && T[key][LANG]) || (T[key] && T[key]['en']) || key; }
 
@@ -688,20 +693,35 @@
             renderNav();
             if (PAGE === 'cabinet') {
                 if (!currentUser) renderLoginPage();
+                else if (currentUser.waitlist) renderWaitlistPage();
                 else await initCabinet();
             } else {
                 await loadFeed();
             }
         }
 
+        function renderWaitlistPage() {
+            document.getElementById('main-content').innerHTML = `<div class="page-center">
+                <h2>&#9203; ${t('waitlist_title')}</h2>
+                <p>${t('waitlist_desc')}</p>
+                <p style="font-size:48px;font-weight:800;color:#6b4830;margin:16px 0">#${currentUser.waitlist_position} <span style="font-size:20px;color:#8a7050">${t('waitlist_of')} ${currentUser.waitlist_total}</span></p>
+                <p style="color:#8a7050;font-size:14px;max-width:400px;margin:0 auto">${t('waitlist_hint')}</p>
+                <a href="/" class="btn-google" style="margin-top:20px">&#128049; ${t('feed')}</a>
+            </div>`;
+        }
+
         function renderAuthArea() {
             const a = document.getElementById('auth-area');
             if (currentUser) {
+                const wlBadge = currentUser.waitlist
+                    ? `<span class="gen-counter" style="color:#f0a040;border-color:#f0a040">#${currentUser.waitlist_position} ${t('waitlist_badge')}</span>`
+                    : '';
                 a.innerHTML = `<div class="user-info">
                     ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}">` : ''}
                     <span>${esc(currentUser.name)}</span>
                     ${currentUser.is_premium ? '<span class="premium-badge">PRO</span>' : ''}
-                    <span class="gen-counter">${currentUser.generations_count}/${currentUser.max_generations} ${t('generations')}</span>
+                    ${wlBadge}
+                    ${!currentUser.waitlist ? `<span class="gen-counter">${currentUser.generations_count}/${currentUser.max_generations} ${t('generations')}</span>` : ''}
                     <a href="/auth/logout" class="btn-logout">${t('logout')}</a>
                 </div>`;
             } else {
