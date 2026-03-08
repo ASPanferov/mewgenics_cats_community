@@ -1,6 +1,7 @@
 """Build image generation prompts from cat data in Edmund McMillen's Mewgenics style."""
 
 from cat_parser import (CatData, CLASS_RU, STAT_LABELS, STAT_LABELS_RU, PART_NAME_RU, PART_NAME_EN,
+                        STAT_FOCUS_RU, STAT_FOCUS_EN,
                         _BIRTH_DEFECT_FRAME_THRESHOLD, BIRTH_DEFECT_PASSIVES)
 from game_descriptions import game_desc
 
@@ -472,6 +473,23 @@ def build_prompt(cat: CatData) -> str:
     return ". ".join(parts)
 
 
+def _translate_focus(raw_focus: str, lang: str) -> str:
+    """Translate stat_focus raw key (e.g. 'str', 'poisoned') to display string."""
+    if not raw_focus:
+        return "none" if lang == 'en' else "нет"
+    focus_map = STAT_FOCUS_EN if lang == 'en' else STAT_FOCUS_RU
+    # raw_focus is either a raw key ('str', 'poisoned') or legacy Russian value
+    if raw_focus in focus_map:
+        return focus_map[raw_focus]
+    # Legacy: raw_focus might already be a Russian string from old DB data
+    # Reverse-lookup from Russian to get the key, then translate
+    reverse_ru = {v: k for k, v in STAT_FOCUS_RU.items()}
+    key = reverse_ru.get(raw_focus)
+    if key:
+        return focus_map.get(key, raw_focus)
+    return raw_focus
+
+
 def build_cat_summary(cat: CatData, lang: str = 'ru') -> dict:
     """Build a localized summary of cat data for the UI."""
     class_ru = CLASS_RU.get(cat.cat_class, cat.cat_class)
@@ -556,7 +574,7 @@ def build_cat_summary(cat: CatData, lang: str = 'ru') -> dict:
         "gender": gender_display,
         "gender_code": cat.gender_code,
         "voice": cat.voice or "",
-        "stat_focus": cat.stat_focus or ("none" if lang == 'en' else "нет"),
+        "stat_focus": _translate_focus(cat.stat_focus, lang),
         "status": cat.status,
         "is_dead": cat.is_dead,
         "is_retired": cat.is_retired,

@@ -137,6 +137,11 @@ STAT_FOCUS_RU = {
     "dex": "Ловкость", "cha": "Харизма", "con": "Выносливость", "none": "Нет",
     "burned": "Обожжённый", "poisoned": "Отравленный", "bleeding": "Кровотечение",
 }
+STAT_FOCUS_EN = {
+    "str": "Strength", "spd": "Speed", "lck": "Luck", "int": "Intelligence",
+    "dex": "Dexterity", "cha": "Charisma", "con": "Constitution", "none": "None",
+    "burned": "Burned", "poisoned": "Poisoned", "bleeding": "Bleeding",
+}
 
 BIRTH_DEFECT_PASSIVES = frozenset({
     'Dwarfism', 'Tourettes', 'Dyslexia', 'WobblyCat', 'SavantSyndrome',
@@ -467,7 +472,7 @@ def _classify_strings_saveeditor(cat: CatData, all_strings: list[tuple[int, str]
         # stat_type is at stat_type_idx
         st_str = all_strings[stat_type_idx][1]
         if st_str in STAT_TYPES:
-            cat.stat_focus = STAT_FOCUS_RU.get(st_str, st_str)
+            cat.stat_focus = st_str if st_str in STAT_TYPES else st_str
 
         # Abilities start right after stat_type (+gap) = stat_type_idx + 1
         # But there's a 14-byte gap with death marker, then DefaultMove
@@ -486,7 +491,7 @@ def _classify_strings_saveeditor(cat: CatData, all_strings: list[tuple[int, str]
         # stat_type at -16
         st_str = all_strings[-16][1]
         if st_str in STAT_TYPES:
-            cat.stat_focus = STAT_FOCUS_RU.get(st_str, st_str)
+            cat.stat_focus = st_str if st_str in STAT_TYPES else st_str
 
         ability_strings = [all_strings[i][1] for i in range(n - 15, n - 1)]
         _parse_ability_slots(cat, ability_strings)
@@ -648,7 +653,7 @@ def parse_cat_blob(cat_id: int, blob: bytes) -> CatData:
     if stat_type_idx is not None:
         st_str = all_strings[stat_type_idx][1]
         if st_str in STAT_TYPES:
-            cat.stat_focus = STAT_FOCUS_RU.get(st_str, st_str)
+            cat.stat_focus = st_str if st_str in STAT_TYPES else st_str
 
     # Voice from voice_idx
     if voice_idx is None:
