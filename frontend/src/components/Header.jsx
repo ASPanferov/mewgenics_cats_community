@@ -12,6 +12,16 @@ export default function Header() {
       <div className="header-brand">
         <span className="header-logo">&#128049;</span>
         <h1>MEWGENICS</h1>
+        <a
+          href="https://t.me/DukeofFlies"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="header-community"
+        >
+          {lang === 'ru'
+            ? 'Самое крупное русскоязычное сообщество любителей Mewgenics.'
+            : 'The largest Russian-speaking Mewgenics community.'}
+        </a>
       </div>
       <div className="header-right">
         <div className="lang-switch">
