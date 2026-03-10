@@ -369,9 +369,22 @@
 
     <div class="toast" id="toast"></div>
 
+    <div id="fullscreen-overlay" onclick="closeFullscreen()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);z-index:9999;justify-content:center;align-items:center;cursor:pointer">
+        <img id="fullscreen-img" src="" style="max-width:92%;max-height:92%;object-fit:contain;border-radius:6px;border:3px solid #5c4428">
+    </div>
+
     <script>
         let defaultPrompts = {};
         let pgState = { catId: null, catName: '', catClass: '' };
+
+        function openFullscreen(url) {
+            const ov = document.getElementById('fullscreen-overlay');
+            document.getElementById('fullscreen-img').src = url;
+            ov.style.display = 'flex';
+        }
+        function closeFullscreen() {
+            document.getElementById('fullscreen-overlay').style.display = 'none';
+        }
 
         function switchTab(name, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -687,7 +700,7 @@
                     <tr>
                         <td>${c.id}</td><td>${esc(c.name||'')}</td>
                         <td>${esc(c.owner_name||'')} (${esc(c.owner_email||'')})</td>
-                        <td>${c.image_url?`<img src="${c.image_url}" style="height:40px;border-radius:4px">`:'-'}</td>
+                        <td>${c.image_url?`<img src="${c.image_url}" style="height:60px;border-radius:4px;cursor:pointer;transition:transform .15s" onclick="openFullscreen('${c.image_url}')" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">`:'—'}</td>
                     </tr>`).join('');
             } catch(e) {}
         }
