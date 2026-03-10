@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLang } from '../context/LangContext';
 import { useAuth } from '../hooks/useAuth';
-import TagWithIcon from '../components/TagWithIcon';
+import SkillCard from '../components/SkillCard';
 
 const FEED_PAGE_SIZE = 20;
 
 export default function FeedPage() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const { user } = useAuth();
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -104,7 +104,7 @@ export default function FeedPage() {
     if (cat.is_retired) parts.push(t('filter_retired'));
     if (!parts.length) return null;
     return (
-      <div style={{ fontSize: 12, color: '#6a5830', marginBottom: 4 }}>
+      <div style={{ fontSize: 12, color: '#7a756c', marginBottom: 4 }}>
         {parts.join(' \u00b7 ')}
       </div>
     );
@@ -116,7 +116,7 @@ export default function FeedPage() {
         <div className="empty-feed">
           <p style={{ fontSize: 48 }}>&#128049;</p>
           <p>{t('empty_feed')}</p>
-          <p style={{ fontSize: 13, color: '#a08060' }}>{t('empty_feed_hint')}</p>
+          <p style={{ fontSize: 13, color: '#a8a49c' }}>{t('empty_feed_hint')}</p>
         </div>
       </div>
     );
@@ -143,31 +143,21 @@ export default function FeedPage() {
                 {c.owner_name}
               </div>
               {renderDetails(c)}
-              <div className="feed-tags">
+              <div className="feed-skills">
                 {(c.abilities_rich || c.abilities || []).map((a, j) => {
                   const nm = typeof a === 'object' ? a.name : a;
                   const ds = typeof a === 'object' ? a.desc : '';
+                  const key = typeof a === 'object' ? (a.key || a.name) : a;
                   return (
-                    <TagWithIcon
-                      key={`ab-${j}`}
-                      name={nm}
-                      desc={ds}
-                      type="ability"
-                      iconName={typeof a === 'object' ? (a.key || a.name) : a}
-                    />
+                    <SkillCard key={`ab-${j}`} name={nm} desc={ds} iconKey={key} type="ability" lang={lang} compact />
                   );
                 })}
                 {(c.passives_rich || c.passives || []).map((p, j) => {
                   const nm = typeof p === 'object' ? p.name : p;
                   const ds = typeof p === 'object' ? p.desc : '';
+                  const key = typeof p === 'object' ? (p.key || p.name) : p;
                   return (
-                    <TagWithIcon
-                      key={`ps-${j}`}
-                      name={nm}
-                      desc={ds}
-                      type="passive"
-                      iconName={typeof p === 'object' ? (p.key || p.name) : p}
-                    />
+                    <SkillCard key={`ps-${j}`} name={nm} desc={ds} iconKey={key} type="passive" lang={lang} compact />
                   );
                 })}
               </div>

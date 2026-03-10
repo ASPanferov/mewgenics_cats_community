@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLang } from '../context/LangContext';
 import { useAuth } from '../hooks/useAuth';
-import CatCard from '../components/CatCard';
+import GameCatCard from '../redesign/GameCatCard';
 import UploadBox from '../components/UploadBox';
 
 const CATS_PER_PAGE = 25;
@@ -12,7 +12,7 @@ const CAT_CLASSES = [
 ];
 
 export default function CabinetPage() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const { user, loading: authLoading, refetch } = useAuth();
 
   const [saveInfo, setSaveInfo] = useState(null);
@@ -191,13 +191,13 @@ export default function CabinetPage() {
       <div className="page-center">
         <h2>&#9203; {t('waitlist_title')}</h2>
         <p>{t('waitlist_desc')}</p>
-        <p style={{ fontSize: 48, fontWeight: 800, color: '#6b4830', margin: '16px 0' }}>
+        <p style={{ fontSize: 48, fontWeight: 800, color: '#28241e', margin: '16px 0' }}>
           #{user.waitlist_position}{' '}
-          <span style={{ fontSize: 20, color: '#8a7050' }}>
+          <span style={{ fontSize: 20, color: '#7a756c' }}>
             {t('waitlist_of')} {user.waitlist_total}
           </span>
         </p>
-        <p style={{ color: '#8a7050', fontSize: 14, maxWidth: 400, margin: '0 auto' }}>
+        <p style={{ color: '#7a756c', fontSize: 14, maxWidth: 400, margin: '0 auto' }}>
           {t('waitlist_hint')}
         </p>
         <a href="/" className="btn-google" style={{ marginTop: 20 }}>
@@ -311,11 +311,12 @@ export default function CabinetPage() {
       </div>
 
       {/* Cat grid */}
-      <div className="cat-grid">
+      <div className="game-cat-grid">
         {pageCats.map(cat => (
-          <CatCard
+          <GameCatCard
             key={cat.db_id}
             cat={cat}
+            lang={lang}
             canGenerate={canGen}
             onGenerate={handleCatGenerate}
             onPublish={handleCatPublish}

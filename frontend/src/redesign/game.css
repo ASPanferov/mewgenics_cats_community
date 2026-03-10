@@ -1,0 +1,546 @@
+/* ====================================
+   MEWGENICS GAME UI — Faithful Style
+   Gray paper, hand-drawn borders,
+   TV-frame skill cards
+   ==================================== */
+
+/* === PAGE BACKGROUND — gray paper like the game === */
+.game-page {
+  min-height: 100vh;
+  background: #b8b4aa;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+  padding: 0;
+  font-family: 'Nunito', -apple-system, sans-serif;
+  color: #2a2420;
+}
+
+/* === PANEL — paper panel with dark hand-drawn border === */
+.game-panel {
+  background: #d4d0c8;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  border: 3px solid #2a2420;
+  border-radius: 2px;
+  position: relative;
+  box-shadow:
+    4px 4px 0 rgba(0,0,0,0.12),
+    inset 0 0 20px rgba(0,0,0,0.04);
+}
+
+/* === BANNER HEADER — scroll/ribbon like "Equipped" in game === */
+.panel-banner {
+  background: #e8e4dc;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  border: 3px solid #2a2420;
+  border-radius: 2px;
+  padding: 5px 28px;
+  text-align: center;
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #2a2420;
+  letter-spacing: 1px;
+  width: fit-content;
+  min-width: 140px;
+  margin: 0 auto;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 5;
+}
+
+/* === SKILL CARD — TV/monitor frame from game === */
+.skill-card {
+  position: relative;
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The TV frame body */
+.skill-card-frame {
+  position: relative;
+  width: 84px;
+  height: 78px;
+  background: #8a3a3a;
+  border: 2px solid #2a2420;
+  border-radius: 4px;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+  padding: 5px;
+}
+
+/* Different colors per type */
+.skill-card.ability .skill-card-frame { background: #8a3a3a; }
+.skill-card.passive .skill-card-frame { background: #3a6a4a; }
+.skill-card.item .skill-card-frame { background: #7a6a30; }
+.skill-card.mutation .skill-card-frame { background: #5a3a7a; }
+.skill-card.defect .skill-card-frame { background: #5a2020; }
+
+/* TV "ears" / antenna tabs on top — removed */
+
+/* The screen inside the TV — fills the frame completely */
+.skill-card-screen {
+  flex: 1;
+  background: #c8c0b0;
+  border: 2px solid #2a2420;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Icons fill the screen */
+.skill-card-screen img,
+.skill-card-screen svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.15));
+}
+
+/* Abilities — larger card */
+.skill-card.ability {
+  width: 100px;
+}
+.skill-card.ability .skill-card-frame {
+  width: 94px;
+  height: 88px;
+}
+
+/* Items — same size as abilities, edge-to-edge icon */
+.skill-card.item {
+  width: 100px;
+}
+.skill-card.item .skill-card-frame {
+  width: 94px;
+  height: 88px;
+  padding: 3px;
+}
+
+/* Mutations & defects — same as abilities */
+.skill-card.mutation,
+.skill-card.defect {
+  width: 100px;
+}
+.skill-card.mutation .skill-card-frame,
+.skill-card.defect .skill-card-frame {
+  width: 94px;
+  height: 88px;
+  padding: 3px;
+}
+
+/* Passives — rectangular card, icon edge-to-edge */
+.skill-card.passive {
+  width: 110px;
+}
+.skill-card.passive .skill-card-frame {
+  width: 104px;
+  height: 68px;
+  padding: 2px;
+}
+.skill-card.passive .skill-card-screen {
+  border: none;
+  border-radius: 1px;
+}
+.skill-card.passive .skill-card-screen img,
+.skill-card.passive .skill-card-screen svg {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.skill-card-screen .icon-fallback,
+.skill-card-screen .ability-icon-fallback {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  opacity: 0.3;
+}
+
+/* Bottom tabs with stats (like damage numbers in game) */
+.skill-card-tabs {
+  display: flex;
+  gap: 2px;
+  margin-top: -2px;
+  position: relative;
+  z-index: 2;
+}
+
+.skill-card-tab {
+  background: #8a3a3a;
+  border: 2px solid #2a2420;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  padding: 1px 5px 3px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #e8e0d0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 24px;
+  justify-content: center;
+}
+
+.skill-card.ability .skill-card-tab { background: #8a3a3a; }
+.skill-card.passive .skill-card-tab { background: #3a6a4a; }
+.skill-card.item .skill-card-tab { background: #7a6a30; }
+.skill-card.mutation .skill-card-tab { background: #5a3a7a; }
+.skill-card.defect .skill-card-tab { background: #5a2020; }
+
+.skill-card-tab .tab-icon {
+  font-size: 9px;
+}
+
+/* Card name below */
+.skill-card-name {
+  font-size: 9px;
+  font-weight: 700;
+  color: #2a2420;
+  text-align: center;
+  line-height: 1.1;
+  margin-top: 3px;
+  max-width: 88px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* === TOOLTIP — game style paper tooltip === */
+.skill-card .skill-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e8e4dc;
+  border: 3px solid #2a2420;
+  border-radius: 2px;
+  padding: 10px 12px;
+  min-width: 180px;
+  max-width: 260px;
+  z-index: 100;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.12);
+  pointer-events: none;
+}
+.skill-card:hover .skill-tooltip {
+  display: block;
+}
+.skill-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #2a2420;
+}
+
+.skill-tooltip-title {
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #2a2420;
+  border-bottom: 2px solid #b0a898;
+  padding-bottom: 4px;
+  margin-bottom: 5px;
+}
+
+.skill-tooltip-desc {
+  font-size: 12px;
+  color: #4a4038;
+  line-height: 1.4;
+}
+
+.skill-tooltip-type {
+  font-size: 10px;
+  color: #8a8070;
+  text-transform: uppercase;
+  margin-top: 5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* === SKILL GRID (inventory-like) === */
+.skill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  justify-content: flex-start;
+}
+
+/* === SECTION DIVIDER === */
+.section-divider {
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #5a5048;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 12px 4px;
+  border-bottom: 2px solid #a8a098;
+}
+
+/* === CAT PORTRAIT === */
+.portrait-area {
+  position: relative;
+  padding: 16px;
+  background: #c0bab0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 220px;
+}
+
+/* Shadow under cat like in game */
+.portrait-area::after {
+  content: '';
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 20px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.2) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.cat-portrait-img {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 3px;
+  border: 3px solid #2a2420;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  background: #b0aaa0;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.15s;
+}
+.cat-portrait-img:hover { transform: scale(1.02); }
+
+.no-portrait-game {
+  width: 220px;
+  height: 165px;
+  border: 3px dashed #8a8478;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: #a09890;
+  background: #c8c0b8;
+}
+
+/* === NAME BANNER === */
+.cat-name-banner {
+  background: #e8e4dc;
+  border: 3px solid #2a2420;
+  border-top: none;
+  padding: 6px 16px;
+  text-align: center;
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #2a2420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cat-name-banner .gender-icon { font-size: 16px; }
+
+/* === STATS PANEL — like game's left stat column === */
+.stats-panel {
+  padding: 10px;
+  background: #ccc8be;
+}
+
+.stat-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 2px;
+}
+.stat-row:hover { background: rgba(0,0,0,0.04); }
+
+.stat-row-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  border: 2px solid #2a2420;
+}
+.stat-row-icon.str { background: #c03030; }
+.stat-row-icon.dex { background: #2a8a2a; }
+.stat-row-icon.con { background: #d07020; }
+.stat-row-icon.int { background: #4070c0; }
+.stat-row-icon.spd { background: #50a0d0; }
+.stat-row-icon.cha { background: #c050a0; }
+.stat-row-icon.lck { background: #b89828; }
+
+.stat-row-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: #2a2420;
+  min-width: 24px;
+}
+.stat-row-val.hurt { color: #c03030; }
+.stat-row-val.buff { color: #2a8a2a; }
+
+.stat-row-mod {
+  font-size: 10px;
+  color: #7a7068;
+  margin-left: auto;
+}
+
+/* === BADGES === */
+.badges-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border-bottom: 2px solid #a8a098;
+}
+
+.game-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-weight: 800;
+  border: 2px solid #2a2420;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.game-badge.class-badge { color: #fff; }
+.game-badge.dead { background: #8a2020; color: #fff; }
+.game-badge.injured { background: #d87030; color: #fff; }
+.game-badge.retired { background: #6a5838; color: #fff; }
+.game-badge.donated { background: #4a6a8a; color: #fff; }
+.game-badge.published { background: #4a8848; color: #fff; }
+
+.game-badge.c-Fighter { background: #c03030; }
+.game-badge.c-Tank { background: #d07020; }
+.game-badge.c-Hunter { background: #308850; }
+.game-badge.c-Mage { background: #8858b0; }
+.game-badge.c-Medic { background: #a09880; }
+.game-badge.c-Necromancer { background: #2a2a2a; }
+.game-badge.c-Druid { background: #4a6a2a; }
+.game-badge.c-Thief { background: #b8a840; color: #2a2420; }
+.game-badge.c-Tinkerer { background: #58a030; }
+.game-badge.c-Colorless { background: #908070; }
+.game-badge.c-Monk { background: #b89828; }
+.game-badge.c-Psychic { background: #9038b0; }
+.game-badge.c-Jester { background: linear-gradient(90deg,#c03030,#3858a8,#308850); }
+.game-badge.c-Butcher { background: #701818; }
+
+/* === INFO ROW === */
+.info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #5a5048;
+  border-bottom: 2px solid #a8a098;
+}
+.info-item { display: flex; align-items: center; gap: 3px; }
+.info-item .info-label { color: #8a8078; font-weight: 600; }
+.info-item .info-val { color: #2a2420; font-weight: 700; }
+
+/* === ACTION BUTTONS === */
+.game-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+}
+
+.game-btn {
+  flex: 1;
+  padding: 7px 14px;
+  border: 3px solid #2a2420;
+  border-radius: 2px;
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+  transition: all 0.1s;
+}
+.game-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+}
+.game-btn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+}
+.game-btn.primary { background: #5a4030; color: #e8dcc0; }
+.game-btn.primary:hover { background: #6a5040; }
+.game-btn.primary:disabled { background: #908880; color: #b0a8a0; cursor: not-allowed; transform: none; }
+.game-btn.success { background: #3a7a3a; color: #fff; }
+.game-btn.success:hover { background: #4a8a4a; }
+.game-btn.muted { background: #b0a898; color: #4a4038; }
+.game-btn.muted:hover { background: #c0b8a8; }
+
+/* === GRID === */
+.game-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+/* === COMPACT CARD === */
+.game-card-compact {
+  display: flex;
+  flex-direction: column;
+}
+.game-card-compact .portrait-area { min-height: 200px; padding: 12px; }
+.game-card-compact .cat-portrait-img { max-width: 240px; }
+
+/* === COMPACT SKILL CARDS (feed) === */
+.skill-card.compact { width: 72px; }
+.skill-card.compact .skill-card-frame { width: 66px; height: 62px; padding: 4px; }
+.skill-card.compact .skill-card-name { font-size: 8px; max-width: 70px; }
+
+.skill-card.compact.passive { width: 82px; }
+.skill-card.compact.passive .skill-card-frame { width: 76px; height: 52px; padding: 2px; }
+
+/* === RESPONSIVE === */
+@media (max-width: 800px) {
+  .game-cat-grid { grid-template-columns: 1fr; padding: 12px; }
+}
+@media (max-width: 500px) {
+  .skill-card { width: 80px; }
+  .skill-card-frame { width: 74px; height: 68px; }
+  .skill-card-screen { width: 52px; height: 46px; }
+  .skill-card-screen img, .skill-card-screen svg { width: 36px; height: 36px; }
+  .skill-card.compact { width: 64px; }
+  .skill-card.compact .skill-card-frame { width: 58px; height: 54px; }
+}

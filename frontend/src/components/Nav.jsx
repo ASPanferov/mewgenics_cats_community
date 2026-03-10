@@ -30,9 +30,9 @@ export default function Nav() {
           className="admin-link"
           style={{
             marginLeft: 'auto',
-            color: '#f0d878',
-            background: 'rgba(0,0,0,0.2)',
-            borderRadius: 4,
+            color: '#c4888a',
+            background: 'rgba(0,0,0,0.06)',
+            borderRadius: 2,
           }}
         >
           {t('admin')}

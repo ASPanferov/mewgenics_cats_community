@@ -69,28 +69,29 @@ export default function UploadBox({ onSuccess }) {
           maxWidth: 520,
           margin: '20px auto 0',
           textAlign: 'left',
-          background: '#e8dcc0',
-          border: '2px solid #8a6e48',
-          borderRadius: 8,
+          background: '#d2cec6',
+          border: '3px solid #28241e',
+          borderRadius: 2,
           padding: '16px 20px',
           fontSize: 13,
-          color: '#5c3d2e',
+          color: '#4a463e',
           lineHeight: 1.6,
         }}
       >
-        <h3 style={{ fontSize: 18, fontWeight: 700, color: '#3a2e1e', marginBottom: 8 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: '#28241e', marginBottom: 8, fontFamily: "'EdmundMcMillen', 'Nunito', sans-serif" }}>
           &#128269; {t('where_save')}
         </h3>
         <p><b>Windows:</b> {t('win_path_hint')}</p>
         <code
           style={{
             display: 'block',
-            background: '#d8cca8',
+            background: '#e4e0d8',
             padding: '8px 12px',
-            borderRadius: 4,
+            borderRadius: 2,
             margin: '6px 0',
             wordBreak: 'break-all',
             fontSize: 12,
+            border: '1px solid #a8a49c',
           }}
         >
           %AppData%\Glaiel Games\Mewgenics
@@ -109,17 +110,18 @@ export default function UploadBox({ onSuccess }) {
         <code
           style={{
             display: 'block',
-            background: '#d8cca8',
+            background: '#e4e0d8',
             padding: '8px 12px',
-            borderRadius: 4,
+            borderRadius: 2,
             margin: '6px 0',
             wordBreak: 'break-all',
             fontSize: 12,
+            border: '1px solid #a8a49c',
           }}
         >
           ~/.local/share/Glaiel Games/Mewgenics/
         </code>
-        <p style={{ marginTop: 8, fontSize: 11, color: '#8a7050' }}>
+        <p style={{ marginTop: 8, fontSize: 11, color: '#7a756c' }}>
           &#9888; {t('hidden_folder_hint')}
         </p>
       </div>
