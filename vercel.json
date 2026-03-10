@@ -1,23 +1,17 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 30,
+      "memory": 1024
     }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.py" },
-    { "src": "/auth/(.*)", "dest": "/api/index.py" },
-    { "src": "/img/(.*)", "dest": "/api/index.py" },
-    { "src": "/admin(.*)", "dest": "/api/index.py" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.py" },
+    { "source": "/auth/(.*)", "destination": "/api/index.py" },
+    { "source": "/img/(.*)", "destination": "/api/index.py" },
+    { "source": "/admin(.*)", "destination": "/api/index.py" },
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]
 }
