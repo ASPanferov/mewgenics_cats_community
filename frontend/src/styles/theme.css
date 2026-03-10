@@ -1,0 +1,44 @@
+/* Mewgenics Cat Community — CSS Variables */
+
+:root {
+  --bg: #c8b898;
+  --card-bg: #e8dbb8;
+  --stat-bg: #f5edd5;
+  --dark-brown: #3a1e0e;
+  --mid-brown: #6b4830;
+  --brown: #5c4428;
+  --text: #2a1a0e;
+  --gold: #f0d878;
+  --border: #5c4428;
+
+  --class-fighter: #c03030;
+  --class-tank: #d07020;
+  --class-hunter: #308850;
+  --class-mage: #8858b0;
+  --class-medic: #a09880;
+  --class-necromancer: #2a2a2a;
+  --class-druid: #4a6a2a;
+  --class-thief: #b8a840;
+  --class-tinkerer: #58a030;
+  --class-colorless: #908070;
+  --class-monk: #b89828;
+  --class-psychic: #9038b0;
+  --class-butcher: #701818;
+
+  --tag-ability: #c83030;
+  --tag-passive: #2a7a50;
+  --tag-item: #b89828;
+  --tag-mutation: #7838a0;
+  --tag-defect: #581818;
+}
+
+/* Custom cursor */
+body {
+  cursor: url('/assets/textures/default.png'), auto;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #b8a888; }
+::-webkit-scrollbar-thumb { background: #8a7058; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #5c4428; }

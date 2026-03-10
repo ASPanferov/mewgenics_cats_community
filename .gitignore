@@ -6,3 +6,6 @@ __pycache__/
 static/generated/
 MewgenicsSaveEditor-v3.0.1/
 MewgenicsSaveEditor-v3.0.1*.zip
+.vercel
+node_modules/
+dist/

@@ -1,0 +1,65 @@
+/* Mewgenics game fonts */
+
+@font-face {
+  font-family: 'EdmundMcMillen';
+  src: url('/assets/fonts/6_Edmundm_EdmundMcMillen_INTLv4 Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MewgenicsFrank';
+  src: url('/assets/fonts/4_NPCFont_Frank_Mewgenics Frank.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MewgenicsJack';
+  src: url('/assets/fonts/5_NPCFont_BabyJack_Mewgenics Jack.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MewgenicsOrganGrinder';
+  src: url('/assets/fonts/2_NPCFont_OrganGrinder_Mewgenics Organ Grinder.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peralta';
+  src: url('/assets/fonts/7_Peralta_Peralta.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TheEnd';
+  src: url('/assets/fonts/3_NPCFont_Steven_TheEnd Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TikaFont';
+  src: url('/assets/fonts/1_TikaFont_TikaFont Adjusted Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TikaSwank';
+  src: url('/assets/fonts/8_Swanky_TikaSwank Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
