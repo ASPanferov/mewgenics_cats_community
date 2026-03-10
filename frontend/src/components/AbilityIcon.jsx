@@ -10,33 +10,30 @@ function getIconId(name) {
   if (byName) {
     const id = byName[key] || byName[name];
     if (id) { nameToIdCache[key] = id; return id; }
-  }
-  const byId = iconMap.byId;
-  if (byId) {
-    for (const [id, n] of Object.entries(byId)) {
-      if (n.toLowerCase() === key) {
-        nameToIdCache[key] = id;
-        return id;
-      }
+    // Fallback: strip trailing digits (e.g. "Catbot2" -> "catbot")
+    const stripped = key.replace(/\d+$/, '');
+    if (stripped !== key && byName[stripped]) {
+      nameToIdCache[key] = byName[stripped];
+      return byName[stripped];
     }
   }
   nameToIdCache[key] = null;
   return null;
 }
 
-export default function AbilityIcon({ name, type }) {
+export default function AbilityIcon({ name, type, size = 16 }) {
   const [errored, setErrored] = useState(false);
   const iconId = getIconId(name);
 
   if (!iconId || errored) {
-    const color = type === 'ability' ? '#c83030' : '#2a7a50';
+    const color = type === 'ability' ? '#c83030' : type === 'passive' ? '#2a7a50' : type === 'item' ? '#b89828' : type === 'mutation' ? '#7838a0' : '#8a7050';
     return (
       <span
         className="ability-icon-fallback"
         style={{
           display: 'inline-block',
-          width: 16,
-          height: 16,
+          width: size,
+          height: size,
           borderRadius: '50%',
           background: color,
           opacity: 0.5,
@@ -47,25 +44,12 @@ export default function AbilityIcon({ name, type }) {
     );
   }
 
-  if (type === 'passive') {
-    return (
-      <img
-        src={`/assets/icons/passives/${iconId}.png`}
-        alt={name}
-        width={16}
-        height={16}
-        style={{ verticalAlign: 'middle', flexShrink: 0 }}
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-
   return (
     <img
       src={`/assets/icons/abilities/${iconId}.svg`}
       alt={name}
-      width={16}
-      height={16}
+      width={size}
+      height={size}
       style={{ verticalAlign: 'middle', flexShrink: 0 }}
       onError={() => setErrored(true)}
     />
