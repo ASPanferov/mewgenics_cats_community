@@ -13,14 +13,19 @@ export default function Header() {
         <span className="header-logo">&#128049;</span>
         <h1>MEWGENICS</h1>
         <a
-          href="https://t.me/DukeofFlies"
+          href="https://t.me/mewgenicsru"
           target="_blank"
           rel="noopener noreferrer"
           className="header-community"
         >
-          {lang === 'ru'
-            ? 'Самое крупное русскоязычное сообщество любителей Mewgenics.'
-            : 'The largest Russian-speaking Mewgenics community.'}
+          <span className="header-community-text">
+            {lang === 'ru'
+              ? 'Самое крупное русскоязычное сообщество любителей Mewgenics.'
+              : 'The largest Russian-speaking Mewgenics community.'}
+          </span>
+          <span className="header-community-btn">
+            Telegram &rarr;
+          </span>
         </a>
       </div>
       <div className="header-right">
