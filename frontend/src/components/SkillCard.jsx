@@ -1,4 +1,5 @@
 import AbilityIcon from './AbilityIcon';
+import classMap from '../data/classMap.json';
 
 const TYPE_LABELS_RU = {
   ability: 'Атака',
@@ -16,11 +17,18 @@ const TYPE_LABELS_EN = {
   defect: 'Defect',
 };
 
+function getSkillClass(iconKey, name) {
+  const key = (iconKey || name || '').toLowerCase();
+  return classMap[key] || null;
+}
+
 export default function SkillCard({ name, desc, iconKey, type, lang = 'ru', compact = false }) {
   const labels = lang === 'ru' ? TYPE_LABELS_RU : TYPE_LABELS_EN;
+  const skillClass = (type === 'ability' || type === 'passive') ? getSkillClass(iconKey, name) : null;
+  const classCss = skillClass ? ` sc-${skillClass}` : '';
 
   return (
-    <div className={`skill-card ${type}${compact ? ' compact' : ''}`}>
+    <div className={`skill-card ${type}${compact ? ' compact' : ''}${classCss}`}>
       <div className="skill-card-frame">
         <div className="skill-card-screen">
           <AbilityIcon name={iconKey || name} type={type === 'defect' ? 'ability' : type} size={compact ? 32 : 44} />

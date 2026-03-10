@@ -74,12 +74,27 @@
   padding: 5px;
 }
 
-/* Different colors per type */
+/* Default colors per type (neutral/colorless) */
 .skill-card.ability .skill-card-frame { background: #8a3a3a; }
 .skill-card.passive .skill-card-frame { background: #3a6a4a; }
 .skill-card.item .skill-card-frame { background: #7a6a30; }
 .skill-card.mutation .skill-card-frame { background: #5a3a7a; }
 .skill-card.defect .skill-card-frame { background: #5a2020; }
+
+/* Class-colored frames — overrides type color */
+.skill-card.sc-Fighter .skill-card-frame { background: #c03030; }
+.skill-card.sc-Tank .skill-card-frame { background: #d07020; }
+.skill-card.sc-Hunter .skill-card-frame { background: #308850; }
+.skill-card.sc-Mage .skill-card-frame { background: #7050a0; }
+.skill-card.sc-Medic .skill-card-frame { background: #8a8070; }
+.skill-card.sc-Thief .skill-card-frame { background: #b8a840; }
+.skill-card.sc-Necromancer .skill-card-frame { background: #2a2a2a; }
+.skill-card.sc-Druid .skill-card-frame { background: #5a4a30; }
+.skill-card.sc-Tinkerer .skill-card-frame { background: #58a030; }
+.skill-card.sc-Monk .skill-card-frame { background: #888078; }
+.skill-card.sc-Butcher .skill-card-frame { background: #701818; }
+.skill-card.sc-Psychic .skill-card-frame { background: #9038b0; }
+.skill-card.sc-Jester .skill-card-frame { background: linear-gradient(135deg, #c03030, #3858a8, #308850); }
 
 /* TV "ears" / antenna tabs on top — removed */
 
@@ -192,6 +207,21 @@
 .skill-card.passive .skill-card-tab { background: #3a6a4a; }
 .skill-card.item .skill-card-tab { background: #7a6a30; }
 .skill-card.mutation .skill-card-tab { background: #5a3a7a; }
+
+/* Class-colored tabs */
+.skill-card.sc-Fighter .skill-card-tab { background: #c03030; }
+.skill-card.sc-Tank .skill-card-tab { background: #d07020; }
+.skill-card.sc-Hunter .skill-card-tab { background: #308850; }
+.skill-card.sc-Mage .skill-card-tab { background: #7050a0; }
+.skill-card.sc-Medic .skill-card-tab { background: #8a8070; }
+.skill-card.sc-Thief .skill-card-tab { background: #b8a840; }
+.skill-card.sc-Necromancer .skill-card-tab { background: #2a2a2a; }
+.skill-card.sc-Druid .skill-card-tab { background: #5a4a30; }
+.skill-card.sc-Tinkerer .skill-card-tab { background: #58a030; }
+.skill-card.sc-Monk .skill-card-tab { background: #888078; }
+.skill-card.sc-Butcher .skill-card-tab { background: #701818; }
+.skill-card.sc-Psychic .skill-card-tab { background: #9038b0; }
+.skill-card.sc-Jester .skill-card-tab { background: linear-gradient(135deg, #c03030, #3858a8, #308850); }
 .skill-card.defect .skill-card-tab { background: #5a2020; }
 
 .skill-card-tab .tab-icon {
