@@ -1,6 +1,16 @@
 /* === RESET & BASE — Grey paper notebook style === */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+*, *::before, *::after {
+  cursor: url('/assets/cursors/default.png'), auto;
+}
+a, button, [role="button"], input[type="submit"], input[type="button"],
+select, label[class*="btn"], .like-btn, .share-btn, .lang-switch button,
+.pagination button, .skill-card, .cat-portrait, .cat-portrait-img,
+.feed-img, .upload-box, .header-community {
+  cursor: url('/assets/cursors/btn_over.png') 10 4, pointer;
+}
+
 body {
   background: #bab6ae;
   background-image:
