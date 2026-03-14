@@ -68,10 +68,10 @@
   border: 2px solid #2a2420;
   border-radius: 4px;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
+  align-items: center;
+  justify-content: center;
   box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
-  padding: 5px;
+  padding: 4px;
 }
 
 /* Default colors per type (neutral/colorless) */
@@ -100,7 +100,8 @@
 
 /* The screen inside the TV — fills the frame completely */
 .skill-card-screen {
-  flex: 1;
+  width: 100%;
+  height: 100%;
   background: #c8c0b0;
   border: 2px solid #2a2420;
   border-radius: 2px;
@@ -110,72 +111,65 @@
   overflow: hidden;
 }
 
-/* Icons fill the screen */
+/* Icons fill the screen — contain to preserve proportions */
 .skill-card-screen img,
 .skill-card-screen svg {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.15));
 }
 
-/* Abilities — larger card */
+/* Abilities — square-ish card for attack icons (~63x58) */
 .skill-card.ability {
-  width: 100px;
+  width: 90px;
 }
 .skill-card.ability .skill-card-frame {
-  width: 94px;
-  height: 88px;
+  width: 84px;
+  height: 78px;
+  padding: 6px;
 }
 
-/* Items — same size as abilities, edge-to-edge icon */
+/* Items — same as abilities */
 .skill-card.item {
-  width: 100px;
+  width: 90px;
 }
 .skill-card.item .skill-card-frame {
-  width: 94px;
-  height: 88px;
-  padding: 3px;
+  width: 84px;
+  height: 78px;
+  padding: 6px;
 }
 
 /* Mutations & defects — same as abilities */
 .skill-card.mutation,
 .skill-card.defect {
-  width: 100px;
+  width: 90px;
 }
 .skill-card.mutation .skill-card-frame,
 .skill-card.defect .skill-card-frame {
-  width: 94px;
-  height: 88px;
-  padding: 3px;
+  width: 84px;
+  height: 78px;
+  padding: 6px;
 }
 
-/* Passives — rectangular card, icon edge-to-edge */
+/* Passives — wider card for wide passive icons (~76x40) */
 .skill-card.passive {
-  width: 110px;
+  width: 96px;
 }
 .skill-card.passive .skill-card-frame {
-  width: 104px;
-  height: 68px;
-  padding: 2px;
-}
-.skill-card.passive .skill-card-screen {
-  border: none;
-  border-radius: 1px;
-}
-.skill-card.passive .skill-card-screen img,
-.skill-card.passive .skill-card-screen svg {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
+  width: 90px;
+  height: 60px;
+  padding: 5px;
 }
 
 .skill-card-screen .icon-fallback,
 .skill-card-screen .ability-icon-fallback {
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 0 !important;
-  opacity: 0.3;
+  width: 60% !important;
+  height: 60% !important;
+  border-radius: 4px !important;
+  opacity: 0.25;
 }
 
 /* Bottom tabs with stats (like damage numbers in game) */
@@ -236,7 +230,8 @@
   text-align: center;
   line-height: 1.1;
   margin-top: 3px;
-  max-width: 88px;
+  max-width: 100%;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -556,11 +551,11 @@
 
 /* === COMPACT SKILL CARDS (feed) === */
 .skill-card.compact { width: 72px; }
-.skill-card.compact .skill-card-frame { width: 66px; height: 62px; padding: 4px; }
+.skill-card.compact .skill-card-frame { width: 66px; height: 62px; padding: 5px; }
 .skill-card.compact .skill-card-name { font-size: 8px; max-width: 70px; }
 
-.skill-card.compact.passive { width: 82px; }
-.skill-card.compact.passive .skill-card-frame { width: 76px; height: 52px; padding: 2px; }
+.skill-card.compact.passive { width: 76px; }
+.skill-card.compact.passive .skill-card-frame { width: 70px; height: 48px; padding: 4px; }
 
 /* === RESPONSIVE === */
 @media (max-width: 800px) {
