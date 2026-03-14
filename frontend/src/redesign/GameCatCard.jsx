@@ -26,7 +26,7 @@ export default function GameCatCard({ cat, lang = 'ru', canGenerate, onGenerate,
       const d = await r.json();
       if (d.success) { cat.has_image = true; cat.image_url = d.image_url; setBust(Date.now()); onGenerate?.(cat, d); }
       else setError(d.error || 'Ошибка');
-    } catch { setError('Ошибка сети'); }
+    } catch (e) { setError(lang === 'ru' ? 'Таймаут — попробуйте ещё раз' : 'Timeout — try again'); }
     finally { setGenerating(false); }
   }
 
