@@ -42,89 +42,53 @@ export default function UploadBox({ onSuccess }) {
 
   return (
     <div className="page-center">
-      <div
-        className={`upload-box${dragover ? ' dragover' : ''}`}
-        onClick={() => fileRef.current?.click()}
-        onDragOver={handleDragOver}
-        onDragLeave={() => setDragover(false)}
-        onDrop={handleDrop}
-      >
-        <h2>&#128190; {t('upload_title')}</h2>
-        <p dangerouslySetInnerHTML={{ __html: t('upload_hint') }} />
-        {uploading && (
-          <p><span className="loading-spinner" /> {t('loading')}</p>
-        )}
-        {error && <p className="error-msg">{error}</p>}
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".sav"
-          style={{ display: 'none' }}
-          onChange={(e) => { if (e.target.files[0]) uploadFile(e.target.files[0]); }}
-        />
-      </div>
+      <div className="lab-upload">
+        <div
+          className={`lab-upload-zone${dragover ? ' dragover' : ''}`}
+          onClick={() => fileRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={() => setDragover(false)}
+          onDrop={handleDrop}
+        >
+          <h2>&#128190; {t('upload_title')}</h2>
+          <p dangerouslySetInnerHTML={{ __html: t('upload_hint') }} />
+          {uploading && (
+            <p><span className="loading-spinner" /> {t('loading')}</p>
+          )}
+          {error && <p className="error-msg">{error}</p>}
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".sav"
+            style={{ display: 'none' }}
+            onChange={(e) => { if (e.target.files[0]) uploadFile(e.target.files[0]); }}
+          />
+        </div>
 
-      <div
-        style={{
-          maxWidth: '100%',
-          width: 520,
-          margin: '20px auto 0',
-          textAlign: 'left',
-          background: '#d2cec6',
-          border: '3px solid #28241e',
-          borderRadius: 2,
-          padding: '16px 20px',
-          fontSize: 13,
-          color: '#4a463e',
-          lineHeight: 1.6,
-        }}
-      >
-        <h3 style={{ fontSize: 18, fontWeight: 800, color: '#28241e', marginBottom: 8, fontFamily: "'EdmundMcMillen', 'Nunito', sans-serif" }}>
-          &#128269; {t('where_save')}
-        </h3>
-        <p><b>Windows:</b> {t('win_path_hint')}</p>
-        <code
-          style={{
-            display: 'block',
-            background: '#e4e0d8',
-            padding: '8px 12px',
-            borderRadius: 2,
-            margin: '6px 0',
-            wordBreak: 'break-all',
-            fontSize: 12,
-            border: '1px solid #a8a49c',
-          }}
-        >
-          %AppData%\Glaiel Games\Mewgenics
-        </code>
-        <p>
-          {t('win_full_path')}{' '}
-          <code style={{ fontSize: 11 }}>
-            C:\Users\&lt;YourName&gt;\AppData\Roaming\Glaiel Games\Mewgenics\
+        <div className="lab-upload-hint">
+          <h3>&#128269; {t('where_save')}</h3>
+          <p><b>Windows:</b> {t('win_path_hint')}</p>
+          <code style={{ display: 'block', margin: '6px 0', padding: '8px 12px', wordBreak: 'break-all', border: '1px solid #a8a49c' }}>
+            %AppData%\Glaiel Games\Mewgenics
           </code>
-        </p>
-        <p
-          style={{ marginTop: 6 }}
-          dangerouslySetInnerHTML={{ __html: t('win_save_hint') }}
-        />
-        <p style={{ marginTop: 6 }}><b>{t('steam_deck_linux')}</b></p>
-        <code
-          style={{
-            display: 'block',
-            background: '#e4e0d8',
-            padding: '8px 12px',
-            borderRadius: 2,
-            margin: '6px 0',
-            wordBreak: 'break-all',
-            fontSize: 12,
-            border: '1px solid #a8a49c',
-          }}
-        >
-          ~/.local/share/Glaiel Games/Mewgenics/
-        </code>
-        <p style={{ marginTop: 8, fontSize: 11, color: '#7a756c' }}>
-          &#9888; {t('hidden_folder_hint')}
-        </p>
+          <p>
+            {t('win_full_path')}{' '}
+            <code>
+              C:\Users\&lt;YourName&gt;\AppData\Roaming\Glaiel Games\Mewgenics\
+            </code>
+          </p>
+          <p
+            style={{ marginTop: 6 }}
+            dangerouslySetInnerHTML={{ __html: t('win_save_hint') }}
+          />
+          <p style={{ marginTop: 6 }}><b>{t('steam_deck_linux')}</b></p>
+          <code style={{ display: 'block', margin: '6px 0', padding: '8px 12px', wordBreak: 'break-all', border: '1px solid #a8a49c' }}>
+            ~/.local/share/Glaiel Games/Mewgenics/
+          </code>
+          <p style={{ marginTop: 8, fontSize: 11, color: '#7a756c' }}>
+            &#9888; {t('hidden_folder_hint')}
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -6,8 +6,9 @@
 }
 a, button, [role="button"], input[type="submit"], input[type="button"],
 select, label[class*="btn"], .like-btn, .share-btn, .lang-switch button,
-.pagination button, .skill-card, .cat-portrait, .cat-portrait-img,
-.feed-img, .upload-box, .header-community {
+.pagination button, .lab-pagination button, .lab-chip, .lab-chip-reset, .lab-upload-btn,
+.skill-card, .cat-portrait, .cat-portrait-img,
+.feed-img, .upload-box, .lab-upload-zone, .header-community {
   cursor: url('/assets/cursors/btn_over.png') 10 4, pointer;
 }
 
@@ -618,6 +619,97 @@ a { font-weight: 500; color: #7a60a0; text-decoration: inherit; }
 }
 .btn-telegram:hover { background: #3a362e; color: #fff; }
 
+/* === LAB TOOLBAR === */
+.lab-toolbar { background: #d2cec6; border: 3px solid #28241e; border-radius: 2px; padding: 12px 16px; margin: 0; box-shadow: 4px 4px 0 rgba(0,0,0,0.12); }
+.lab-toolbar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.lab-toolbar-row + .lab-toolbar-row { margin-top: 10px; padding-top: 10px; border-top: 2px dashed #a8a09840; }
+.lab-search { flex: 1; min-width: 150px; background: #e4e0d8; border: 2.5px solid #28241e; padding: 8px 12px; font-family: inherit; font-size: 14px; border-radius: 2px; color: #28241e; }
+.lab-search:focus { outline: none; border-color: #5a8848; box-shadow: 0 0 0 2px #5a884820; }
+.lab-search::placeholder { color: #a8a49c; }
+.lab-select { background: #e4e0d8; border: 2.5px solid #28241e; padding: 8px 12px; font-family: inherit; font-size: 13px; border-radius: 2px; color: #28241e; min-width: 120px; }
+.lab-count { font-family: 'EdmundMcMillen', 'Nunito', sans-serif; font-size: 13px; background: #28241e; color: #e8e4dc; padding: 4px 12px; border-radius: 2px; font-weight: 800; white-space: nowrap; }
+.lab-upload-btn { background: #5a8848; color: #fff; border: 2.5px solid #3a5828; padding: 8px 16px; border-radius: 2px; font-family: 'EdmundMcMillen', 'Nunito', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; box-shadow: 2px 2px 0 rgba(0,0,0,0.1); }
+.lab-upload-btn:hover { background: #4a7838; transform: translateY(-1px); }
+
+/* Filter chips */
+.lab-filters { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+.lab-filter-group { display: flex; gap: 3px; align-items: center; }
+.lab-filter-group + .lab-filter-group { margin-left: 4px; padding-left: 8px; border-left: 2px solid #a8a09830; }
+.lab-chip { font-size: 11px; padding: 3px 8px; border: 2px solid #28241e; border-radius: 2px; cursor: pointer; font-weight: 700; background: #e4e0d8; color: #4a463e; transition: all 0.12s; white-space: nowrap; }
+.lab-chip:hover { background: #dedad2; transform: translateY(-1px); }
+.lab-chip.active { background: #28241e; color: #e8e4dc; }
+/* Class chips use their badge colors when active */
+.lab-chip.active.bc-Fighter { background: #c03030; border-color: #c03030; color: #fff; }
+.lab-chip.active.bc-Tank { background: #d07020; border-color: #d07020; color: #fff; }
+.lab-chip.active.bc-Hunter { background: #308850; border-color: #308850; color: #fff; }
+.lab-chip.active.bc-Mage { background: #8858b0; border-color: #8858b0; color: #fff; }
+.lab-chip.active.bc-Medic { background: #a09880; border-color: #a09880; color: #fff; }
+.lab-chip.active.bc-Necromancer { background: #2a2a2a; border-color: #2a2a2a; color: #fff; }
+.lab-chip.active.bc-Druid { background: #4a6a2a; border-color: #4a6a2a; color: #fff; }
+.lab-chip.active.bc-Thief { background: #b8a840; border-color: #b8a840; color: #28241e; }
+.lab-chip.active.bc-Tinkerer { background: #58a030; border-color: #58a030; color: #fff; }
+.lab-chip.active.bc-Colorless { background: #908070; border-color: #908070; color: #fff; }
+.lab-chip.active.bc-Monk { background: #b89828; border-color: #b89828; color: #fff; }
+.lab-chip.active.bc-Psychic { background: #9038b0; border-color: #9038b0; color: #fff; }
+.lab-chip.active.bc-Jester { background: linear-gradient(90deg,#c03030,#3858a8,#308850); border-color: #3858a8; color: #fff; }
+.lab-chip.active.bc-Butcher { background: #701818; border-color: #701818; color: #fff; }
+.lab-chip-reset { font-size: 11px; color: #7a756c; cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: underline; padding: 3px 6px; }
+.lab-chip-reset:hover { color: #c43838; }
+
+/* Save info as subtle bar */
+.lab-save-info { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12px; color: #7a756c; }
+.lab-save-info b { color: #28241e; }
+.lab-save-info-sep { width: 1px; height: 16px; background: #a8a09860; }
+
+/* === LAB PAGINATION === */
+.lab-pagination {
+  display: flex; justify-content: center; align-items: center; gap: 4px;
+  padding: 16px 12px; flex-wrap: wrap;
+}
+.lab-pagination button {
+  background: #d2cec6; border: 2.5px solid #28241e; color: #28241e;
+  padding: 6px 12px; border-radius: 2px; cursor: pointer;
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+  transition: all 0.12s; box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+  min-height: 36px;
+}
+.lab-pagination button:hover:not(:disabled) { background: #c8c4bc; transform: translateY(-1px); }
+.lab-pagination button:active:not(:disabled) { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(0,0,0,0.1); }
+.lab-pagination button.active { background: #28241e; color: #e8e4dc; }
+.lab-pagination button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+.lab-pagination .page-info { font-size: 12px; color: #7a756c; padding: 0 6px; font-weight: 600; }
+
+/* === LAB UPLOAD === */
+.lab-upload {
+  max-width: 520px; margin: 40px auto; padding: 0 16px;
+}
+.lab-upload-zone {
+  background: #dedad2;
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  border: 3px dashed #7a756c; border-radius: 2px;
+  padding: 40px 32px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.04);
+}
+.lab-upload-zone:hover { border-color: #28241e; background: #e4e0d8; }
+.lab-upload-zone.dragover { border-color: #5a8848; background: #e8e4dc; border-style: solid; box-shadow: inset 0 0 30px rgba(90,136,72,0.1); }
+.lab-upload-zone h2 {
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 24px; font-weight: 800; color: #28241e; margin-bottom: 8px;
+}
+.lab-upload-zone p { font-size: 14px; color: #7a756c; margin: 6px 0; }
+.lab-upload-hint {
+  margin-top: 20px; background: #d2cec6; border: 2px solid #28241e40;
+  border-radius: 2px; padding: 16px; text-align: left;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+}
+.lab-upload-hint h3 {
+  font-family: 'EdmundMcMillen', 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 800; color: #28241e; margin-bottom: 8px;
+}
+.lab-upload-hint p { font-size: 13px; color: #4a463e; margin: 4px 0; line-height: 1.5; }
+.lab-upload-hint code { background: #e4e0d8; padding: 1px 6px; border-radius: 2px; font-size: 12px; color: #28241e; }
+
 /* === RESPONSIVE === */
 
 /* --- Tablets & small desktops --- */
@@ -647,6 +739,18 @@ a { font-weight: 500; color: #7a60a0; text-decoration: inherit; }
   .ctrl-group select { width: 100%; font-size: 14px; padding: 8px; }
   .controls button, .controls label.ctrl-btn { width: 100%; padding: 10px; font-size: 14px; min-height: 44px; }
   .save-info { margin-left: 0; width: 100%; flex-wrap: wrap; justify-content: center; }
+
+  .lab-toolbar { padding: 10px 10px; }
+  .lab-search { min-width: 0; font-size: 14px; }
+  .lab-select { min-width: 0; flex: 1; font-size: 13px; }
+  .lab-upload-btn { padding: 8px 12px; font-size: 12px; }
+  .lab-count { font-size: 12px; }
+  .lab-chip { font-size: 10px; padding: 4px 6px; }
+  .lab-filter-group + .lab-filter-group { margin-left: 2px; padding-left: 4px; }
+  .lab-save-info { font-size: 11px; justify-content: center; width: 100%; }
+  .lab-upload-zone { padding: 28px 20px; }
+  .lab-upload-zone h2 { font-size: 20px; }
+  .lab-pagination button { padding: 6px 8px; font-size: 12px; }
 
   .feed-card { border-radius: 0; box-shadow: none; border-left: none; border-right: none; }
   .feed-grid { padding: 8px 0; gap: 12px; }

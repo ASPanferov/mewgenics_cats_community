@@ -224,90 +224,117 @@ export default function CabinetPage() {
   // Main cabinet UI
   return (
     <>
-      {/* Controls bar */}
-      <div className="controls">
-        <div className="controls-row">
+      {/* Lab Toolbar */}
+      <div className="lab-toolbar">
+        <div className="lab-toolbar-row">
           <input
+            className="lab-search"
             type="text"
-            placeholder={t('search')}
+            placeholder={`🔍 ${t('search')}`}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <div className="ctrl-group">
-            <label>{t('filter_class')}</label>
-            <select value={classFilter} onChange={e => setClassFilter(e.target.value)}>
-              <option value="">{t('filter_all')}</option>
-              {CAT_CLASSES.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-          <div className="ctrl-group">
-            <label>{t('filter_status')}</label>
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-              <option value="">{t('filter_all')}</option>
-              <option value="alive">{t('filter_alive')}</option>
-              <option value="OK">OK</option>
-              <option value="Injured">{t('filter_injured')}</option>
-              <option value="Dead">{t('filter_dead')}</option>
-              <option value="retired">{t('filter_retired')}</option>
-              <option value="donated">{t('filter_donated')}</option>
-            </select>
-          </div>
-          <div className="ctrl-group">
-            <label>{t('filter_gender')}</label>
-            <select value={genderFilter} onChange={e => setGenderFilter(e.target.value)}>
-              <option value="">{t('filter_all')}</option>
-              <option value="1">{t('filter_male')}</option>
-              <option value="2">{t('filter_female')}</option>
-            </select>
-          </div>
-          <div className="ctrl-group">
-            <label>{t('filter_image')}</label>
-            <select value={imageFilter} onChange={e => setImageFilter(e.target.value)}>
-              <option value="">{t('filter_all')}</option>
-              <option value="yes">{t('filter_with_art')}</option>
-              <option value="no">{t('filter_no_art')}</option>
-            </select>
-          </div>
-          <div className="ctrl-group">
-            <label>{t('sort')}</label>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value="image_first">{t('sort_img')}</option>
-              <option value="birth_desc">{t('sort_new')}</option>
-              <option value="birth_asc">{t('sort_old')}</option>
-              <option value="name_asc">{t('sort_name_az')}</option>
-              <option value="name_desc">{t('sort_name_za')}</option>
-              <option value="class">{t('sort_class')}</option>
-            </select>
-          </div>
-          <label className="ctrl-btn" style={{ cursor: 'pointer' }}>
-            {t('new_save')}
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".sav"
-              style={{ display: 'none' }}
+          <select className="lab-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+            <option value="image_first">{t('sort_img')}</option>
+            <option value="birth_desc">{t('sort_new')}</option>
+            <option value="birth_asc">{t('sort_old')}</option>
+            <option value="name_asc">{t('sort_name_az')}</option>
+            <option value="name_desc">{t('sort_name_za')}</option>
+            <option value="class">{t('sort_class')}</option>
+          </select>
+          <label className="lab-upload-btn">
+            📂 {t('new_save')}
+            <input ref={fileRef} type="file" accept=".sav" style={{ display: 'none' }}
               onChange={e => { if (e.target.files[0]) handleNewSave(e.target.files[0]); }}
             />
           </label>
-          <div className="save-info">
-            <span>{t('day')} <b>{saveInfo.current_day || '?'}</b></span>
-            <span>{t('gold')} <b>{saveInfo.house_gold || '?'}</b></span>
-            {saveInfo.house_food && (
-              <span>{t('food')} <b>{saveInfo.house_food}</b></span>
+          <span className="lab-count">
+            {filteredCats.length} / {allCats.length}
+          </span>
+        </div>
+
+        <div className="lab-toolbar-row">
+          <div className="lab-filters">
+            {/* Class filter chips */}
+            <div className="lab-filter-group">
+              {CAT_CLASSES.map(c => (
+                <button
+                  key={c}
+                  className={`lab-chip${classFilter === c ? ` active bc-${c}` : ''}`}
+                  onClick={() => setClassFilter(classFilter === c ? '' : c)}
+                  title={c}
+                >
+                  {c.slice(0, 3)}
+                </button>
+              ))}
+            </div>
+
+            {/* Status chips */}
+            <div className="lab-filter-group">
+              {[
+                { val: 'alive', label: '❤️' },
+                { val: 'Dead', label: '💀' },
+                { val: 'Injured', label: '🩹' },
+                { val: 'retired', label: '🏠' },
+              ].map(s => (
+                <button
+                  key={s.val}
+                  className={`lab-chip${statusFilter === s.val ? ' active' : ''}`}
+                  onClick={() => setStatusFilter(statusFilter === s.val ? '' : s.val)}
+                  title={t(`filter_${s.val.toLowerCase()}`)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Gender chips */}
+            <div className="lab-filter-group">
+              <button
+                className={`lab-chip${genderFilter === '1' ? ' active' : ''}`}
+                onClick={() => setGenderFilter(genderFilter === '1' ? '' : '1')}
+              >♂</button>
+              <button
+                className={`lab-chip${genderFilter === '2' ? ' active' : ''}`}
+                onClick={() => setGenderFilter(genderFilter === '2' ? '' : '2')}
+              >♀</button>
+            </div>
+
+            {/* Art filter chips */}
+            <div className="lab-filter-group">
+              <button
+                className={`lab-chip${imageFilter === 'yes' ? ' active' : ''}`}
+                onClick={() => setImageFilter(imageFilter === 'yes' ? '' : 'yes')}
+              >🎨</button>
+              <button
+                className={`lab-chip${imageFilter === 'no' ? ' active' : ''}`}
+                onClick={() => setImageFilter(imageFilter === 'no' ? '' : 'no')}
+              >❌</button>
+            </div>
+
+            {/* Reset */}
+            {(classFilter || statusFilter || genderFilter || imageFilter || search) && (
+              <button className="lab-chip-reset" onClick={() => {
+                setClassFilter(''); setStatusFilter(''); setGenderFilter(''); setImageFilter(''); setSearch('');
+              }}>
+                {lang === 'ru' ? 'сброс' : 'reset'}
+              </button>
             )}
-            {saveInfo.adventure_coins && (
-              <span>{t('coins')} <b>{saveInfo.adventure_coins}</b></span>
-            )}
-            {saveInfo.blank_collars && (
-              <span>{t('collars')} <b>{saveInfo.blank_collars}</b></span>
-            )}
-            <span className="cat-count-badge">
-              {filteredCats.length} / {allCats.length}
-            </span>
           </div>
         </div>
+
+        {/* Save info */}
+        {saveInfo && (
+          <div className="lab-toolbar-row">
+            <div className="lab-save-info">
+              <span>{t('day')} <b>{saveInfo.current_day || '?'}</b></span>
+              <span className="lab-save-info-sep" />
+              <span>{t('gold')} <b>{saveInfo.house_gold || '?'}</b></span>
+              {saveInfo.house_food && <><span className="lab-save-info-sep" /><span>{t('food')} <b>{saveInfo.house_food}</b></span></>}
+              {saveInfo.adventure_coins && <><span className="lab-save-info-sep" /><span>{t('coins')} <b>{saveInfo.adventure_coins}</b></span></>}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Cat grid */}
@@ -328,7 +355,7 @@ export default function CabinetPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="pagination">
+        <div className="lab-pagination">
           <button disabled={safePage === 0} onClick={() => goToPage(0)}>&laquo;</button>
           <button disabled={safePage === 0} onClick={() => goToPage(safePage - 1)}>&lsaquo;</button>
           {(() => {
