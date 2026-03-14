@@ -1,5 +1,7 @@
 """Build image generation prompts from cat data in Edmund McMillen's Mewgenics style."""
 
+import re
+
 from cat_parser import (CatData, CLASS_RU, STAT_LABELS, STAT_LABELS_RU, PART_NAME_RU, PART_NAME_EN,
                         STAT_FOCUS_RU, STAT_FOCUS_EN,
                         _BIRTH_DEFECT_FRAME_THRESHOLD, BIRTH_DEFECT_PASSIVES)
@@ -521,11 +523,16 @@ def build_cat_summary(cat: CatData, lang: str = 'ru') -> dict:
             "is_defect": is_defect,
         })
 
+    def _humanize(key):
+        """Convert PascalCase to readable: 'SwiftSanctify' -> 'Swift Sanctify'"""
+        return re.sub(r'([a-z])([A-Z])', r'\1 \2',
+               re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1 \2', key))
+
     # Build rich ability/passive/item info with names + descriptions
     abilities_rich = []
     for a in cat.abilities:
         info = game_desc.get_ability(a, lang=lang)
-        name = (info[0] if info and info[0] else '') or a
+        name = (info[0] if info and info[0] else '') or _humanize(a)
         abilities_rich.append({
             "key": a,
             "name": name,
@@ -535,7 +542,7 @@ def build_cat_summary(cat: CatData, lang: str = 'ru') -> dict:
     passives_rich = []
     for p in cat.passives:
         info = game_desc.get_passive(p, lang=lang)
-        name = (info[0] if info and info[0] else '') or p
+        name = (info[0] if info and info[0] else '') or _humanize(p)
         passives_rich.append({
             "key": p,
             "name": name,
@@ -545,7 +552,7 @@ def build_cat_summary(cat: CatData, lang: str = 'ru') -> dict:
     items_rich = []
     for it in cat.items:
         info = game_desc.get_item(it, lang=lang)
-        name = (info[0] if info and info[0] else '') or it
+        name = (info[0] if info and info[0] else '') or _humanize(it)
         items_rich.append({
             "key": it,
             "name": name,
