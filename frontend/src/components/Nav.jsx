@@ -19,10 +19,13 @@ export default function Nav() {
   return (
     <div className="nav">
       <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>
-        {t('feed')}
+        Dr. Beanies
+      </NavLink>
+      <NavLink to="/feed" className={({ isActive }) => isActive ? 'active' : ''}>
+        {t('nav_gallery')}
       </NavLink>
       <NavLink to="/cabinet" className={({ isActive }) => isActive ? 'active' : ''}>
-        {t('my_cats')}
+        {t('nav_lab')}
       </NavLink>
       {isAdmin && (
         <a

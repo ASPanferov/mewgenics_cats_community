@@ -86,7 +86,7 @@ export default function FeedPage() {
   function shareCat(catId, catName) {
     const url = window.location.origin + '/cat/' + catId;
     if (navigator.share) {
-      navigator.share({ title: catName + ' \u2014 Mewgenics', url }).catch(() => {});
+      navigator.share({ title: catName + " \u2014 Dr. Beanies' Lab", url }).catch(() => {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(url).then(() => showToast(t('link_copied')));
     } else {

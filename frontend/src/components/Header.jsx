@@ -10,8 +10,8 @@ export default function Header() {
   return (
     <div className="header">
       <div className="header-brand">
-        <span className="header-logo">&#128049;</span>
-        <h1>MEWGENICS</h1>
+        <span className="header-logo">&#129514;</span>
+        <h1>DR. BEANIES' LAB</h1>
         <a
           href="https://t.me/mewgenicsru"
           target="_blank"
@@ -59,7 +59,7 @@ export default function Header() {
                 </span>
               ) : (
                 <span className="gen-counter">
-                  {user.generations_count}/{user.max_generations} {t('generations')}
+                  {user.generations_today}/{user.max_daily_generations} {lang === 'ru' ? 'сегодня' : 'today'}
                 </span>
               )}
               <a href="/auth/logout" className="btn-logout">{t('logout')}</a>

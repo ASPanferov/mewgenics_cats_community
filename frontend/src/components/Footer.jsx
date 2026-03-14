@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-col">
-          <h3>Mewgenics Cat Community</h3>
+          <h3>Dr. Beanies' Laboratory</h3>
           <p dangerouslySetInnerHTML={{ __html: t('footer_about') }} />
           <p>{t('footer_disclaimer')}</p>
         </div>
@@ -38,7 +38,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        Mewgenics Cat Community &copy; 2025-2026 &mdash; Fan project. Not affiliated with Team Meat.
+        {t('footer_brand')} &copy; 2025-2026 &mdash; Fan project. Not affiliated with Team Meat.
       </div>
     </footer>
   );

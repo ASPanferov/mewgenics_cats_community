@@ -113,6 +113,27 @@ const translations = {
   filter_ok: { en: 'OK', ru: 'OK' },
   admin: { en: 'Admin', ru: 'Админ' },
   steam_deck_linux: { en: 'Steam Deck / Linux:', ru: 'Steam Deck / Linux:' },
+  // Nav
+  nav_gallery: { en: 'Gallery', ru: 'Галерея' },
+  nav_lab: { en: 'Laboratory', ru: 'Лаборатория' },
+  // Landing
+  landing_title: { en: "DR. BEANIES' LABORATORY", ru: 'ЛАБОРАТОРИЯ ДОКТОРА БИНЕСА' },
+  landing_subtitle: { en: 'Welcome to the craziest laboratory in the Mewgenics universe', ru: 'Добро пожаловать в самую безумную лабораторию во вселенной Mewgenics' },
+  landing_desc: { en: 'We take your save files from Mewgenics, decode your cats down to the last mutation, and then our AI draws unique realistic portraits for each one. Every cat is one of a kind — just like in the game.', ru: 'Мы берём ваши сейв-файлы из Mewgenics, разбираем ваших котов до последней мутации, а затем наш ИИ рисует уникальные реалистичные портреты для каждого. Каждый кот — единственный в своём роде, как и в игре.' },
+  landing_cta: { en: 'Start the experiment', ru: 'Начать эксперимент' },
+  landing_how_title: { en: 'How it works', ru: 'Как это работает' },
+  landing_step1_title: { en: 'Upload your save', ru: 'Загрузите сейв' },
+  landing_step1_desc: { en: 'Upload a .sav file from Mewgenics', ru: 'Загрузите файл .sav из Mewgenics' },
+  landing_step2_title: { en: 'We parse your cats', ru: 'Мы разберём ваших котов' },
+  landing_step2_desc: { en: 'Our parser extracts every stat, ability, and mutation', ru: 'Наш парсер извлечёт все характеристики, способности и мутации' },
+  landing_step3_title: { en: 'AI draws a portrait', ru: 'ИИ нарисует портрет' },
+  landing_step3_desc: { en: 'A unique realistic portrait generated just for your cat', ru: 'Уникальный реалистичный портрет, созданный специально для вашего кота' },
+  landing_gallery_title: { en: 'Best experiments', ru: 'Лучшие эксперименты' },
+  landing_join_title: { en: 'Join the experiment', ru: 'Присоединяйтесь к эксперименту' },
+  landing_join_desc: { en: 'Log in, upload your save and resurrect your cats', ru: 'Войдите, загрузите сейв и воскресите своих котов' },
+  landing_community: { en: 'Telegram community', ru: 'Сообщество в Telegram' },
+  // Footer rebranded
+  footer_brand: { en: "Dr. Beanies' Laboratory — Breeding the future, one mutation at a time", ru: "Dr. Beanies' Laboratory — Выводим будущее, мутация за мутацией" },
 };
 
 const LangContext = createContext();

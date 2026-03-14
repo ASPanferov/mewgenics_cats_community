@@ -154,6 +154,7 @@ def auth_me():
     if not approved:
         wl_position = db.get_waitlist_position(db_user["id"])
         wl_total = db.get_waitlist_count()
+    _, gen_today, max_daily = db.can_generate(db_user["id"])
     return jsonify({
         "authenticated": True,
         "user": {
@@ -163,6 +164,8 @@ def auth_me():
             "avatar_url": db_user["avatar_url"],
             "generations_count": db_user["generations_count"],
             "max_generations": db.get_user_max_generations(db_user),
+            "generations_today": gen_today,
+            "max_daily_generations": max_daily,
             "is_premium": bool(db_user.get("is_premium")),
             "waitlist": not approved,
             "waitlist_position": wl_position,
@@ -435,8 +438,9 @@ def api_generate(db_cat_id):
     if not db.is_user_approved(user["user_id"]):
         return jsonify({"error": "You are on the waitlist. Please wait for approval."}), 403
 
-    if not db.can_generate(user["user_id"]):
-        return jsonify({"error": f"Лимит генераций исчерпан ({db.MAX_GENERATIONS}/{db.MAX_GENERATIONS})"}), 403
+    allowed, gen_today, max_daily = db.can_generate(user["user_id"])
+    if not allowed:
+        return jsonify({"error": f"Дневной лимит генераций исчерпан ({gen_today}/{max_daily})"}), 403
 
     # Verify ownership
     owner_id = db.get_cat_owner_id(db_cat_id)
@@ -499,7 +503,7 @@ def api_generate(db_cat_id):
                     blob_url = f"/static/generated/cat_{db_cat_id}.{ext}"
 
                 db.set_cat_image(db_cat_id, blob_url)
-                db.increment_generations(user["user_id"])
+                db.increment_generation(user["user_id"])
 
                 return jsonify({"success": True, "image_url": blob_url})
 
@@ -603,7 +607,7 @@ def api_admin_reset_generations(uid):
     user = require_auth()
     if not user or not db.is_admin(user["user_id"]):
         return jsonify({"error": "Forbidden"}), 403
-    db.execute("UPDATE users SET generations_count = 0 WHERE id = %s", (uid,))
+    db.execute("UPDATE users SET generations_count = 0, generations_today = 0, last_generation_date = NULL WHERE id = %s", (uid,))
     return jsonify({"success": True})
 
 

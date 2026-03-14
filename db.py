@@ -2,13 +2,15 @@
 
 import json
 import os
+from datetime import date
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 _pool = None
 
-MAX_GENERATIONS = 5
-MAX_GENERATIONS_PREMIUM = 50
+DAILY_GENERATIONS = 5
+DAILY_GENERATIONS_PREMIUM = 50
 MAX_ACTIVE_USERS = 100  # After this, new users go to waitlist
 WAITLIST_BATCH_SIZE = 50
 
@@ -144,6 +146,14 @@ def init_db():
     if not wl_cols:
         execute("ALTER TABLE users ADD COLUMN waitlist_approved BOOLEAN DEFAULT TRUE")
         # Existing users are approved by default; new ones after limit will be FALSE
+    # Migration: add daily generation columns
+    try:
+        cols = query("SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name='generations_today'")
+        if not cols:
+            execute("ALTER TABLE users ADD COLUMN generations_today INT DEFAULT 0")
+            execute("ALTER TABLE users ADD COLUMN last_generation_date DATE")
+    except:
+        pass
     # Feedback table
     execute("""
         CREATE TABLE IF NOT EXISTS feedback (
@@ -191,22 +201,38 @@ def get_user(user_id):
     return query_one("SELECT * FROM users WHERE id = %s", (user_id,))
 
 
-def increment_generations(user_id):
-    execute("UPDATE users SET generations_count = generations_count + 1 WHERE id = %s", (user_id,))
+def increment_generation(user_id):
+    today = date.today()
+    execute("""
+        UPDATE users SET
+            generations_count = generations_count + 1,
+            generations_today = CASE WHEN last_generation_date = %s THEN generations_today + 1 ELSE 1 END,
+            last_generation_date = %s
+        WHERE id = %s
+    """, (today, today, user_id))
 
 
 def get_user_max_generations(user):
-    """Return max generations limit based on premium status."""
+    """Return max daily generations limit based on premium status."""
     if user and user.get("is_premium"):
-        return MAX_GENERATIONS_PREMIUM
-    return MAX_GENERATIONS
+        return DAILY_GENERATIONS_PREMIUM
+    return DAILY_GENERATIONS
 
 
 def can_generate(user_id):
-    user = get_user(user_id)
+    """Check if user can generate today. Returns (allowed, gen_today, max_gen)."""
+    user = query_one("SELECT generations_today, last_generation_date, is_premium FROM users WHERE id = %s", (user_id,))
     if not user:
-        return False
-    return user["generations_count"] < get_user_max_generations(user)
+        return False, 0, 0
+    today = date.today()
+    gen_today = user.get("generations_today") or 0
+    last_date = user.get("last_generation_date")
+    # Reset if new day
+    if last_date is None or str(last_date) != str(today):
+        execute("UPDATE users SET generations_today = 0, last_generation_date = %s WHERE id = %s", (today, user_id))
+        gen_today = 0
+    max_gen = DAILY_GENERATIONS_PREMIUM if user.get("is_premium") else DAILY_GENERATIONS
+    return gen_today < max_gen, gen_today, max_gen
 
 
 def set_premium(user_id, is_premium=True):

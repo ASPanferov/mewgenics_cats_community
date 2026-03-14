@@ -11,7 +11,7 @@ const TYPE_CLASSES = {
 
 export default function TagWithIcon({ name, desc, tagKey, type, iconName }) {
   const cls = TYPE_CLASSES[type] || 'tag';
-  const showIcon = type === 'ability' || type === 'passive';
+  const showIcon = type === 'ability' || type === 'passive' || type === 'item';
   const hasTooltip = desc && desc.trim();
   const showKey = tagKey && tagKey !== name;
 

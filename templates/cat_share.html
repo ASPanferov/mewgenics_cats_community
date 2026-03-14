@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ name }} — Mewgenics Cat Community</title>
+    <title>{{ name }} — Dr. Beanies' Laboratory</title>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="{{ name }} — Mewgenics">
-    <meta property="og:description" content="{% if cat_class %}{{ cat_class }} class cat{% endif %}{% if owner_name %} by {{ owner_name }}{% endif %}. {{ likes }} likes.">
+    <meta property="og:title" content="{{ name }} — Dr. Beanies' Lab">
+    <meta property="og:description" content="{% if cat_class %}{{ cat_class }} class cat{% endif %}{% if owner_name %} by {{ owner_name }}{% endif %}. {{ likes }} likes. Dr. Beanies' Laboratory — Mewgenics fan project.">
     <meta property="og:image" content="{{ image_url }}">
     <meta property="og:image:width" content="1024">
     <meta property="og:image:height" content="1024">
@@ -16,8 +16,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ name }} — Mewgenics">
-    <meta name="twitter:description" content="{% if cat_class %}{{ cat_class }} class cat{% endif %}{% if owner_name %} by {{ owner_name }}{% endif %}. {{ likes }} likes.">
+    <meta name="twitter:title" content="{{ name }} — Dr. Beanies' Lab">
+    <meta name="twitter:description" content="{% if cat_class %}{{ cat_class }} class cat{% endif %}{% if owner_name %} by {{ owner_name }}{% endif %}. {{ likes }} likes. Dr. Beanies' Laboratory — Mewgenics fan project.">
     <meta name="twitter:image" content="{{ image_url }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -94,7 +94,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>MEWGENICS</h1>
+        <h1>DR. BEANIES' LAB</h1>
     </div>
 
     <div class="card">
@@ -107,7 +107,7 @@
                 {% if owner_name %}<span class="owner">by {{ owner_name }}</span>{% endif %}
             </div>
             <div class="actions">
-                <a href="/" class="btn btn-feed">&#128049; Открыть ленту</a>
+                <a href="/feed" class="btn btn-feed">&#128049; Открыть галерею</a>
                 <button class="btn btn-share" onclick="shareCat()">&#128279; Поделиться</button>
             </div>
         </div>
@@ -121,7 +121,7 @@
         function shareCat() {
             const url = window.location.href;
             if (navigator.share) {
-                navigator.share({ title: '{{ name }} — Mewgenics', url: url });
+                navigator.share({ title: "{{ name }} — Dr. Beanies' Lab", url: url });
             } else if (navigator.clipboard) {
                 navigator.clipboard.writeText(url).then(() => alert('Ссылка скопирована!'));
             } else {

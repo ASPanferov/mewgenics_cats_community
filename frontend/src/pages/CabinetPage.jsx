@@ -100,7 +100,7 @@ export default function CabinetPage() {
   const totalPages = Math.ceil(filteredCats.length / CATS_PER_PAGE);
   const safePage = currentPage >= totalPages ? Math.max(0, totalPages - 1) : currentPage;
   const pageCats = filteredCats.slice(safePage * CATS_PER_PAGE, (safePage + 1) * CATS_PER_PAGE);
-  const canGen = user && user.generations_count < user.max_generations;
+  const canGen = user && user.generations_today < user.max_daily_generations;
 
   // Reset page on filter change
   useEffect(() => { setCurrentPage(0); }, [search, classFilter, statusFilter, genderFilter, imageFilter]);
@@ -200,8 +200,8 @@ export default function CabinetPage() {
         <p style={{ color: '#7a756c', fontSize: 14, maxWidth: 400, margin: '0 auto' }}>
           {t('waitlist_hint')}
         </p>
-        <a href="/" className="btn-google" style={{ marginTop: 20 }}>
-          &#128049; {t('feed')}
+        <a href="/feed" className="btn-google" style={{ marginTop: 20 }}>
+          &#128049; {t('nav_gallery')}
         </a>
       </div>
     );
