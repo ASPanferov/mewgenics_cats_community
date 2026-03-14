@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useToast } from '../hooks/useToast';
 
 const styles = {
   overlay: {
@@ -105,7 +104,6 @@ export default function FeedbackModal({ isOpen, onClose, userName }) {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
-  const { showToast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
@@ -150,7 +148,6 @@ export default function FeedbackModal({ isOpen, onClose, userName }) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `HTTP ${res.status}`);
       }
-      showToast('Feedback sent. Thank you!');
       onClose();
     } catch (err) {
       setError(err.message);
