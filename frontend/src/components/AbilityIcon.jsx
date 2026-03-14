@@ -64,7 +64,7 @@ export default function AbilityIcon({ name, type, size = 16 }) {
   const [errored, setErrored] = useState(false);
   const iconId = getIconId(name);
 
-  if (!iconId || errored) {
+  if (!iconId || iconId > 901 || errored) {
     const color = type === 'ability' ? '#c83030' : type === 'passive' ? '#2a7a50' : type === 'item' ? '#b89828' : type === 'mutation' ? '#7838a0' : '#8a7050';
     return (
       <span
@@ -85,7 +85,7 @@ export default function AbilityIcon({ name, type, size = 16 }) {
 
   return (
     <img
-      src={`/assets/icons/abilities/${iconId}.svg`}
+      src={`/assets/icons/abilities/${iconId}.png`}
       alt={name}
       width={size}
       height={size}
