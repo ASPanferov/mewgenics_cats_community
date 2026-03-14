@@ -566,11 +566,33 @@
 @media (max-width: 800px) {
   .game-cat-grid { grid-template-columns: 1fr; padding: 12px; }
 }
-@media (max-width: 500px) {
-  .skill-card { width: 80px; }
-  .skill-card-frame { width: 74px; height: 68px; }
-  .skill-card-screen { width: 52px; height: 46px; }
-  .skill-card-screen img, .skill-card-screen svg { width: 36px; height: 36px; }
-  .skill-card.compact { width: 64px; }
-  .skill-card.compact .skill-card-frame { width: 58px; height: 54px; }
+@media (max-width: 600px) {
+  .game-cat-grid { grid-template-columns: 1fr; gap: 10px; padding: 10px 8px; }
+  .game-card-compact { max-width: 100%; }
+
+  .skill-cards-section { gap: 6px; }
+  .skill-card { width: auto; min-width: 70px; }
+  .skill-card.compact { min-width: 60px; }
+  .skill-card-frame { width: 64px; height: 58px; }
+  .skill-card.compact .skill-card-frame { width: 52px; height: 48px; }
+
+  .skill-card .skill-tooltip {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    top: auto;
+    transform: none;
+    max-width: none;
+    min-width: 0;
+    z-index: 9999;
+  }
+  .skill-tooltip::after { display: none; }
+
+  .game-panel-header { flex-wrap: wrap; }
+  .stat-rows { gap: 3px; }
+  .badges-row { gap: 4px; padding: 6px 8px; }
+  .info-row { font-size: 12px; padding: 6px 10px; }
+  .game-actions .btn,
+  .game-actions .game-btn { min-height: 44px; font-size: 13px; padding: 10px; }
 }

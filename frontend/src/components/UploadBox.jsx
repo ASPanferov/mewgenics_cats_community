@@ -66,7 +66,8 @@ export default function UploadBox({ onSuccess }) {
 
       <div
         style={{
-          maxWidth: 520,
+          maxWidth: '100%',
+          width: 520,
           margin: '20px auto 0',
           textAlign: 'left',
           background: '#d2cec6',

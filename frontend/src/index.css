@@ -619,34 +619,94 @@ a { font-weight: 500; color: #7a60a0; text-decoration: inherit; }
 .btn-telegram:hover { background: #3a362e; color: #fff; }
 
 /* === RESPONSIVE === */
-@media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 700px) {
-  .cat-grid { grid-template-columns: 1fr; }
-  .controls { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
-  .controls input[type="text"] { width: 100%; }
-  .ctrl-group { width: 48%; }
-  .ctrl-group select { width: 100%; }
-  .save-info { margin-left: 0; width: 100%; }
-  .feed-card { border-radius: 0; box-shadow: none; border-left: none; border-right: none; }
-  .feed-grid { padding: 12px 0; gap: 16px; }
-  .feed-card-info { padding: 10px 14px; }
-  .feed-card-bottom { padding: 6px 14px 10px; }
-  .feed-cat-name { font-size: 28px; }
-  .like-btn { font-size: 24px; }
-  .like-btn .like-count { font-size: 16px; }
-  .auth-area { font-size: 12px; }
-  .auth-area img { width: 26px; height: 26px; }
-  /* Landing responsive */
-  .landing-hero-title { font-size: 28px; letter-spacing: 1px; }
-  .landing-hero-subtitle { font-size: 16px; }
-  .landing-steps { grid-template-columns: 1fr; }
-  .landing-gallery { grid-template-columns: repeat(2, 1fr); }
-  .landing-hero { padding: 40px 16px 32px; }
-  .landing-section { padding: 28px 16px; }
-  .landing-cta-section { padding: 32px 16px; }
+
+/* --- Tablets & small desktops --- */
+@media (max-width: 900px) {
+  .header { flex-wrap: wrap; padding: 8px 12px; }
+  .header-brand { flex-wrap: wrap; gap: 6px; }
+  .header-community { display: none; }
+  .header h1 { font-size: 20px; }
+  .cat-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 400px) {
-  .ctrl-group { width: 100%; }
-  .feed-cat-name { font-size: 24px; }
-  .feed-owner { font-size: 12px; }
+
+/* --- Mobile phones --- */
+@media (max-width: 600px) {
+  .header { flex-direction: column; gap: 8px; align-items: stretch; }
+  .header-brand { justify-content: center; }
+  .header-right { justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .header h1 { font-size: 18px; letter-spacing: 1px; }
+
+  .nav { padding: 0 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .nav a { padding: 8px 14px; font-size: 14px; white-space: nowrap; }
+
+  .cat-grid { grid-template-columns: 1fr; gap: 10px; padding: 10px 8px; }
+
+  .controls { padding: 8px 10px; gap: 6px; }
+  .controls input[type="text"] { width: 100%; }
+  .ctrl-group { width: 100%; min-width: 0; }
+  .ctrl-group select { width: 100%; font-size: 14px; padding: 8px; }
+  .controls button, .controls label.ctrl-btn { width: 100%; padding: 10px; font-size: 14px; min-height: 44px; }
+  .save-info { margin-left: 0; width: 100%; flex-wrap: wrap; justify-content: center; }
+
+  .feed-card { border-radius: 0; box-shadow: none; border-left: none; border-right: none; }
+  .feed-grid { padding: 8px 0; gap: 12px; }
+  .feed-card-info { padding: 10px 12px; }
+  .feed-card-bottom { padding: 6px 12px 10px; }
+  .feed-cat-name { font-size: 22px; }
+  .feed-skills { gap: 5px; }
+  .card-actions .btn { min-height: 40px; padding: 8px 6px; font-size: 12px; }
+
+  .btn { min-height: 44px; padding: 10px 14px; }
+  .pagination { gap: 4px; }
+  .pagination button { padding: 8px 10px; font-size: 12px; min-height: 40px; }
+
+  .page-center { padding: 40px 16px; }
+  .upload-box { padding: 24px 16px; margin: 0 8px; }
+  .upload-box h2 { font-size: 18px; }
+
+  .modal { width: 95%; max-width: none; margin: 8px; }
+  .toast { left: 12px; right: 12px; bottom: 20px; text-align: center; }
+
+  .user-info { font-size: 12px; gap: 6px; }
+  .user-info img { width: 24px; height: 24px; }
+  .gen-counter { font-size: 11px; }
+  .btn-auth { padding: 8px 14px; font-size: 13px; }
+  .btn-logout { padding: 6px 10px; }
+
+  /* Landing page mobile */
+  .landing-hero { padding: 32px 12px 24px; }
+  .landing-hero-title { font-size: 24px; letter-spacing: 0.5px; }
+  .landing-hero-subtitle { font-size: 15px; }
+  .landing-hero-desc { font-size: 13px; }
+  .btn-cta { width: 100%; text-align: center; padding: 14px 20px; font-size: 16px; }
+  .landing-section { padding: 24px 12px; }
+  .landing-section-title { font-size: 22px; }
+  .landing-steps { grid-template-columns: 1fr; gap: 12px; }
+  .landing-step { padding: 18px 14px; }
+  .landing-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .landing-cta-section { padding: 28px 12px; }
+  .landing-cta-buttons { flex-direction: column; gap: 10px; width: 100%; }
+  .landing-cta-buttons .btn-google,
+  .landing-cta-buttons .btn-telegram { width: 100%; text-align: center; justify-content: center; }
+  .btn-telegram { padding: 12px 20px; }
+
+  /* Footer mobile */
+  .site-footer { padding: 20px 12px 16px; }
+  .footer-inner { flex-direction: column; gap: 16px; }
+  .footer-col { min-width: 0; }
+  .footer-bottom { font-size: 10px; }
+}
+
+/* --- Very small phones --- */
+@media (max-width: 380px) {
+  .landing-gallery { grid-template-columns: 1fr; }
+  .header h1 { font-size: 16px; }
+  .feed-cat-name { font-size: 20px; }
+  .nav a { padding: 8px 10px; font-size: 13px; }
+}
+
+/* --- Safe area support (notched phones) --- */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .site-footer { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(20px + env(safe-area-inset-bottom)); }
 }
